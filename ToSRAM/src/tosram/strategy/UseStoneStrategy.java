@@ -2,18 +2,17 @@ package tosram.strategy;
 
 import java.util.Deque;
 
-import tosram.ComboCalculator;
+import tosram.ComboDescriber;
 import tosram.Direction;
 import tosram.RuneMap;
 import tosram.RuneStone.Type;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
 
 /**
  * A strategy that restrict the usage of a specified type of stone.
  * 
  * @author johnchen902
  */
-public class UseStoneStrategy extends FilterStrategy {
+public class UseStoneStrategy extends FilterSolutionStrategy {
 
 	private final Type type;
 	private final int lower, upper;
@@ -32,7 +31,7 @@ public class UseStoneStrategy extends FilterStrategy {
 	 * @param upper
 	 *            the upper limit of the specified range (including)
 	 */
-	public UseStoneStrategy(Strategy next, Type type, int lower, int upper) {
+	public UseStoneStrategy(SolutionStrategy next, Type type, int lower, int upper) {
 		super(next);
 		if (lower > upper)
 			throw new IllegalArgumentException("lower > upper");
@@ -42,8 +41,8 @@ public class UseStoneStrategy extends FilterStrategy {
 	}
 
 	@Override
-	public void reset(RuneMap initial) {
-		super.reset(initial);
+	public void reset() {
+		super.reset();
 		minDifference = Integer.MAX_VALUE;
 	}
 
@@ -51,10 +50,11 @@ public class UseStoneStrategy extends FilterStrategy {
 	private int difference;
 
 	@Override
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack) {
-		super.submit(map, x, y, stack);
+	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
+			ComboDescriber cd) {
+		super.submit(map, x, y, stack, cd);
 		count = 0;
-		for (ComboCalculator.Combo ccc : getComboCalculator().getComboList())
+		for (ComboDescriber.Combo ccc : cd.getComboList())
 			if (ccc.getType() == type)
 				count += Long.bitCount(ccc.getMask());
 		difference = count > upper ? count - upper : lower > count ? lower

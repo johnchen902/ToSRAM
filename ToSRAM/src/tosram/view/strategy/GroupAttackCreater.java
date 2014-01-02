@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 
 import tosram.RuneStone.Type;
 import tosram.strategy.GroupAttackStrategy;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
+import tosram.strategy.SolutionStrategy;
 
 /**
  * A <code>StrategyCreater</code> who creates {@link GroupAttackStrategy}
@@ -33,7 +33,7 @@ public class GroupAttackCreater extends DefaultStrategyCreater {
 	}
 
 	@Override
-	public Strategy createStrategy(Strategy next) {
+	public SolutionStrategy createStrategy(SolutionStrategy next) {
 		return new GroupAttackStrategy(next, set);
 	}
 

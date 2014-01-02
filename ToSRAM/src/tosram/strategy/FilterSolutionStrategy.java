@@ -2,10 +2,9 @@ package tosram.strategy;
 
 import java.util.Deque;
 
-import tosram.ComboCalculator;
+import tosram.ComboDescriber;
 import tosram.Direction;
 import tosram.RuneMap;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
 
 /**
  * A <code>FilterStrategy</code> contains some other strategy, which it uses as
@@ -17,12 +16,12 @@ import tosram.strategy.StrategySearchPathRobot.Strategy;
  * 
  * @author johnchen902
  */
-public class FilterStrategy implements StrategySearchPathRobot.Strategy {
+public class FilterSolutionStrategy implements SolutionStrategy {
 
 	/**
 	 * The strategy to be filtered.
 	 */
-	protected final StrategySearchPathRobot.Strategy strategy;
+	protected final SolutionStrategy strategy;
 
 	/**
 	 * Creates a <code>FilterStrategy</code> by assigning the argument
@@ -32,33 +31,19 @@ public class FilterStrategy implements StrategySearchPathRobot.Strategy {
 	 * @param strategy
 	 *            the underlying strategy
 	 */
-	protected FilterStrategy(Strategy strategy) {
+	protected FilterSolutionStrategy(SolutionStrategy strategy) {
 		this.strategy = strategy;
 	}
 
 	@Override
-	public void reset(RuneMap initial) {
-		strategy.reset(initial);
+	public void reset() {
+		strategy.reset();
 	}
 
 	@Override
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack) {
-		strategy.submit(map, x, y, stack);
-	}
-
-	@Override
-	public ComboCalculator getComboCalculator() {
-		return strategy.getComboCalculator();
-	}
-
-	@Override
-	public boolean isToDiagonal() {
-		return strategy.isToDiagonal();
-	}
-
-	@Override
-	public boolean isToStop() {
-		return strategy.isToStop();
+	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
+			ComboDescriber cd) {
+		strategy.submit(map, x, y, stack, cd);
 	}
 
 	@Override

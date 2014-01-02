@@ -4,7 +4,7 @@ import java.awt.Component;
 
 import javax.swing.ListCellRenderer;
 
-import tosram.strategy.StrategySearchPathRobot.Strategy;
+import tosram.strategy.SolutionStrategy;
 
 /**
  * A <code>StrategyCreater</code> can create a <code>Strategy</code> and
@@ -22,7 +22,7 @@ public interface StrategyCreater extends ListCellRenderer<StrategyCreater> {
 	 *            the strategy used to break tie
 	 * @return constructed strategy
 	 */
-	public Strategy createStrategy(Strategy next);
+	public SolutionStrategy createStrategy(SolutionStrategy next);
 
 	/**
 	 * Show settings, usually a dialog.

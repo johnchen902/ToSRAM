@@ -21,8 +21,8 @@ import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 
-import tosram.strategy.LinearStrategy;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
+import tosram.strategy.NullSolutionStrategy;
+import tosram.strategy.SolutionStrategy;
 
 /**
  * A panel that let user choose and order some strategies and create final one
@@ -89,7 +89,6 @@ public class StrategyPanel extends JPanel {
 		model.addElement(new UseStoneCreater(tosram.RuneStone.Type.FIRE));
 		model.addElement(new SixInComboCreater());
 		model.addElement(new KComboCreater());
-		model.addElement(new WeatheringChooser());
 		return model;
 	}
 
@@ -98,8 +97,8 @@ public class StrategyPanel extends JPanel {
 	 * 
 	 * @return a <code>Strategy</code>
 	 */
-	public Strategy createStrategy() {
-		Strategy ss = LinearStrategy.createLinearStrategy();
+	public SolutionStrategy createStrategy() {
+		SolutionStrategy ss = new NullSolutionStrategy();
 		for (int i = listUsing.getModel().getSize() - 1; i >= 0; i--) {
 			StrategyCreater fsp = listUsing.getModel().getElementAt(i);
 			ss = fsp.createStrategy(ss);

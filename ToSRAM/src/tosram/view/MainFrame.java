@@ -11,8 +11,10 @@ import java.util.List;
 import javax.swing.*;
 
 import tosram.*;
+import tosram.strategy.ImprovementStrategy;
+import tosram.strategy.SearchStrategy;
+import tosram.strategy.SolutionStrategy;
 import tosram.strategy.StrategySearchPathRobot;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
 import tosram.view.strategy.StrategyPanel;
 
 /**
@@ -392,8 +394,9 @@ public class MainFrame extends JFrame {
 		private Thread thread;
 
 		public ComputionWorker() {
-			Strategy ss = strategyList.createStrategy();
-			pathRobot = new StrategySearchPathRobot(ss);
+			SearchStrategy ses = new ImprovementStrategy();
+			SolutionStrategy ss = strategyList.createStrategy();
+			pathRobot = new StrategySearchPathRobot(ses, ss);
 		}
 
 		public void interrupt() {

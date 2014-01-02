@@ -7,7 +7,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 
 import tosram.strategy.SixInComboStrategy;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
+import tosram.strategy.SolutionStrategy;
 
 /**
  * A <code>StrategyCreater</code> who creates {@link SixInComboStrategy}
@@ -26,7 +26,7 @@ public class SixInComboCreater extends DefaultStrategyCreater {
 	}
 
 	@Override
-	public Strategy createStrategy(Strategy next) {
+	public SolutionStrategy createStrategy(SolutionStrategy next) {
 		return new SixInComboStrategy(next, heartAllowed);
 	}
 

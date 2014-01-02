@@ -3,17 +3,18 @@ package tosram.strategy;
 import java.util.Arrays;
 import java.util.Deque;
 
+import tosram.ComboDescriber;
 import tosram.Direction;
 import tosram.RuneMap;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
 
 /**
  * A strategy that handles weathering stones.
  * 
  * @author johnchen902
  */
-public class WeatheringStrategy extends FilterStrategy {
+public class WeatheringStrategy implements SearchStrategy {
 
+	private final SearchStrategy strategy;
 	private final boolean[] mask; // true if weathering
 
 	/**
@@ -26,21 +27,33 @@ public class WeatheringStrategy extends FilterStrategy {
 	 *            at position <code>(x, y)</code> is a weathering stone;
 	 *            <code>false</code> otherwise
 	 */
-	public WeatheringStrategy(Strategy next, boolean[] mask) {
-		super(next);
+	public WeatheringStrategy(SearchStrategy next, boolean[] mask) {
+		strategy = next;
 		this.mask = Arrays.copyOf(mask, mask.length);
 	}
 
-	int position;
+	private int position;
 
 	@Override
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack) {
-		super.submit(map, x, y, stack);
+	public void reset() {
+		strategy.reset();
+	}
+
+	@Override
+	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
+			ComboDescriber cd) {
+		strategy.submit(map, x, y, stack, cd);
 		position = y * map.getWidth() + x;
 	}
 
 	@Override
 	public boolean isToStop() {
-		return mask[position] || super.isToStop();
+		return mask[position] || strategy.isToStop();
 	}
+
+	@Override
+	public boolean isToDiagonal() {
+		return strategy.isToDiagonal();
+	}
+
 }

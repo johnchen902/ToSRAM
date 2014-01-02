@@ -2,21 +2,19 @@ package tosram.strategy;
 
 import java.util.Deque;
 
-import tosram.ComboCalculator;
+import tosram.ComboDescriber;
 import tosram.Direction;
 import tosram.RuneMap;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
 
 /**
  * Stop if <code>steps >= combo * increaseLimit + initialLimit</code>.<br>
  * Diagonal if <code>combo >= diagonalCombo</code> and (
  * <code>diagonalBeforeStop == IGNORE </code>or<code>
  * steps + diagonalBeforeStop >= combo * increaseLimit + initialLimit</code>)<br>
- * All solutions are treated as equal.
  * 
  * @author johnchen902
  */
-public class LinearStrategy implements Strategy {
+public class LinearStrategy implements SearchStrategy {
 
 	/**
 	 * Ignore <code>diagonalBeforeStop</code>.
@@ -121,24 +119,18 @@ public class LinearStrategy implements Strategy {
 	}
 
 	@Override
-	public void reset(RuneMap initial) {
+	public void reset() {
 		// do nothing
 	}
 
-	private final ComboCalculator cc = new ComboCalculator();
 	private int combo;
 	private int steps;
 
 	@Override
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack) {
-		cc.setMap(map);
-		combo = cc.getCombo();
+	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
+			ComboDescriber cd) {
+		combo = cd.getCombo();
 		steps = stack.size();
-	}
-
-	@Override
-	public ComboCalculator getComboCalculator() {
-		return cc;
 	}
 
 	@Override
@@ -152,20 +144,4 @@ public class LinearStrategy implements Strategy {
 				&& (diagonalBeforeStop == IGNORE || steps + diagonalBeforeStop >= combo
 						* increaseLimit + initialLimit);
 	}
-
-	@Override
-	public int compareSolution() {
-		return 0;
-	}
-
-	@Override
-	public String getMilestone() {
-		return "!";
-	}
-
-	@Override
-	public void solutionAccepted() {
-		// do nothing
-	}
-
 }

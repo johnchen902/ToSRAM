@@ -7,11 +7,11 @@ import java.util.List;
 import tosram.RuneStone.Type;
 
 /**
- * Calculate combo of a map.
+ * A describer of combo in a map.
  * 
  * @author johnchen902
  */
-public class ComboCalculator {
+public class ComboDescriber {
 
 	private static final int WIDTH = 6;
 	private static final int HEIGHT = 5;
@@ -106,15 +106,14 @@ public class ComboCalculator {
 
 	private final List<Combo> comboList;
 
-	private ComboCalculator next;
+	private ComboDescriber next;
 
 	/**
 	 * Create an empty <code>MergeComboCalculator</code>
 	 */
-	public ComboCalculator() throws IllegalArgumentException {
+	public ComboDescriber() throws IllegalArgumentException {
 		this.map = new RuneMap(WIDTH, HEIGHT);
-		this.comboList = new ArrayList<ComboCalculator.Combo>(2 * (WIDTH - 2)
-				* (HEIGHT - 2));
+		this.comboList = new ArrayList<Combo>(2 * (WIDTH - 2) * (HEIGHT - 2));
 	}
 
 	/**
@@ -146,7 +145,7 @@ public class ComboCalculator {
 			fall(nextmap);
 			// consider stacking
 			if (next == null)
-				next = new ComboCalculator();
+				next = new ComboDescriber();
 			next.setMap(nextmap);
 			comboList.addAll(next.comboList);
 		}

@@ -1,7 +1,7 @@
 package tosram.view.strategy;
 
 import tosram.strategy.MinStepStrategy;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
+import tosram.strategy.SolutionStrategy;
 
 /**
  * A <code>StrategyCreater</code> who creates {@link MinStepStrategy}
@@ -18,7 +18,7 @@ public class MinStepCreater extends DefaultStrategyCreater {
 	}
 
 	@Override
-	public Strategy createStrategy(Strategy next) {
+	public SolutionStrategy createStrategy(SolutionStrategy next) {
 		return new MinStepStrategy(next);
 	}
 

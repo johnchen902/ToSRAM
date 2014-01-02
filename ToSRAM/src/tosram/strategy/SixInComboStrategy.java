@@ -1,18 +1,18 @@
 package tosram.strategy;
 
 import java.util.Deque;
-import tosram.ComboCalculator;
+
+import tosram.ComboDescriber;
 import tosram.Direction;
 import tosram.RuneMap;
 import tosram.RuneStone.Type;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
 
 /**
  * A strategy that requires six stones to be removed in the same combo.
  * 
  * @author johnchen902
  */
-public class SixInComboStrategy extends FilterStrategy {
+public class SixInComboStrategy extends FilterSolutionStrategy {
 
 	private final boolean heartAllowed;
 	private boolean bestHasSix;
@@ -26,24 +26,25 @@ public class SixInComboStrategy extends FilterStrategy {
 	 *            <code>true</code> if heart stones are counted;
 	 *            <code>false</code> otherwise
 	 */
-	public SixInComboStrategy(Strategy next, boolean heartAllowed) {
+	public SixInComboStrategy(SolutionStrategy next, boolean heartAllowed) {
 		super(next);
 		this.heartAllowed = heartAllowed;
 	}
 
 	@Override
-	public void reset(RuneMap initial) {
-		super.reset(initial);
+	public void reset() {
+		super.reset();
 		bestHasSix = false;
 	}
 
 	private boolean hasSix;
 
 	@Override
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack) {
-		super.submit(map, x, y, stack);
+	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
+			ComboDescriber cd) {
+		super.submit(map, x, y, stack, cd);
 		hasSix = false;
-		for (ComboCalculator.Combo ccc : getComboCalculator().getComboList()) {
+		for (ComboDescriber.Combo ccc : cd.getComboList()) {
 			if (Long.bitCount(ccc.getMask()) >= 6
 					&& (ccc.getType() != Type.HEART || heartAllowed)) {
 				hasSix = true;

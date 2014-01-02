@@ -2,16 +2,16 @@ package tosram.strategy;
 
 import java.util.Deque;
 
+import tosram.ComboDescriber;
 import tosram.Direction;
 import tosram.RuneMap;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
 
 /**
  * A strategy that tries to minimize steps.
  * 
  * @author johnchen902
  */
-public class MinStepStrategy extends FilterStrategy {
+public class MinStepStrategy extends FilterSolutionStrategy {
 	private int minSteps;
 
 	/**
@@ -21,21 +21,22 @@ public class MinStepStrategy extends FilterStrategy {
 	 * @param next
 	 *            the filtered strategy
 	 */
-	public MinStepStrategy(Strategy next) {
+	public MinStepStrategy(SolutionStrategy next) {
 		super(next);
 	}
 
 	@Override
-	public void reset(RuneMap initial) {
-		super.reset(initial);
+	public void reset() {
+		super.reset();
 		minSteps = Integer.MAX_VALUE;
 	}
 
 	private int steps;
 
 	@Override
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack) {
-		super.submit(map, x, y, stack);
+	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
+			ComboDescriber cd) {
+		super.submit(map, x, y, stack, cd);
 		steps = stack.size();
 	}
 

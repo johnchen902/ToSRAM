@@ -16,8 +16,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import tosram.RuneStone.Type;
+import tosram.strategy.SolutionStrategy;
 import tosram.strategy.UseStoneStrategy;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
 
 /**
  * A <code>StrategyCreater</code> who creates {@link UseStoneStrategy}
@@ -49,7 +49,7 @@ public class UseStoneCreater extends DefaultStrategyCreater {
 	}
 
 	@Override
-	public Strategy createStrategy(Strategy next) {
+	public SolutionStrategy createStrategy(SolutionStrategy next) {
 		return new UseStoneStrategy(next, type, lowerBound, upperBound);
 	}
 

@@ -13,7 +13,7 @@ import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import tosram.ComboCalculator;
+import tosram.ComboDescriber;
 import tosram.DefaultPath;
 import tosram.Direction;
 import tosram.Path;
@@ -30,100 +30,34 @@ import tosram.RuneStone;
  */
 public class StrategySearchPathRobot implements PathRobot {
 
-	/**
-	 * A strategy determines the range searched and the quality of the solution.
-	 * 
-	 * @author johnchen902
-	 */
-	public static interface Strategy {
-		/**
-		 * Clear the solutions found and set the initial map.
-		 * 
-		 * @param initial
-		 *            the initial map
-		 */
-		public void reset(RuneMap initial);
-
-		/**
-		 * Submit a solution and prepare to invoke other methods.
-		 * 
-		 * @param map
-		 *            the resulting <code>RuneMap</code>
-		 * @param x
-		 *            the X coordinate of the current location
-		 * @param y
-		 *            the Y coordinate of the current location
-		 * @param stack
-		 *            the directions of current path
-		 */
-		public void submit(RuneMap map, int x, int y, Deque<Direction> stack);
-
-		/**
-		 * Return a <code>ComboCalculator</code> of the submitted solution.
-		 * 
-		 * @return a <code>ComboCalculator</code>
-		 */
-		public ComboCalculator getComboCalculator();
-
-		/**
-		 * Do you want to move stones diagonally?
-		 * 
-		 * @return <code>true</code> if to move stones diagonally;
-		 *         <code>false</code> otherwise
-		 */
-		public boolean isToDiagonal();
-
-		/**
-		 * Do you want to stop this branch?
-		 * 
-		 * @return <code>true</code> if to stop this branch; <code>false</code>
-		 *         otherwise
-		 */
-		public boolean isToStop();
-
-		/**
-		 * Is the currently submitted solution better or worse than the
-		 * currently accepted solution?
-		 * 
-		 * @return a positive number if the currently submitted solution is
-		 *         better; a negative number if the currently submitted solution
-		 *         is worse; <code>0</code> if two solution are equally good
-		 */
-		public int compareSolution();
-
-		/**
-		 * Get a text description of this currently submitted solution.
-		 * 
-		 * @return a <code>String</code>
-		 */
-		public String getMilestone();
-
-		/**
-		 * Set the currently submitted solution to the currently accepted
-		 * solution, even if the solution become worse.
-		 */
-		public void solutionAccepted();
-	}
-
-	private final Strategy strategy;
+	private final SearchStrategy searchStrategy;
+	private final SolutionStrategy solutionStrategy;
+	private final ComboDescriber comboDescriber;
 	private StatusListener listener;
 	private Path bestSolution;
 
 	/**
-	 * Create a <code>StrategySearchPathRobot</code> with specified strategy.
+	 * Create a <code>StrategySearchPathRobot</code> with specified strategies.
 	 * 
-	 * @param strategy
-	 *            the strategy specified
+	 * @param searchStrategy
+	 *            the specified strategy about search
+	 * @param solutionStrategy
+	 *            the specified strategy about solution
 	 */
-	public StrategySearchPathRobot(Strategy strategy) {
-		if (strategy == null)
-			throw new NullPointerException("strategy");
-		this.strategy = strategy;
+	public StrategySearchPathRobot(SearchStrategy searchStrategy,
+			SolutionStrategy solutionStrategy) {
+		if (searchStrategy == null)
+			throw new NullPointerException("SearchStrategy");
+		if (solutionStrategy == null)
+			throw new NullPointerException("SolutionStrategy");
+		this.searchStrategy = searchStrategy;
+		this.solutionStrategy = solutionStrategy;
+		this.comboDescriber = new ComboDescriber();
 	}
 
 	@Override
 	public Path getPath(RuneMap stones) {
-		strategy.reset(stones);
+		solutionStrategy.reset();
 		bestSolution = null;
 
 		try {
@@ -174,22 +108,24 @@ public class StrategySearchPathRobot implements PathRobot {
 	// pB = the progress when this method starts
 	// pB + pI = the progress when this method ends
 	private void turn(RuneMap cc, int x, int y, double pB, double pI) {
-		strategy.submit(cc, x, y, stack);
+		comboDescriber.setMap(cc);
+		solutionStrategy.submit(cc, x, y, stack, comboDescriber);
 
-		if (strategy.compareSolution() > 0) {
-			strategy.solutionAccepted();
+		if (solutionStrategy.compareSolution() > 0) {
+			solutionStrategy.solutionAccepted();
 			bestSolution = new DefaultPath(new Point(bx, by), stack);
 			if (listener != null)
-				listener.updateMilestone(strategy.getMilestone());
+				listener.updateMilestone(solutionStrategy.getMilestone());
 		}
 
-		if (strategy.isToStop())
+		searchStrategy.submit(cc, x, y, stack, comboDescriber);
+		if (searchStrategy.isToStop())
 			return;
 
 		if (Thread.currentThread().isInterrupted())
 			return;
 
-		boolean diag = strategy.isToDiagonal();
+		boolean diag = searchStrategy.isToDiagonal();
 
 		setProgress(pB);
 

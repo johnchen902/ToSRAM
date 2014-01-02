@@ -1,7 +1,7 @@
 package tosram.view.strategy;
 
 import tosram.strategy.MaxComboStrategy;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
+import tosram.strategy.SolutionStrategy;
 
 /**
  * A <code>StrategyCreater</code> who creates {@link MaxComboStrategy}
@@ -18,7 +18,7 @@ public class MaxComboCreater extends DefaultStrategyCreater {
 	}
 
 	@Override
-	public Strategy createStrategy(Strategy next) {
+	public SolutionStrategy createStrategy(SolutionStrategy next) {
 		return new MaxComboStrategy(next);
 	}
 

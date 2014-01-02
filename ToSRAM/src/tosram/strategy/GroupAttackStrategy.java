@@ -3,18 +3,17 @@ package tosram.strategy;
 import java.util.Deque;
 import java.util.EnumSet;
 
-import tosram.ComboCalculator;
+import tosram.ComboDescriber;
 import tosram.Direction;
 import tosram.RuneMap;
 import tosram.RuneStone.Type;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
 
 /**
  * A strategy that tries to find most group attacks.
  * 
  * @author johnchen902
  */
-public class GroupAttackStrategy extends FilterStrategy {
+public class GroupAttackStrategy extends FilterSolutionStrategy {
 
 	private final EnumSet<Type> requirements;
 	private int bestGroupAttacks;
@@ -26,7 +25,7 @@ public class GroupAttackStrategy extends FilterStrategy {
 	 * @param next
 	 *            the filtered strategy
 	 */
-	public GroupAttackStrategy(Strategy next) {
+	public GroupAttackStrategy(SolutionStrategy next) {
 		this(next, EnumSet.complementOf(EnumSet.of(Type.HEART)));
 	}
 
@@ -39,7 +38,7 @@ public class GroupAttackStrategy extends FilterStrategy {
 	 * @param type
 	 *            the type of group attack required
 	 */
-	public GroupAttackStrategy(Strategy next, Type type) {
+	public GroupAttackStrategy(SolutionStrategy next, Type type) {
 		this(next, EnumSet.of(type));
 	}
 
@@ -52,24 +51,25 @@ public class GroupAttackStrategy extends FilterStrategy {
 	 * @param typeSet
 	 *            the set of type of group attack required
 	 */
-	public GroupAttackStrategy(Strategy next, EnumSet<Type> typeSet) {
+	public GroupAttackStrategy(SolutionStrategy next, EnumSet<Type> typeSet) {
 		super(next);
 		this.requirements = EnumSet.copyOf(typeSet);
 	}
 
 	@Override
-	public void reset(RuneMap initial) {
-		super.reset(initial);
+	public void reset() {
+		super.reset();
 		bestGroupAttacks = 0;
 	}
 
 	private int groupAttacks;
 
 	@Override
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack) {
-		super.submit(map, x, y, stack);
+	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
+			ComboDescriber cd) {
+		super.submit(map, x, y, stack, cd);
 		EnumSet<Type> types = EnumSet.noneOf(Type.class);
-		for (ComboCalculator.Combo ccc : getComboCalculator().getComboList()) {
+		for (ComboDescriber.Combo ccc : cd.getComboList()) {
 			if (Long.bitCount(ccc.getMask()) >= 5) {
 				types.add(ccc.getType());
 			}

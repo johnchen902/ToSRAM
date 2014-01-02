@@ -2,16 +2,16 @@ package tosram.strategy;
 
 import java.util.Deque;
 
+import tosram.ComboDescriber;
 import tosram.Direction;
 import tosram.RuneMap;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
 
 /**
  * A strategy that tries to maximize combo.
  * 
  * @author johnchen902
  */
-public class MaxComboStrategy extends FilterStrategy {
+public class MaxComboStrategy extends FilterSolutionStrategy {
 	private int maxCombo;
 
 	/**
@@ -21,22 +21,23 @@ public class MaxComboStrategy extends FilterStrategy {
 	 * @param next
 	 *            the filtered strategy
 	 */
-	public MaxComboStrategy(Strategy next) {
+	public MaxComboStrategy(SolutionStrategy next) {
 		super(next);
 	}
 
 	@Override
-	public void reset(RuneMap initial) {
-		super.reset(initial);
+	public void reset() {
+		super.reset();
 		maxCombo = -1;
 	}
 
 	private int combo;
 
 	@Override
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack) {
-		super.submit(map, x, y, stack);
-		combo = getComboCalculator().getCombo();
+	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
+			ComboDescriber cd) {
+		super.submit(map, x, y, stack, cd);
+		combo = cd.getCombo();
 	}
 
 	@Override

@@ -6,7 +6,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JSlider;
 
 import tosram.strategy.KComboStrategy;
-import tosram.strategy.StrategySearchPathRobot.Strategy;
+import tosram.strategy.SolutionStrategy;
 
 /**
  * A <code>StrategyCreater</code> who creates {@link KComboStrategy}
@@ -24,7 +24,7 @@ public class KComboCreater extends DefaultStrategyCreater {
 		super("K Combo");
 	}
 
-	public Strategy createStrategy(Strategy next) {
+	public SolutionStrategy createStrategy(SolutionStrategy next) {
 		return new KComboStrategy(next, combo);
 	}
 
