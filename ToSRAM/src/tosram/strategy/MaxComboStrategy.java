@@ -46,6 +46,12 @@ public class MaxComboStrategy extends FilterSolutionStrategy {
 	}
 
 	@Override
+	public double getQuality() {
+		// assume 0 <= combo <= 10
+		return combo * 0.09 + super.getQuality() * 0.1;
+	}
+
+	@Override
 	public String getMilestone() {
 		return combo + " combo " + super.getMilestone();
 	}

@@ -3,7 +3,6 @@ package tosram.strategy;
 import java.util.Arrays;
 import java.util.Deque;
 
-import tosram.ComboDescriber;
 import tosram.Direction;
 import tosram.RuneMap;
 
@@ -41,8 +40,8 @@ public class WeatheringStrategy implements SearchStrategy {
 
 	@Override
 	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			ComboDescriber cd) {
-		strategy.submit(map, x, y, stack, cd);
+			double quality) {
+		strategy.submit(map, x, y, stack, quality);
 		position = y * map.getWidth() + x;
 	}
 

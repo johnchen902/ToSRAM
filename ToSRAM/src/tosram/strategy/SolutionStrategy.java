@@ -38,22 +38,32 @@ public interface SolutionStrategy {
 	 * Compare the currently submitted solution and the currently accepted
 	 * solution.
 	 * 
-	 * @return a positive number if the currently submitted solution is
-	 *         better; a negative number if the currently submitted solution
-	 *         is worse; <code>0</code> if two solution are equally good
+	 * @return a positive number if the currently submitted solution is better;
+	 *         a negative number if the currently submitted solution is worse;
+	 *         <code>0</code> if two solution are equally good
 	 */
 	public int compareSolution();
 
 	/**
-	 * Get a text description of this currently submitted solution.
+	 * Get a rough measurement of quality of the currently submitted solution.
+	 * However, the quality does not guarantee the result of
+	 * {@link #compareSolution()}.
+	 * 
+	 * @return a <code>double</code> between <code>0.0</code> (worst) and
+	 *         <code>1.0</code> (best)
+	 */
+	public double getQuality();
+
+	/**
+	 * Get a text description of the currently submitted solution.
 	 * 
 	 * @return a <code>String</code>
 	 */
 	public String getMilestone();
 
 	/**
-	 * Set the currently submitted solution to the currently accepted
-	 * solution, even if the solution become worse.
+	 * Set the currently submitted solution to the currently accepted solution,
+	 * even if the solution become worse.
 	 */
 	public void solutionAccepted();
 }

@@ -3,7 +3,6 @@ package tosram.strategy;
 import java.util.Arrays;
 import java.util.Deque;
 
-import tosram.ComboDescriber;
 import tosram.Direction;
 import tosram.RuneMap;
 
@@ -11,36 +10,35 @@ public class ImprovementStrategy implements SearchStrategy {
 
 	private static final int MAX_STEP = 50;
 	private static final int HOPEFUL_STEP = 9;
-	private final double[] bestValue;
+	private final double[] bestQualities;
 
 	public ImprovementStrategy() {
-		bestValue = new double[MAX_STEP];
+		bestQualities = new double[MAX_STEP];
 	}
 
 	@Override
 	public void reset() {
-		Arrays.fill(bestValue, 0.0);
+		Arrays.fill(bestQualities, 0.0);
 	}
 
-	private int combo;
 	private int steps;
-	private double value;
+	private double quality;
 
 	@Override
 	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			ComboDescriber cc) {
-		combo = cc.getCombo();
+			double q) {
 		steps = stack.size();
-		value = combo / 10.0;
-		for (int i = steps; i < MAX_STEP && value > bestValue[i]; i++)
-			bestValue[i] = value;
+		quality = q;
+		for (int i = steps; i < MAX_STEP && quality > bestQualities[i]; i++)
+			bestQualities[i] = quality;
 	}
 
 	@Override
 	public boolean isToStop() {
 		if (steps >= MAX_STEP)
 			return true;
-		if (steps >= HOPEFUL_STEP && bestValue[steps - HOPEFUL_STEP] > value)
+		if (steps >= HOPEFUL_STEP
+				&& bestQualities[steps - HOPEFUL_STEP] > quality)
 			return true;
 		return false;
 	}

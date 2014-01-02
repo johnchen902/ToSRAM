@@ -86,6 +86,14 @@ public class GroupAttackStrategy extends FilterSolutionStrategy {
 	}
 
 	@Override
+	public double getQuality() {
+		final double weight = 0.2 + 0.1 * requirements.size();
+		final double weight1 = weight / requirements.size();
+		final double weight2 = 1 - weight;
+		return weight1 * groupAttacks + weight2 * super.getQuality();
+	}
+
+	@Override
 	public String getMilestone() {
 		return groupAttacks + "G.A. " + super.getMilestone();
 	}

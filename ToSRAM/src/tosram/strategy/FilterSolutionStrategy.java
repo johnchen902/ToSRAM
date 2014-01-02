@@ -52,6 +52,11 @@ public class FilterSolutionStrategy implements SolutionStrategy {
 	}
 
 	@Override
+	public double getQuality() {
+		return strategy.getQuality();
+	}
+
+	@Override
 	public String getMilestone() {
 		return strategy.getMilestone();
 	}

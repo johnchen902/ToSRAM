@@ -14,7 +14,7 @@ import tosram.RuneMap;
 public class KComboStrategy extends FilterSolutionStrategy {
 
 	private final int target;
-	private boolean bestHasK;
+	private int minDifference;
 
 	/**
 	 * Create a <code>KComboStrategy</code> that looks for exact
@@ -33,23 +33,30 @@ public class KComboStrategy extends FilterSolutionStrategy {
 	@Override
 	public void reset() {
 		super.reset();
-		bestHasK = false;
+		minDifference = Integer.MAX_VALUE;
 	}
 
 	private int combo;
+	private int difference;
 
 	@Override
 	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
 			ComboDescriber cd) {
 		super.submit(map, x, y, stack, cd);
 		combo = cd.getCombo();
+		difference = Math.abs(combo - target);
 	}
 
 	@Override
 	public int compareSolution() {
-		if ((combo == target) != bestHasK)
-			return combo == target ? 1 : -1;
+		if (difference != minDifference)
+			return difference < minDifference ? 1 : -1;
 		return super.compareSolution();
+	}
+
+	@Override
+	public double getQuality() {
+		return 0.06 * Math.max(5 - difference, 0) + 0.7 * super.getQuality();
 	}
 
 	@Override
@@ -60,7 +67,7 @@ public class KComboStrategy extends FilterSolutionStrategy {
 	@Override
 	public void solutionAccepted() {
 		super.solutionAccepted();
-		bestHasK = combo == target;
+		minDifference = difference;
 	}
 
 }

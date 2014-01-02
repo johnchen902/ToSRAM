@@ -31,7 +31,8 @@ public class UseStoneStrategy extends FilterSolutionStrategy {
 	 * @param upper
 	 *            the upper limit of the specified range (including)
 	 */
-	public UseStoneStrategy(SolutionStrategy next, Type type, int lower, int upper) {
+	public UseStoneStrategy(SolutionStrategy next, Type type, int lower,
+			int upper) {
 		super(next);
 		if (lower > upper)
 			throw new IllegalArgumentException("lower > upper");
@@ -66,6 +67,11 @@ public class UseStoneStrategy extends FilterSolutionStrategy {
 		if (minDifference != difference)
 			return minDifference - difference;
 		return super.compareSolution();
+	}
+
+	@Override
+	public double getQuality() {
+		return 0.06 * Math.max(5 - difference, 0) + 0.7 * super.getQuality();
 	}
 
 	@Override

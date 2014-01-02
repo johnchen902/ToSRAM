@@ -2,7 +2,6 @@ package tosram.strategy;
 
 import java.util.Deque;
 
-import tosram.ComboDescriber;
 import tosram.Direction;
 import tosram.RuneMap;
 
@@ -24,11 +23,11 @@ public interface SearchStrategy {
 	 *            the Y coordinate of the current location
 	 * @param stack
 	 *            the directions of current path
-	 * @param combos
-	 *            an description of combo of the map
+	 * @param quality
+	 *            the quality of the solution
 	 */
 	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			ComboDescriber combos);
+			double quality);
 
 	/**
 	 * Do you want to move stones diagonally?

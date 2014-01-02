@@ -23,6 +23,11 @@ public class NullSolutionStrategy implements SolutionStrategy {
 	}
 
 	@Override
+	public double getQuality() {
+		return 1.0;
+	}
+
+	@Override
 	public String getMilestone() {
 		return "!";
 	}

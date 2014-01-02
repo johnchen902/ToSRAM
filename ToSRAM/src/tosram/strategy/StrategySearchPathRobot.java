@@ -118,7 +118,7 @@ public class StrategySearchPathRobot implements PathRobot {
 				listener.updateMilestone(solutionStrategy.getMilestone());
 		}
 
-		searchStrategy.submit(cc, x, y, stack, comboDescriber);
+		searchStrategy.submit(cc, x, y, stack, solutionStrategy.getQuality());
 		if (searchStrategy.isToStop())
 			return;
 

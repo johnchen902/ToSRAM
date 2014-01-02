@@ -61,6 +61,14 @@ public class SixInComboStrategy extends FilterSolutionStrategy {
 	}
 
 	@Override
+	public double getQuality() {
+		if (hasSix)
+			return 0.3 + 0.7 * super.getQuality();
+		else
+			return 0.7 * super.getQuality();
+	}
+
+	@Override
 	public String getMilestone() {
 		if (hasSix)
 			return "with six " + super.getMilestone();
