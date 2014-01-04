@@ -11,7 +11,10 @@ import static tosram.Direction.WEST_SOUTH;
 
 import java.awt.Point;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
+import java.util.List;
 
 import tosram.ComboDescriber;
 import tosram.DefaultPath;
@@ -60,14 +63,20 @@ public class StrategySearchPathRobot implements PathRobot {
 		solutionStrategy.reset();
 		bestSolution = null;
 
+		List<Point> points = new ArrayList<>();
+		for (int y = 0; y < stones.getHeight(); y++)
+			for (int x = 0; x < stones.getWidth(); x++)
+				points.add(new Point(x, y));
+
+		Collections.shuffle(points);
+
 		try {
-			double subprogress = 1.0 / (stones.getWidth() * stones.getHeight());
+			double subprogress = 1.0 / points.size();
 			double curprogress = 0;
-			for (int y = 0; y < stones.getHeight(); y++)
-				for (int x = 0; x < stones.getWidth(); x++) {
-					compute(new RuneMap(stones), x, y, curprogress, subprogress);
-					curprogress += subprogress;
-				}
+			for (Point p : points) {
+				compute(new RuneMap(stones), p.x, p.y, curprogress, subprogress);
+				curprogress += subprogress;
+			}
 		} catch (Exception exception) {
 			if (listener != null)
 				listener.updateMilestone(exception.toString());
