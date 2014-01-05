@@ -1,5 +1,12 @@
 package tosram.view.strategy;
 
+import static java.awt.event.InputEvent.ALT_DOWN_MASK;
+import static java.awt.event.KeyEvent.VK_DOWN;
+import static java.awt.event.KeyEvent.VK_PAGE_DOWN;
+import static java.awt.event.KeyEvent.VK_PAGE_UP;
+import static java.awt.event.KeyEvent.VK_UP;
+import static javax.swing.KeyStroke.getKeyStroke;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.datatransfer.Transferable;
@@ -8,18 +15,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.DefaultListModel;
-import javax.swing.DropMode;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListCellRenderer;
-import javax.swing.SwingConstants;
-import javax.swing.TransferHandler;
+import javax.swing.*;
 
 import tosram.strategy.NullSolutionStrategy;
 import tosram.strategy.SolutionStrategy;
@@ -49,8 +45,8 @@ public class StrategyPanel extends JPanel {
 	private void initUI() {
 		setLayout(new BorderLayout(0, 0));
 
-		JLabel lblStrategies = new JLabel("Strategies");
-		lblStrategies.setLabelFor(this);
+		JLabel lblStrategies = new JLabel("Solution Strategies");
+		lblStrategies.setDisplayedMnemonic('o');
 		lblStrategies.setHorizontalAlignment(SwingConstants.CENTER);
 		add(lblStrategies, BorderLayout.NORTH);
 
@@ -58,6 +54,7 @@ public class StrategyPanel extends JPanel {
 		add(spUsing, BorderLayout.CENTER);
 
 		listUsing = new JList<>(usingModel = createInitialUsingModel());
+		lblStrategies.setLabelFor(listUsing);
 		listUsing.setCellRenderer(new StrategyCreaterRenderer());
 		listUsing.setDropMode(DropMode.INSERT);
 		listUsing.setDragEnabled(true);
@@ -66,6 +63,7 @@ public class StrategyPanel extends JPanel {
 		spUsing.setViewportView(listUsing);
 
 		btnAddRemove = new JButton("Add");
+		btnAddRemove.setMnemonic('d');
 		add(btnAddRemove, BorderLayout.SOUTH);
 		btnAddRemove.addActionListener(new AddListener());
 		btnAddRemove.setTransferHandler(new RemoveTransferHandler());
@@ -73,6 +71,30 @@ public class StrategyPanel extends JPanel {
 		listUnused = new JList<>(unusedModel = createInitialUnusedModel());
 		listUnused.setCellRenderer(new StrategyCreaterRenderer());
 		listUnused.addMouseListener(new SettingsMouseAdapter());
+
+		setInputActionMap();
+	}
+
+	private void setInputActionMap() {
+		InputMap im = listUsing.getInputMap();
+		im.put(getKeyStroke('\n'), "settings");
+		im.put(getKeyStroke('\b'), "remove");
+		im.put(getKeyStroke('\u007f'), "remove");
+		im.put(getKeyStroke(VK_UP, ALT_DOWN_MASK), "moveUp");
+		im.put(getKeyStroke(VK_DOWN, ALT_DOWN_MASK), "moveDown");
+		im.put(getKeyStroke(VK_PAGE_UP, ALT_DOWN_MASK), "moveTop");
+		im.put(getKeyStroke(VK_PAGE_DOWN, ALT_DOWN_MASK), "moveBottom");
+
+		ActionMap ac = listUsing.getActionMap();
+		ac.put("settings", new SettingsAction());
+		ac.put("remove", new RemoveAction());
+		ac.put("moveUp", new MoveAction(MoveAction.MOVE_UP));
+		ac.put("moveDown", new MoveAction(MoveAction.MOVE_DOWN));
+		ac.put("moveTop", new MoveAction(MoveAction.MOVE_TOP));
+		ac.put("moveBottom", new MoveAction(MoveAction.MOVE_BOTTOM));
+
+		listUnused.getInputMap().put(getKeyStroke('\n'), "settings");
+		listUnused.getActionMap().put("settings", new SettingsAction());
 	}
 
 	private DefaultListModel<StrategyCreater> createInitialUsingModel() {
@@ -127,9 +149,21 @@ public class StrategyPanel extends JPanel {
 				if (sid == -1)
 					return;
 				usingModel.addElement(unusedModel.remove(sid));
+				listUsing.setSelectedIndex(usingModel.size() - 1);
+				listUsing.requestFocusInWindow();
 			}
 		}
+	}
 
+	private class RemoveAction extends AbstractAction {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (e.getSource() == listUsing) {
+				int i = listUsing.getSelectedIndex();
+				if (i != -1)
+					unusedModel.addElement(usingModel.remove(i));
+			}
+		}
 	}
 
 	private class RemoveTransferHandler extends TransferHandler {
@@ -157,6 +191,17 @@ public class StrategyPanel extends JPanel {
 		}
 	}
 
+	private class SettingsAction extends AbstractAction {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			@SuppressWarnings("unchecked")
+			JList<StrategyCreater> src = (JList<StrategyCreater>) e.getSource();
+			StrategyCreater val = src.getSelectedValue();
+			if (val != null)
+				val.settings(StrategyPanel.this);
+		}
+	}
+
 	private class SettingsMouseAdapter extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -167,6 +212,46 @@ public class StrategyPanel extends JPanel {
 				StrategyCreater val = src.getSelectedValue();
 				if (val != null)
 					val.settings(StrategyPanel.this);
+			}
+		}
+	}
+
+	private class MoveAction extends AbstractAction {
+		public static final int MOVE_UP = 0;
+		public static final int MOVE_DOWN = 1;
+		public static final int MOVE_TOP = 2;
+		public static final int MOVE_BOTTOM = 3;
+
+		private final int move;
+
+		public MoveAction(int move) {
+			this.move = move;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (e.getSource() == listUsing) {
+				int i = listUsing.getSelectedIndex();
+				if (i != -1) {
+					int dest = getDestination(i, usingModel.size());
+					usingModel.add(dest, usingModel.remove(i));
+					listUsing.setSelectedIndex(dest);
+				}
+			}
+		}
+
+		private int getDestination(int from, int size) {
+			switch (move) {
+			case MOVE_UP:
+				return from == 0 ? 0 : from - 1;
+			case MOVE_DOWN:
+				return from == size - 1 ? size - 1 : from + 1;
+			case MOVE_TOP:
+				return 0;
+			case MOVE_BOTTOM:
+				return size - 1;
+			default:
+				return from;
 			}
 		}
 	}

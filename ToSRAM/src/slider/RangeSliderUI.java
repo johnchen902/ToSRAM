@@ -32,11 +32,14 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 
+import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JSlider;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -74,10 +77,21 @@ class RangeSliderUI extends BasicSliderUI {
 	/**
 	 * Installs this UI delegate on the specified component.
 	 */
+	@SuppressWarnings("serial")
 	@Override
 	public void installUI(JComponent c) {
 		upperThumbRect = new Rectangle();
 		super.installUI(c);
+		c.getInputMap().put(KeyStroke.getKeyStroke(' '), "toggleLowHigh");
+		c.getActionMap().put("toggleLowHigh", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (!lowerDragging && !upperDragging) {
+					upperThumbSelected = !upperThumbSelected;
+					slider.repaint();
+				}
+			}
+		});
 	}
 
 	/**
@@ -223,7 +237,10 @@ class RangeSliderUI extends BasicSliderUI {
 			g.translate(trackBounds.x, trackBounds.y + cy);
 
 			// Draw selected range.
-			g.setColor(rangeColor);
+			if (slider.isEnabled())
+				g.setColor(rangeColor);
+			else
+				g.setColor(new Color(0, 127, 0));
 			for (int y = 0; y <= 3; y++) {
 				g.drawLine(lowerX - trackBounds.x, y, upperX - trackBounds.x, y);
 			}
@@ -246,7 +263,10 @@ class RangeSliderUI extends BasicSliderUI {
 			g.translate(trackBounds.x + cx, trackBounds.y);
 
 			// Draw selected range.
-			g.setColor(rangeColor);
+			if (slider.isEnabled())
+				g.setColor(rangeColor);
+			else
+				g.setColor(new Color(0, 127, 0));
 			for (int x = 0; x <= 3; x++) {
 				g.drawLine(x, lowerY - trackBounds.y, x, upperY - trackBounds.y);
 			}
@@ -285,11 +305,19 @@ class RangeSliderUI extends BasicSliderUI {
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.translate(knobBounds.x, knobBounds.y);
 
-		g2d.setColor(Color.CYAN);
-		g2d.fill(thumbShape);
+		if (slider.isEnabled()) {
+			g2d.setColor(Color.CYAN);
+			g2d.fill(thumbShape);
 
-		g2d.setColor(Color.BLUE);
-		g2d.draw(thumbShape);
+			g2d.setColor(Color.BLUE);
+			g2d.draw(thumbShape);
+		} else {
+			g2d.setColor(new Color(0, 127, 127));
+			g2d.fill(thumbShape);
+
+			g2d.setColor(Color.BLACK);
+			g2d.draw(thumbShape);
+		}
 
 		// Dispose graphics.
 		g2d.dispose();
@@ -314,11 +342,19 @@ class RangeSliderUI extends BasicSliderUI {
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.translate(knobBounds.x, knobBounds.y);
 
-		g2d.setColor(Color.PINK);
-		g2d.fill(thumbShape);
+		if (slider.isEnabled()) {
+			g2d.setColor(Color.PINK);
+			g2d.fill(thumbShape);
 
-		g2d.setColor(Color.RED);
-		g2d.draw(thumbShape);
+			g2d.setColor(Color.RED);
+			g2d.draw(thumbShape);
+		} else {
+			g2d.setColor(new Color(127, 87, 87));
+			g2d.fill(thumbShape);
+
+			g2d.setColor(Color.BLACK);
+			g2d.draw(thumbShape);
+		}
 
 		// Dispose graphics.
 		g2d.dispose();
@@ -412,6 +448,24 @@ class RangeSliderUI extends BasicSliderUI {
 	 * Listener to handle mouse movements in the slider track.
 	 */
 	public class RangeTrackListener extends TrackListener {
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (!slider.isEnabled()) {
+				return;
+			}
+			if (upperThumbSelected) {
+				if (thumbRect.contains(e.getX(), e.getY())) {
+					upperThumbSelected = false;
+					slider.repaint();
+				}
+			} else {
+				if (upperThumbRect.contains(e.getX(), e.getY())) {
+					upperThumbSelected = true;
+					slider.repaint();
+				}
+			}
+		}
 
 		@Override
 		public void mousePressed(MouseEvent e) {

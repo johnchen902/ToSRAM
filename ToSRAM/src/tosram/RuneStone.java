@@ -123,11 +123,42 @@ public class RuneStone {
 		return type.ordinal() * 2 + (stronger ? 1 : 0);
 	}
 
+	/**
+	 * Return the string representation of this stone.
+	 * 
+	 * @return one of <code>"r"</code>, <code>"b"</code>, <code>"g"</code>,
+	 *         <code>"y"</code>, <code>"d"</code>, <code>"p"</code>,
+	 *         <code>"x"</code> or its upper case.
+	 */
 	@Override
 	public String toString() {
 		if (stronger)
 			return String.valueOf(Character.toUpperCase(type.getShortName()));
 		else
 			return String.valueOf(type.getShortName());
+	}
+
+	/**
+	 * Return a <code>RuneStone</code> from its string representation.
+	 * 
+	 * @param s
+	 *            one of <code>"r"</code>, <code>"b"</code>, <code>"g"</code>,
+	 *            <code>"y"</code>, <code>"d"</code>, <code>"p"</code>,
+	 *            <code>"x"</code> or its upper case.
+	 * @return the corresponding <code>RuneStone</code>
+	 * @throws IllegalArgumentException
+	 *             cannot find the corresponding <code>RuneStone</code>
+	 */
+	public static RuneStone valueOf(String s) {
+		if (s.length() != 1)
+			throw new IllegalArgumentException("No such stone: " + s);
+		char c = s.charAt(0);
+		char lowerC = Character.toLowerCase(c);
+		for (Type t : Type.values()) {
+			if (lowerC == t.getShortName()) {
+				return new RuneStone(t, Character.isUpperCase(c));
+			}
+		}
+		throw new IllegalArgumentException("No such stone: " + s);
 	}
 }

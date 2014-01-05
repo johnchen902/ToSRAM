@@ -5,9 +5,11 @@ import java.awt.Component;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.DropMode;
 import javax.swing.JComponent;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.TransferHandler;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -23,7 +25,7 @@ import tosram.RuneStone;
 @SuppressWarnings("serial")
 public class RuneMapTable extends JTable {
 	private RuneMapModel tableModel;
-	private boolean acceptDrop;
+	private boolean editable;
 
 	/**
 	 * Construct a table that <code>RuneMapTable</code>.
@@ -34,33 +36,35 @@ public class RuneMapTable extends JTable {
 		setDefaultRenderer(RuneStone.class, new RuneMapCellRenderer());
 		setDragEnabled(true);
 		setDropMode(DropMode.ON);
-		setAcceptDrop(true);
+		setEditable(true);
 	}
 
 	/**
-	 * Get whether drop operation is accepted.
+	 * Get whether the table is editable
 	 * 
-	 * @return a <code>true</code> if drop is accepted; <code>false</code> if
+	 * @return a <code>true</code> if the table is editable; <code>false</code>
 	 *         otherwise
 	 */
-	public boolean isAcceptDrop() {
-		return acceptDrop;
+	public boolean isEditable() {
+		return editable;
 	}
 
 	/**
-	 * Set whether drop operation is accepted.
+	 * Set whether the table is editable
 	 * 
-	 * @param acceptDrop
-	 *            <code>true</code> if drop is accepted; <code>false</code> if
+	 * @param editable
+	 *            <code>true</code> if the table is editable; <code>false</code>
 	 *            otherwise
 	 */
-	public void setAcceptDrop(boolean acceptDrop) {
-		if (this.acceptDrop != acceptDrop) {
-			this.acceptDrop = acceptDrop;
-			if (acceptDrop) {
+	public void setEditable(boolean editable) {
+		if (this.editable != editable) {
+			this.editable = editable;
+			if (editable) {
 				setTransferHandler(new ReadWriteTransferHandler());
+				setDefaultEditor(RuneStone.class, new RuneMapCellEditor());
 			} else {
 				setTransferHandler(new ReadOnlyTransferHandler());
+				setDefaultEditor(RuneStone.class, null);
 			}
 		}
 	}
@@ -158,6 +162,8 @@ public class RuneMapTable extends JTable {
 		@Override
 		protected void setValue(Object value) {
 			super.setValue(value);
+			if (value == null)
+				return;
 			RuneStone stone = (RuneStone) value;
 			switch (stone.getType()) {
 			case FIRE:
@@ -187,6 +193,37 @@ public class RuneMapTable extends JTable {
 				setForeground(Color.WHITE);
 			else
 				setForeground(Color.BLACK);
+		}
+	}
+
+	private static class RuneMapCellEditor extends DefaultCellEditor {
+		public RuneMapCellEditor() {
+			super(new JTextField(1));
+		}
+
+		@Override
+		public Component getTableCellEditorComponent(JTable table,
+				Object value, boolean isSelected, int row, int column) {
+			Component c = super.getTableCellEditorComponent(table, value,
+					isSelected, row, column);
+			c.setFont(table.getFont());
+			return c;
+		}
+
+		@Override
+		public boolean stopCellEditing() {
+			try {
+				RuneStone.valueOf(((JTextField) editorComponent).getText());
+			} catch (IllegalArgumentException e) {
+				editorComponent.getToolkit().beep();
+				return false;
+			}
+			return super.stopCellEditing();
+		}
+
+		@Override
+		public Object getCellEditorValue() {
+			return RuneStone.valueOf(((JTextField) editorComponent).getText());
 		}
 	}
 

@@ -1,14 +1,14 @@
 package tosram.view;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
+import java.awt.event.*;
+import java.beans.EventHandler;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
 
 import tosram.*;
 import tosram.strategy.ImprovementStrategy;
@@ -49,6 +49,8 @@ public class MainFrame extends JFrame {
 	private Path path;
 	private ComputionWorker computionWorker; // to be interrupted
 
+	private boolean settingsVisible;
+	private JSplitPane splitPane;
 	private JPanel pnMain;
 	private JPanel pnSide;
 
@@ -99,7 +101,17 @@ public class MainFrame extends JFrame {
 		initMainPanel();
 		initSidePanel();
 
-		hideSettings();
+		splitPane = new JSplitPane();
+		splitPane.setLeftComponent(pnMain);
+		splitPane.setRightComponent(pnSide);
+		splitPane.setBorder(null);
+		splitPane.setDividerLocation(384);
+		splitPane.setResizeWeight(2.0 / 3.0);
+
+		settingsVisible = true;
+
+		getContentPane().add(splitPane);
+		setSize(600, 400);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationByPlatform(true);
@@ -146,13 +158,21 @@ public class MainFrame extends JFrame {
 			{
 				JLayeredPane layeredPane = new JLayeredPane();
 				pnCenter.add(layeredPane);
+				layeredPane.addComponentListener(new ComponentAdapter() {
+					@Override
+					public void componentResized(ComponentEvent e) {
+						Component c = e.getComponent();
+						pnPath.setBounds(c.getBounds());
+						tbStones.setBounds(c.getBounds());
+						c.validate();
+						adjustRuneMapShown();
+					}
+				});
 
 				pnPath = new PathPanel();
-				pnPath.setBounds(0, 0, 189, 231);
 				layeredPane.add(pnPath, Integer.valueOf(2));
 
 				tbStones = new RuneMapTable();
-				tbStones.setBounds(0, 0, 189, 231);
 				layeredPane.add(tbStones, Integer.valueOf(1));
 				tbStones.setFont(tbStones.getFont().deriveFont(24f));
 			}
@@ -168,37 +188,44 @@ public class MainFrame extends JFrame {
 			JPanel pnSouth = new JPanel();
 			pnMain.add(pnSouth, BorderLayout.SOUTH);
 
+			JLabel lblMap = new JLabel("Map\u2191");
+			lblMap.setLabelFor(tbStones);
+			lblMap.setDisplayedMnemonic('m');
+			pnSouth.add(lblMap);
+
 			btnNext = new JButton("Next");
+			btnNext.setMnemonic('n');
 			pnSouth.add(btnNext);
 			btnNext.addActionListener(new NextActionListener());
 
 			btnBack = new JButton("Back");
+			btnBack.setMnemonic('b');
 			pnSouth.add(btnBack);
 			btnBack.addActionListener(new BackActionListener());
 
 			btnInterrupt = new JButton("Interrupt");
+			btnInterrupt.setMnemonic('i');
 			pnSouth.add(btnInterrupt);
 			btnInterrupt.addActionListener(new CancelActionListener());
 
-			chckbxSettings = new JCheckBox("Settings");
+			chckbxSettings = new JCheckBox("Settings", true);
+			chckbxSettings.setMnemonic('s');
 			pnSouth.add(chckbxSettings);
-			chckbxSettings.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if (chckbxSettings.isSelected())
-						showSettings();
-					else
-						hideSettings();
-				}
-			});
+			chckbxSettings.addActionListener(EventHandler.create(
+					ActionListener.class, this, "settingsVisible",
+					"source.selected"));
 		}
 	}
 
 	private void initSidePanel() {
-		pnSide = new JPanel(new GridLayout(2, 1));
+		pnSide = new JPanel(new GridLayout(1, 1));
+
+		JTabbedPane tabbedPane = new JTabbedPane();
+		pnSide.add(tabbedPane);
 		{
 			strategyList = new StrategyPanel();
-			pnSide.add(strategyList);
+			tabbedPane.addTab("Strategies", strategyList);
+			tabbedPane.setMnemonicAt(0, KeyEvent.VK_T);
 		}
 		{
 			RuneStone.Type[] types = RuneStone.Type.values();
@@ -212,30 +239,131 @@ public class MainFrame extends JFrame {
 			}
 
 			RuneMapTable rmt = new RuneMapTable();
-			rmt.setAcceptDrop(false);
+			rmt.setEditable(false);
+			rmt.setFont(rmt.getFont().deriveFont(24f));
 			rmt.setRuneMap(map0);
-			pnSide.add(new JScrollPane(rmt));
+			tabbedPane.addTab("Edit Map", rmt);
+		}
+		{
+			JPanel pn = new JPanel();
+			pn.setLayout(new BoxLayout(pn, BoxLayout.Y_AXIS));
+
+			final PathPanel.AnimationListener al = new PathPanel.AnimationListener() {
+				@Override
+				public void animationStop() {
+					setRuneMapShown(Paths.follow(realMap, path));
+				}
+
+				@Override
+				public void animationStart() {
+					setRuneMapShown(realMap);
+				}
+
+				@Override
+				public void animate(int index) {
+					setRuneMapShown(Paths.follow(realMap, path, index + 1));
+				}
+			};
+
+			JCheckBox cbx = new JCheckBox("Animate stones");
+			cbx.setMnemonic('o');
+			cbx.setAlignmentX(Component.CENTER_ALIGNMENT);
+			pn.add(cbx);
+			cbx.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						pnPath.addAnimationListener(al);
+					} else {
+						pnPath.removeAnimationListener(al);
+						if (realMap != null && path != null)
+							setRuneMapShown(Paths.follow(realMap, path));
+					}
+				}
+			});
+
+			JLabel lb1 = new JLabel("Small Delay (90 ~ 1000)");
+			lb1.setDisplayedMnemonic('d');
+			lb1.setAlignmentX(Component.CENTER_ALIGNMENT);
+			pn.add(lb1);
+
+			JSpinner sp1 = new JSpinner(new SpinnerNumberModel(
+					pnPath.getSmallDelay(), 90, 1000, 10));
+			lb1.setLabelFor(sp1);
+			sp1.addChangeListener(EventHandler.create(ChangeListener.class,
+					pnPath, "smallDelay", "source.value"));
+			pn.add(sp1);
+
+			JLabel lb2 = new JLabel("Big Delay (500 ~ 15000)");
+			lb2.setDisplayedMnemonic('e');
+			lb2.setAlignmentX(Component.CENTER_ALIGNMENT);
+			pn.add(lb2);
+
+			JSpinner sp2 = new JSpinner(new SpinnerNumberModel(
+					pnPath.getBigDelay(), 500, 15000, 500));
+			lb2.setLabelFor(sp2);
+			sp2.addChangeListener(EventHandler.create(ChangeListener.class,
+					pnPath, "bigDelay", "source.value"));
+			pn.add(sp2);
+
+			pn.add(Box.createVerticalGlue());
+
+			JPanel pnWrapper = new JPanel();
+			pnWrapper.add(pn);
+			tabbedPane.addTab("Animation Settings", pnWrapper);
+			tabbedPane.setMnemonicAt(2, KeyEvent.VK_A);
 		}
 	}
 
+	/**
+	 * Set whether the settings is visible.
+	 * 
+	 * @param visible
+	 *            <code>true</code> if the settings are visible;
+	 *            <code>false</code> otherwise
+	 */
+	public void setSettingsVisible(boolean visible) {
+		if (visible != settingsVisible) {
+			if (visible) {
+				showSettings();
+			} else {
+				hideSettings();
+			}
+			settingsVisible = visible;
+		}
+	}
+
+	/**
+	 * Get whether the settings is visible
+	 * 
+	 * @return <code>true</code> if the settings are visible; <code>false</code>
+	 *         otherwise
+	 */
+	public boolean isSettingsVisible() {
+		return settingsVisible;
+	}
+
 	private void showSettings() {
-		int width0 = pnMain.getWidth();
-		getContentPane().removeAll();
-		JSplitPane sp = new JSplitPane();
-		sp.setBorder(null);
-		sp.setLeftComponent(pnMain);
-		sp.setRightComponent(pnSide);
-		sp.setDividerLocation(width0);
-		sp.setResizeWeight(2.0 / 3.0);
-		getContentPane().add(sp);
-		setSize(600, 400);
+		int mainWidth = pnMain.getWidth();
+		int sideWidth = mainWidth * 200 / 384;
+		int insetsBoth = getInsets().left + getInsets().right;
+		int height = getHeight();
+		getContentPane().remove(pnMain);
+		splitPane.setLeftComponent(pnMain);
+		splitPane.setRightComponent(pnSide);
+		getContentPane().add(splitPane);
+		setSize(insetsBoth + mainWidth + sideWidth, height);
 		validate();
+		splitPane.setDividerLocation(mainWidth);
 	}
 
 	private void hideSettings() {
-		getContentPane().removeAll();
+		int mainWidth = pnMain.getWidth();
+		int insetsBoth = getInsets().left + getInsets().right;
+		int height = getHeight();
+		getContentPane().remove(splitPane);
 		getContentPane().add(pnMain);
-		setSize(400, 400);
+		setSize(insetsBoth + mainWidth, height);
 		validate();
 	}
 
@@ -539,6 +667,7 @@ public class MainFrame extends JFrame {
 			setStatus("Getting map...");
 			setPath(null);
 			new ReadStoneWorker().execute();
+			requestFocus();
 		}
 
 	}
@@ -590,13 +719,17 @@ public class MainFrame extends JFrame {
 	private void setRuneMapShown(RuneMap map) {
 		tbStones.setRuneMap(map);
 		if (map != null) {
-			float tableWidth = tbStones.getWidth();
-			float tableHeight = 0f;
-			for (int row = 0; row < tbStones.getRowCount(); row++)
-				tableHeight += tbStones.getRowHeight(row);
-			pnPath.setCellSize(tableWidth / tbStones.getColumnCount(),
-					tableHeight / tbStones.getRowCount());
+			adjustRuneMapShown();
 		}
+	}
+
+	private void adjustRuneMapShown() {
+		float tableWidth = tbStones.getWidth();
+		float tableHeight = 0f;
+		for (int row = 0; row < tbStones.getRowCount(); row++)
+			tableHeight += tbStones.getRowHeight(row);
+		pnPath.setCellSize(tableWidth / tbStones.getColumnCount(), tableHeight
+				/ tbStones.getRowCount());
 	}
 
 }

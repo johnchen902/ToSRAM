@@ -2,6 +2,7 @@ package tosram.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
@@ -59,6 +60,7 @@ public class SubimageChooser extends JDialog {
 
 		panel = new ImagePanel();
 		scroll.setViewportView(panel);
+		panel.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 
 		setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getMaximumWindowBounds());
