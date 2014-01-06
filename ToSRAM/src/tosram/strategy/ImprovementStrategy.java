@@ -6,6 +6,12 @@ import java.util.Deque;
 import tosram.Direction;
 import tosram.RuneMap;
 
+/**
+ * A search strategy that permits a branch when it determines that branch is
+ * improving.
+ * 
+ * @author johnchen902
+ */
 public class ImprovementStrategy implements SearchStrategy {
 
 	private static final int MAX_STEP = 50;

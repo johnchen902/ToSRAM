@@ -24,7 +24,7 @@ public class NullSolutionStrategy implements SolutionStrategy {
 
 	@Override
 	public double getQuality() {
-		return 1.0;
+		return 0.5;
 	}
 
 	@Override

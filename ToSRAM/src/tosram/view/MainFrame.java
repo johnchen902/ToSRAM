@@ -11,10 +11,10 @@ import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
 import tosram.*;
-import tosram.strategy.ImprovementStrategy;
 import tosram.strategy.SearchStrategy;
 import tosram.strategy.SolutionStrategy;
 import tosram.strategy.StrategySearchPathRobot;
+import tosram.view.strategy.SearchStrategyPanel;
 import tosram.view.strategy.StrategyPanel;
 
 /**
@@ -67,7 +67,8 @@ public class MainFrame extends JFrame {
 	private JButton btnInterrupt; // the "Interrupt" button
 	private JCheckBox chckbxSettings; // toggle settings
 
-	private StrategyPanel strategyList;
+	private StrategyPanel strategyPane;
+	private SearchStrategyPanel searchStrategyPane;
 
 	private final Robot awtRobot;
 
@@ -223,9 +224,14 @@ public class MainFrame extends JFrame {
 		JTabbedPane tabbedPane = new JTabbedPane();
 		pnSide.add(tabbedPane);
 		{
-			strategyList = new StrategyPanel();
-			tabbedPane.addTab("Strategies", strategyList);
+			strategyPane = new StrategyPanel();
+			tabbedPane.addTab("Strategies", strategyPane);
 			tabbedPane.setMnemonicAt(0, KeyEvent.VK_T);
+		}
+		{
+			searchStrategyPane = new SearchStrategyPanel();
+			tabbedPane.addTab("Searching", searchStrategyPane);
+			tabbedPane.setMnemonicAt(1, KeyEvent.VK_E);
 		}
 		{
 			RuneStone.Type[] types = RuneStone.Type.values();
@@ -310,8 +316,8 @@ public class MainFrame extends JFrame {
 
 			JPanel pnWrapper = new JPanel();
 			pnWrapper.add(pn);
-			tabbedPane.addTab("Animation Settings", pnWrapper);
-			tabbedPane.setMnemonicAt(2, KeyEvent.VK_A);
+			tabbedPane.addTab("Animation", pnWrapper);
+			tabbedPane.setMnemonicAt(3, KeyEvent.VK_A);
 		}
 	}
 
@@ -522,8 +528,8 @@ public class MainFrame extends JFrame {
 		private Thread thread;
 
 		public ComputionWorker() {
-			SearchStrategy ses = new ImprovementStrategy();
-			SolutionStrategy ss = strategyList.createStrategy();
+			SearchStrategy ses = searchStrategyPane.createSearchStrategy();
+			SolutionStrategy ss = strategyPane.createStrategy();
 			pathRobot = new StrategySearchPathRobot(ses, ss);
 		}
 
