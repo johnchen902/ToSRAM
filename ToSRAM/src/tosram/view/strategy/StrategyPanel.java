@@ -111,7 +111,6 @@ public class StrategyPanel extends JPanel {
 		model.addElement(new UseStoneCreater(tosram.RuneStone.Type.FIRE));
 		model.addElement(new SixInComboCreater());
 		model.addElement(new KComboCreater());
-		model.addElement(new RandomQualityCreater());
 		return model;
 	}
 

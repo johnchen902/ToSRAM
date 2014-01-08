@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.beans.EventHandler;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -14,16 +15,30 @@ import javax.swing.JPanel;
 import tosram.strategy.ImprovementStrategy;
 import tosram.strategy.LinearStrategy;
 import tosram.strategy.SearchStrategy;
+import tosram.strategy.StepLimitStrategy;
 import tosram.strategy.WeatheringStrategy;
-import javax.swing.JLabel;
 
+import javax.swing.JLabel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+
+/**
+ * A panel that let user choose a {@link SearchStrategy}.
+ * 
+ * @author johnchen902
+ */
 @SuppressWarnings("serial")
 public class SearchStrategyPanel extends JPanel {
 
 	private JComboBox<String> comboBox;
+	private JCheckBox chckbxStepLimit;
+	private JSpinner spnStepLimit;
 	private JCheckBox chckbxWeathering;
 	private JCheckBox[] chckbxWeatherStones;
 
+	/**
+	 * Just constructor.
+	 */
 	public SearchStrategyPanel() {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -37,6 +52,21 @@ public class SearchStrategyPanel extends JPanel {
 		comboBox.addItem("Improvement");
 		comboBox.addItem("Linear");
 		add(comboBox);
+
+		add(Box.createVerticalGlue());
+
+		chckbxStepLimit = new JCheckBox("Step Limit");
+		chckbxStepLimit.setAlignmentX(Component.CENTER_ALIGNMENT);
+		add(chckbxStepLimit);
+
+		spnStepLimit = new JSpinner();
+		spnStepLimit.setEnabled(false);
+		spnStepLimit.setModel(new SpinnerNumberModel(20, 1, 50, 1));
+		add(spnStepLimit);
+		chckbxStepLimit.addItemListener(EventHandler.create(ItemListener.class,
+				spnStepLimit, "enabled", "source.selected"));
+
+		add(Box.createVerticalGlue());
 
 		chckbxWeathering = new JCheckBox("Weathering");
 		chckbxWeathering.setMnemonic('w');
@@ -69,6 +99,9 @@ public class SearchStrategyPanel extends JPanel {
 			ss = new ImprovementStrategy();
 		else
 			ss = new LinearStrategy();
+		if (chckbxStepLimit.isSelected()) {
+			ss = new StepLimitStrategy(ss, (int) spnStepLimit.getValue());
+		}
 		if (chckbxWeathering.isSelected()) {
 			boolean[] bools = new boolean[30];
 			for (int i = 0; i < 30; i++)
