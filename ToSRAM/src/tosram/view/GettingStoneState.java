@@ -2,6 +2,8 @@ package tosram.view;
 
 import java.awt.Rectangle;
 import java.awt.Robot;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.SwingWorker;
@@ -14,12 +16,23 @@ import tosram.RuneStoneGetter;
 class GettingStoneState implements MFState {
 
 	private MainFrame frame;
+	private ActionListener interrupt;
+	private volatile boolean interrupted;
 
 	@Override
 	public void checkIn(MainFrame f0) {
 		frame = f0;
 		frame.setStatus("Getting map...");
 		frame.setPath(null);
+		interrupted = false;
+		frame.getInterruptButton().setEnabled(true);
+		frame.getInterruptButton().addActionListener(
+				interrupt = new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						interrupted = true;
+					}
+				});
 		new GettingStoneWorker().execute();
 	}
 
@@ -36,7 +49,7 @@ class GettingStoneState implements MFState {
 
 			RuneMap map = rsg.getRuneStones(robot.createScreenCapture(rect));
 
-			while (true) {
+			while (!interrupted) {
 				robot.delay(DELAY_BETWEEN_READ_STONE);
 				RuneMap prevmap = map;
 				map = rsg.getRuneStones(robot.createScreenCapture(rect));
@@ -70,6 +83,10 @@ class GettingStoneState implements MFState {
 			} catch (Exception ignore) {
 				ignore.printStackTrace();
 			}
+
+			frame.getInterruptButton().setEnabled(false);
+			frame.getInterruptButton().removeActionListener(interrupt);
+
 			frame.transferState(new ToComputeState());
 		}
 

@@ -278,7 +278,7 @@ public class MainFrame extends JFrame {
 			pn.add(sp1);
 
 			JLabel lb2 = new JLabel("Big Delay (500 ~ 15000)");
-			lb2.setDisplayedMnemonic('e');
+			lb2.setDisplayedMnemonic('l');
 			lb2.setAlignmentX(Component.CENTER_ALIGNMENT);
 			pn.add(lb2);
 
@@ -293,7 +293,7 @@ public class MainFrame extends JFrame {
 
 			JPanel pnWrapper = new JPanel();
 			pnWrapper.add(pn);
-			tabbedPane.addTab("Animation", pnWrapper);
+			tabbedPane.addTab("Miscellaneous", pnWrapper);
 			tabbedPane.setMnemonicAt(3, KeyEvent.VK_A);
 		}
 	}
