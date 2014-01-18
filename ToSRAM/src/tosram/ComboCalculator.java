@@ -7,16 +7,86 @@ import java.util.List;
 import tosram.RuneStone.Type;
 
 /**
- * A describer of combo in a map.
+ * A calculator of combo in a map.
  * 
  * @author johnchen902
  */
-public class ComboDescriber {
+public class ComboCalculator {
 
 	private static final int WIDTH = 6;
 	private static final int HEIGHT = 5;
 	private static final long MIN_HORIZONTAL = 0b00001110_00000000;
 	private static final long MIN_VERTICAL = 0b00000010_00000010_00000010_00000000;
+
+	/**
+	 * A describer of combo in a map.
+	 * 
+	 * @author johnchen902
+	 */
+	public static class Describer {
+		private final List<Combo> comboList;
+		private/* lazy-initialization */List<Combo> fullComboList;
+		private final Describer stacked;
+
+		private Describer() {
+			this(Collections.<Combo> emptyList(), null);
+		}
+
+		private Describer(List<Combo> comboList, Describer nextComboDescriber) {
+			this.comboList = comboList;
+			this.stacked = nextComboDescriber;
+		}
+
+		/**
+		 * Get the list of combo in this map, excluding combo caused by
+		 * stacking.
+		 * 
+		 * @return a list of combo
+		 */
+		public List<Combo> getPartialComboList() {
+			return Collections.unmodifiableList(comboList);
+		}
+
+		/**
+		 * Get the list of combo in this map, including combo caused by
+		 * stacking.
+		 * 
+		 * @return a list of combo
+		 */
+		public List<Combo> getFullComboList() {
+			if (fullComboList == null) {
+				fullComboList = new ArrayList<Combo>();
+				for (Describer cd = this; cd != null; cd = cd.getStacked())
+					fullComboList.addAll(cd.comboList);
+			}
+			return Collections.unmodifiableList(fullComboList);
+		}
+
+		/**
+		 * Get the number of combo in this map, including combo caused by
+		 * stacking. Equivalent to <code>getFullComboList().size()</code>
+		 * 
+		 * @return the number of combo
+		 */
+		public int getFullComboCount() {
+			if (fullComboList == null) {
+				int count = 0;
+				for (Describer cd = this; cd != null; cd = cd.getStacked())
+					count += cd.comboList.size();
+				return count;
+			} else
+				return fullComboList.size();
+		}
+
+		/**
+		 * Get the combo caused by stacking
+		 * 
+		 * @return an <code>Describer</code>
+		 */
+		public Describer getStacked() {
+			return stacked;
+		}
+	}
 
 	/**
 	 * A combo consists of two element: the location and shape of combo and the
@@ -29,7 +99,7 @@ public class ComboDescriber {
 		private/* mutable */long mask; // see getMask
 		private final Type type;
 
-		private Combo(long mask, Type type) {
+		public Combo(long mask, Type type) {
 			this.mask = mask;
 			this.type = type;
 		}
@@ -102,37 +172,19 @@ public class ComboDescriber {
 		}
 	}
 
-	private final RuneMap map;
-
-	private final List<Combo> comboList;
-
-	private ComboDescriber next;
-
-	/**
-	 * Create an empty <code>MergeComboCalculator</code>
-	 */
-	public ComboDescriber() throws IllegalArgumentException {
-		this.map = new RuneMap(WIDTH, HEIGHT);
-		this.comboList = new ArrayList<Combo>(2 * (WIDTH - 2) * (HEIGHT - 2));
-	}
-
 	/**
 	 * Set the map to compute.
 	 * 
 	 * @param that
 	 *            the map being computed
 	 */
-	public void setMap(RuneMap that) {
-		map.assign(that);
-		calculate();
-	}
-
-	private void calculate() {
-		comboList.clear();
-		scanForHorizontalCombo();
-		scanForVerticalCombo();
+	public static Describer getDescriber(RuneMap map) {
+		List<Combo> comboList = new ArrayList<Combo>(2 * (WIDTH - 2)
+				* (HEIGHT - 2));
+		scanForHorizontalCombo(map, comboList);
+		scanForVerticalCombo(map, comboList);
 		if (comboList.size() > 0) {
-			merge();
+			merge(comboList);
 			// remove zeroes
 			int j = 0;
 			for (int i = 0; i < comboList.size(); i++)
@@ -141,35 +193,15 @@ public class ComboDescriber {
 			while (comboList.size() > j)
 				comboList.remove(comboList.size() - 1);
 			// remove
-			RuneMap nextmap = remove();
+			RuneMap nextmap = remove(map, comboList);
 			fall(nextmap);
 			// consider stacking
-			if (next == null)
-				next = new ComboDescriber();
-			next.setMap(nextmap);
-			comboList.addAll(next.comboList);
+			return new Describer(comboList, getDescriber(nextmap));
 		}
+		return new Describer();
 	}
 
-	/**
-	 * Get the list of <code>Combo</code> of this map.
-	 * 
-	 * @return a <code>List</code> of <code>Combo</code>
-	 */
-	public List<Combo> getComboList() {
-		return Collections.unmodifiableList(comboList);
-	}
-
-	/**
-	 * Get the number of combo of this map.
-	 * 
-	 * @return the number of combo
-	 */
-	public int getCombo() {
-		return comboList.size();
-	}
-
-	private Type typeOf(int x, int y) {
+	private static Type typeOf(RuneMap map, int x, int y) {
 		return map.getStone(x, y).getType();
 	}
 
@@ -179,19 +211,21 @@ public class ComboDescriber {
 	}
 
 	// scan for three in a row horizontally
-	private void scanForHorizontalCombo() {
+	private static void scanForHorizontalCombo(RuneMap map,
+			List<Combo> comboList) {
 		for (int y = 0; y < HEIGHT; y++) {
 			for (int x = 0; x < WIDTH - 2; x++) {
-				Type type = typeOf(x + 2, y);
+				Type type = typeOf(map, x + 2, y);
 				if (type == Type.UNKNOWN) {
 					x += 2;
 				} else {
-					if (typeOf(x + 1, y) == type) {
-						if (typeOf(x, y) == type) {
+					if (typeOf(map, x + 1, y) == type) {
+						if (typeOf(map, x, y) == type) {
 							long mask = MIN_HORIZONTAL << (y * (WIDTH + 2) + x);
 							comboList.add(new Combo(mask, type));
 						}
-						for (x++; x < WIDTH - 2 && type == typeOf(x + 2, y); x++) {
+						for (x++; x < WIDTH - 2
+								&& type == typeOf(map, x + 2, y); x++) {
 							long mask = MIN_HORIZONTAL << (y * (WIDTH + 2) + x);
 							comboList.add(new Combo(mask, type));
 						}
@@ -212,19 +246,20 @@ public class ComboDescriber {
 	}
 
 	// scan for three in a row vertically
-	private void scanForVerticalCombo() {
+	private static void scanForVerticalCombo(RuneMap map, List<Combo> comboList) {
 		for (int x = 0; x < WIDTH; x++) {
 			for (int y = 0; y < HEIGHT - 2; y++) {
-				Type type = typeOf(x, y + 2);
+				Type type = typeOf(map, x, y + 2);
 				if (type == Type.UNKNOWN) {
 					y += 2;
 				} else {
-					if (typeOf(x, y + 1) == type) {
-						if (typeOf(x, y) == type) {
+					if (typeOf(map, x, y + 1) == type) {
+						if (typeOf(map, x, y) == type) {
 							long mask = MIN_VERTICAL << (y * (WIDTH + 2) + x);
 							comboList.add(new Combo(mask, type));
 						}
-						for (y++; y < HEIGHT - 2 && type == typeOf(x, y + 2); y++) {
+						for (y++; y < HEIGHT - 2
+								&& type == typeOf(map, x, y + 2); y++) {
 							long mask = MIN_VERTICAL << (y * (WIDTH + 2) + x);
 							comboList.add(new Combo(mask, type));
 						}
@@ -245,7 +280,7 @@ public class ComboDescriber {
 	}
 
 	// combine neighboring or overlapping combos
-	private void merge() {
+	private static void merge(List<Combo> comboList) {
 		for (int i = 0; i < comboList.size(); i++) {
 			final Combo c1 = comboList.get(i);
 			if (c1.mask == 0)
@@ -267,7 +302,7 @@ public class ComboDescriber {
 	}
 
 	// remove used stones
-	private RuneMap remove() {
+	private static RuneMap remove(RuneMap map, List<Combo> comboList) {
 		RuneMap nextmap = new RuneMap(map);
 		for (Combo c : comboList) {
 			// mask &= mask - 1: remove lowest one bit
@@ -282,7 +317,7 @@ public class ComboDescriber {
 	}
 
 	// fall
-	private void fall(RuneMap nextmap) {
+	private static void fall(RuneMap nextmap) {
 		for (int x = 0; x < WIDTH; x++) {
 			for (int y = HEIGHT - 1, y2 = HEIGHT; y >= 0; y--) {
 				do {

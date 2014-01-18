@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 
-import tosram.ComboDescriber;
+import tosram.ComboCalculator;
 import tosram.DefaultPath;
 import tosram.Direction;
 import tosram.Path;
@@ -35,7 +35,6 @@ public class StrategySearchPathRobot implements PathRobot {
 
 	private final SearchStrategy searchStrategy;
 	private final SolutionStrategy solutionStrategy;
-	private final ComboDescriber comboDescriber;
 	private StatusListener listener;
 	private Path bestSolution;
 
@@ -55,7 +54,6 @@ public class StrategySearchPathRobot implements PathRobot {
 			throw new NullPointerException("SolutionStrategy");
 		this.searchStrategy = searchStrategy;
 		this.solutionStrategy = solutionStrategy;
-		this.comboDescriber = new ComboDescriber();
 	}
 
 	@Override
@@ -117,8 +115,8 @@ public class StrategySearchPathRobot implements PathRobot {
 	// pB = the progress when this method starts
 	// pB + pI = the progress when this method ends
 	private void turn(RuneMap cc, int x, int y, double pB, double pI) {
-		comboDescriber.setMap(cc);
-		solutionStrategy.submit(cc, x, y, stack, comboDescriber);
+		solutionStrategy.submit(cc, x, y, stack,
+				ComboCalculator.getDescriber(cc));
 
 		if (solutionStrategy.compareSolution() > 0) {
 			solutionStrategy.solutionAccepted();

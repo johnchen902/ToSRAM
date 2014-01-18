@@ -2,7 +2,7 @@ package tosram.strategy;
 
 import java.util.Deque;
 
-import tosram.ComboDescriber;
+import tosram.ComboCalculator;
 import tosram.Direction;
 import tosram.RuneMap;
 
@@ -32,7 +32,7 @@ public interface SolutionStrategy {
 	 *            an description of combo of the map
 	 */
 	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			ComboDescriber combos);
+			ComboCalculator.Describer combos);
 
 	/**
 	 * Compare the currently submitted solution and the currently accepted

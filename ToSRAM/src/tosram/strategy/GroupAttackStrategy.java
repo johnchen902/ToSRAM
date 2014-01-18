@@ -3,7 +3,7 @@ package tosram.strategy;
 import java.util.Deque;
 import java.util.EnumSet;
 
-import tosram.ComboDescriber;
+import tosram.ComboCalculator;
 import tosram.Direction;
 import tosram.RuneMap;
 import tosram.RuneStone.Type;
@@ -66,10 +66,10 @@ public class GroupAttackStrategy extends FilterSolutionStrategy {
 
 	@Override
 	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			ComboDescriber cd) {
+			ComboCalculator.Describer cd) {
 		super.submit(map, x, y, stack, cd);
 		EnumSet<Type> types = EnumSet.noneOf(Type.class);
-		for (ComboDescriber.Combo ccc : cd.getComboList()) {
+		for (ComboCalculator.Combo ccc : cd.getFullComboList()) {
 			if (Long.bitCount(ccc.getMask()) >= 5) {
 				types.add(ccc.getType());
 			}

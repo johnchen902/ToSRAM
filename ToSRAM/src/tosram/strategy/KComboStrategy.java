@@ -2,7 +2,7 @@ package tosram.strategy;
 
 import java.util.Deque;
 
-import tosram.ComboDescriber;
+import tosram.ComboCalculator;
 import tosram.Direction;
 import tosram.RuneMap;
 
@@ -41,9 +41,9 @@ public class KComboStrategy extends FilterSolutionStrategy {
 
 	@Override
 	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			ComboDescriber cd) {
+			ComboCalculator.Describer cd) {
 		super.submit(map, x, y, stack, cd);
-		combo = cd.getCombo();
+		combo = cd.getFullComboCount();
 		difference = Math.abs(combo - target);
 	}
 

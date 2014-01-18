@@ -2,7 +2,7 @@ package tosram.strategy;
 
 import java.util.Deque;
 
-import tosram.ComboDescriber;
+import tosram.ComboCalculator;
 import tosram.Direction;
 import tosram.RuneMap;
 
@@ -14,7 +14,7 @@ public class NullSolutionStrategy implements SolutionStrategy {
 
 	@Override
 	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			ComboDescriber combos) {
+			ComboCalculator.Describer combos) {
 	}
 
 	@Override

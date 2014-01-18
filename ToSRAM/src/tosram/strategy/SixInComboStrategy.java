@@ -2,7 +2,7 @@ package tosram.strategy;
 
 import java.util.Deque;
 
-import tosram.ComboDescriber;
+import tosram.ComboCalculator;
 import tosram.Direction;
 import tosram.RuneMap;
 import tosram.RuneStone.Type;
@@ -41,10 +41,10 @@ public class SixInComboStrategy extends FilterSolutionStrategy {
 
 	@Override
 	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			ComboDescriber cd) {
+			ComboCalculator.Describer cd) {
 		super.submit(map, x, y, stack, cd);
 		hasSix = false;
-		for (ComboDescriber.Combo ccc : cd.getComboList()) {
+		for (ComboCalculator.Combo ccc : cd.getFullComboList()) {
 			if (Long.bitCount(ccc.getMask()) >= 6
 					&& (ccc.getType() != Type.HEART || heartAllowed)) {
 				hasSix = true;
