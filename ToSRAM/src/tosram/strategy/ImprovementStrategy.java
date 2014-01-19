@@ -17,6 +17,7 @@ public class ImprovementStrategy implements SearchStrategy {
 	private static final int MAX_STEP = 50;
 	private static final int HOPEFUL_STEP = 9;
 	private final double[] bestQualities;
+	private double minProgress;
 
 	public ImprovementStrategy() {
 		bestQualities = new double[MAX_STEP];
@@ -25,6 +26,7 @@ public class ImprovementStrategy implements SearchStrategy {
 	@Override
 	public void reset() {
 		Arrays.fill(bestQualities, 0.0);
+		minProgress = 0.0;
 	}
 
 	private int steps;
@@ -52,6 +54,17 @@ public class ImprovementStrategy implements SearchStrategy {
 	@Override
 	public boolean isToDiagonal() {
 		return false;
+	}
+
+	@Override
+	public double adaptProgress(double progress) {
+		if (progress == 0.0)
+			return 0.0;
+		if (progress == 1.0)
+			return 1.0;
+		if (minProgress == 0.0)
+			minProgress = progress;
+		return 1 - Math.log(progress) / Math.log(minProgress);
 	}
 
 }

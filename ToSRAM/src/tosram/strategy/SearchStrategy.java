@@ -44,4 +44,21 @@ public interface SearchStrategy {
 	 *         otherwise
 	 */
 	public boolean isToStop();
+
+	/**
+	 * Adapt the progress calculated by treating each branch equally to the
+	 * progress calculated by estimating remaining calculation time.
+	 * <ul>
+	 * <li>If the input is <code>0.0</code>, the output is <code>0.0</code>.</li>
+	 * <li>If the input is <code>1.0</code>, the output is <code>1.0</code>.</li>
+	 * </ul>
+	 * 
+	 * @param progress
+	 *            a <code>double</code> between <code>0.0</code> and
+	 *            <code>1.0</code>, non-strictly increasing until
+	 *            {@link #reset()}
+	 * @return a <code>double</code> between <code>0.0</code> and
+	 *         <code>1.0</code>
+	 */
+	public double adaptProgress(double progress);
 }

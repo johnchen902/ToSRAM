@@ -46,4 +46,9 @@ public class LinearStrategy implements SearchStrategy {
 				&& steps >= MULTIPLIER * quality + DIAGONAL_CONSTANT;
 	}
 
+	@Override
+	public double adaptProgress(double progress) {
+		return progress;
+	}
+
 }

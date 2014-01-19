@@ -55,4 +55,9 @@ public class WeatheringStrategy implements SearchStrategy {
 		return strategy.isToDiagonal();
 	}
 
+	@Override
+	public double adaptProgress(double progress) {
+		return strategy.adaptProgress(progress);
+	}
+
 }

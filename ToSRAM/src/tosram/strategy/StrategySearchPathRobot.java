@@ -93,7 +93,7 @@ public class StrategySearchPathRobot implements PathRobot {
 		// Reduce send rate
 		if (listener != null && (t > lastPublishTime || progress == 1.0)) {
 			lastPublishTime = t;
-			listener.updateProgress(progress);
+			listener.updateProgress(searchStrategy.adaptProgress(progress));
 		}
 	}
 
