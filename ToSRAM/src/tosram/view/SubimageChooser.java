@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.text.MessageFormat;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -135,8 +136,14 @@ public class SubimageChooser extends JDialog {
 		public void mouseReleased(MouseEvent e) {
 			choosenArea.setFrameFromDiagonal(startPoint, e.getPoint());
 			panel.repaint();
+			String pattern = "From ({0}, {1}) to ({2}, {3}), Size {4} x {5}";
+			Object[] object = { choosenArea.x, choosenArea.y,
+					choosenArea.x + choosenArea.width,
+					choosenArea.y + choosenArea.height, choosenArea.width,
+					choosenArea.height };
 			int result = JOptionPane.showConfirmDialog(SubimageChooser.this,
-					choosenArea, "confirm", JOptionPane.OK_CANCEL_OPTION);
+					MessageFormat.format(pattern, object), "Confirm",
+					JOptionPane.OK_CANCEL_OPTION);
 			if (result == JOptionPane.OK_OPTION) {
 				submit(choosenArea);
 			} else {

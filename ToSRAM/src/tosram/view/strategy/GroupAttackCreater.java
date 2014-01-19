@@ -11,6 +11,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import tosram.RuneStoneFormatter;
 import tosram.RuneStone.Type;
 import tosram.strategy.GroupAttackStrategy;
 import tosram.strategy.SolutionStrategy;
@@ -85,7 +86,7 @@ public class GroupAttackCreater extends DefaultStrategyCreater {
 		if (result == JOptionPane.OK_OPTION) {
 			if (set.size() == 0) {
 				JOptionPane.showMessageDialog(parent,
-						"At least one type must be selected", "Group Attack",
+						"At least one type must be selected", getName(),
 						JOptionPane.ERROR_MESSAGE);
 			} else {
 				this.set = EnumSet.copyOf(set);
@@ -94,7 +95,8 @@ public class GroupAttackCreater extends DefaultStrategyCreater {
 	}
 
 	private static JCheckBox createCheckBoxForType(EnumSet<Type> set, Type type) {
-		JCheckBox cbx = new JCheckBox(type.toString(), set.contains(type));
+		JCheckBox cbx = new JCheckBox(RuneStoneFormatter.format(type),
+				set.contains(type));
 		cbx.addItemListener(new ToggleItemListener(set, type));
 		return cbx;
 	}

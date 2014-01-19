@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import tosram.RuneStoneFormatter;
 import tosram.RuneStone.Type;
 import tosram.strategy.SolutionStrategy;
 import tosram.strategy.UseStoneStrategy;
@@ -51,13 +52,14 @@ public class UseStoneCreater extends DefaultStrategyCreater {
 	@Override
 	protected String getName() {
 		if (lowerBound == upperBound) {
-			return MessageFormat.format(
-					"Use {0, number, integer} {1}{0, choice, 1#|1<s}",
-					new Object[] { upperBound, type });
+			String pattern = "Use {0, number, integer} {1}{0, choice, 1#|1<s}";
+			Object[] object = { upperBound, RuneStoneFormatter.format(type) };
+			return MessageFormat.format(pattern, object);
 		} else {
-			return MessageFormat
-					.format("Use {0, number, integer} ~ {1, number, integer} {2}{1, choice, 1#|1<s}",
-							new Object[] { lowerBound, upperBound, type });
+			String pattern = "Use {0, number, integer} ~ {1, number, integer} {2}{1, choice, 1#|1<s}";
+			Object[] object = { lowerBound, upperBound,
+					RuneStoneFormatter.format(type) };
+			return MessageFormat.format(pattern, object);
 		}
 	}
 
@@ -141,7 +143,8 @@ public class UseStoneCreater extends DefaultStrategyCreater {
 	}
 
 	private JRadioButton createRadioButtonForType(ButtonGroup group, Type btType) {
-		JRadioButton jrb = new JRadioButton(btType.toString(), btType == type);
+		JRadioButton jrb = new JRadioButton(RuneStoneFormatter.format(btType),
+				btType == type);
 		jrb.addItemListener(new SelectItemListener(btType));
 		group.add(jrb);
 		return jrb;

@@ -2,6 +2,7 @@ package tosram.view.strategy;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.text.MessageFormat;
 
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -41,8 +42,10 @@ public class SixInComboCreater extends DefaultStrategyCreater {
 
 	@Override
 	public void settings(Component parent) {
-		int result = JOptionPane.showConfirmDialog(parent,
-				"Is heart stone counted in? Currently " + heartAllowed,
+		final String pattern = "Is heart stone counted in? Currently {0, choice, 0#No|1#Yes}.";
+
+		int result = JOptionPane.showConfirmDialog(parent, MessageFormat
+				.format(pattern, new Object[] { heartAllowed ? 1 : 0 }),
 				getName(), JOptionPane.YES_NO_CANCEL_OPTION);
 		if (result == JOptionPane.YES_OPTION)
 			heartAllowed = true;

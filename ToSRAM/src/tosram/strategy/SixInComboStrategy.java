@@ -70,10 +70,8 @@ public class SixInComboStrategy extends FilterSolutionStrategy {
 
 	@Override
 	public String getMilestone() {
-		if (hasSix)
-			return "with six " + super.getMilestone();
-		else
-			return "without six " + super.getMilestone();
+		return MilestoneFormatter.formatSixInCombo(hasSix)
+				+ super.getMilestone();
 	}
 
 	@Override

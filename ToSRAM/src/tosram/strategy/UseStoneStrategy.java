@@ -76,7 +76,8 @@ public class UseStoneStrategy extends FilterSolutionStrategy {
 
 	@Override
 	public String getMilestone() {
-		return count + " " + type + "s " + super.getMilestone();
+		return MilestoneFormatter.formatStoneUsage(type, count)
+				+ super.getMilestone();
 	}
 
 	@Override

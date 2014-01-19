@@ -61,7 +61,7 @@ public class KComboStrategy extends FilterSolutionStrategy {
 
 	@Override
 	public String getMilestone() {
-		return combo + " combo " + super.getMilestone();
+		return MilestoneFormatter.formatCombo(combo) + super.getMilestone();
 	}
 
 	@Override

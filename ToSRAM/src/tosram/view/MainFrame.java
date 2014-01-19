@@ -3,8 +3,7 @@ package tosram.view;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.EventHandler;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import java.text.MessageFormat;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -52,10 +51,6 @@ public class MainFrame extends JFrame {
 	private SearchStrategyPanel searchStrategyPane;
 
 	private final Robot awtRobot;
-
-	private static final String timeFormatString = "#.### seconds";
-	private static final NumberFormat timeFormat = new DecimalFormat(
-			timeFormatString);
 
 	/**
 	 * Create a <code>MainFrame</code>
@@ -265,7 +260,9 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			JLabel lb1 = new JLabel("Small Delay (90 ~ 1000)");
+			JLabel lb1 = new JLabel(MessageFormat.format(
+					"Small Delay ({0,number,integer} ~ {1,number,integer})",
+					new Object[] { 90, 1000 }));
 			lb1.setDisplayedMnemonic('d');
 			lb1.setAlignmentX(Component.CENTER_ALIGNMENT);
 			pn.add(lb1);
@@ -277,7 +274,9 @@ public class MainFrame extends JFrame {
 					pnPath, "smallDelay", "source.value"));
 			pn.add(sp1);
 
-			JLabel lb2 = new JLabel("Big Delay (500 ~ 15000)");
+			JLabel lb2 = new JLabel(MessageFormat.format(
+					"Big Delay ({0,number,integer} ~ {1,number,integer})",
+					new Object[] { 500, 15000 }));
 			lb2.setDisplayedMnemonic('l');
 			lb2.setAlignmentX(Component.CENTER_ALIGNMENT);
 			pn.add(lb2);
@@ -415,21 +414,23 @@ public class MainFrame extends JFrame {
 
 	void setTime(double seconds) {
 		if (!Double.isNaN(seconds))
-			lbTime.setText(timeFormat.format(seconds));
+			lbTime.setText(MessageFormat.format("{0,number,#.###} seconds",
+					new Object[] { seconds }));
 		else
-			lbTime.setText(timeFormatString);
+			lbTime.setText("");
 	}
 
 	void setPath(Path path) {
 		this.path = path;
 		if (path != null) {
 			Point point = path.getBeginPoint();
-			lbStartPoint.setText("Start: (" + (point.x + 1) + ", "
-					+ (point.y + 1) + ")");
+			lbStartPoint.setText(MessageFormat.format(
+					"Start: ({0,number,integer}, {1,number,integer})",
+					new Object[] { point.x + 1, point.y + 1 }));
 			listDir.setDirections(path.getDirections());
 			pnPath.setPath(path);
 		} else {
-			lbStartPoint.setText("Start:");
+			lbStartPoint.setText("");
 			listDir.setDirections(null);
 			pnPath.setPath(null);
 		}

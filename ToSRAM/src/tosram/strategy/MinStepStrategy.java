@@ -47,7 +47,7 @@ public class MinStepStrategy extends FilterSolutionStrategy {
 
 	@Override
 	public String getMilestone() {
-		return steps + " steps " + super.getMilestone();
+		return MilestoneFormatter.formatSteps(steps) + super.getMilestone();
 	}
 
 	@Override

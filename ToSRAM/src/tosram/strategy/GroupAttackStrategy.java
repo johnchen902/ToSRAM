@@ -95,7 +95,8 @@ public class GroupAttackStrategy extends FilterSolutionStrategy {
 
 	@Override
 	public String getMilestone() {
-		return groupAttacks + "G.A. " + super.getMilestone();
+		return MilestoneFormatter.formatGroupAttacks(groupAttacks)
+				+ super.getMilestone();
 	}
 
 	@Override

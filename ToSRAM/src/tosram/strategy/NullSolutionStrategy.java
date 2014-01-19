@@ -29,7 +29,7 @@ public class NullSolutionStrategy implements SolutionStrategy {
 
 	@Override
 	public String getMilestone() {
-		return "!";
+		return MilestoneFormatter.formatNull();
 	}
 
 	@Override

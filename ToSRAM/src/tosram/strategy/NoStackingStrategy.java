@@ -58,7 +58,7 @@ public class NoStackingStrategy extends FilterSolutionStrategy {
 		if (noStacking)
 			return super.getMilestone();
 		else
-			return "STACKING " + super.getMilestone();
+			return MilestoneFormatter.formatStacking() + super.getMilestone();
 	}
 
 	@Override
