@@ -10,11 +10,9 @@ import tosram.strategy.SolutionStrategy;
  */
 public class MinStepCreater extends DefaultStrategyCreater {
 
-	/**
-	 * Constructor.
-	 */
-	public MinStepCreater() {
-		super("Min Step");
+	@Override
+	protected String getName() {
+		return "Min Step";
 	}
 
 	@Override

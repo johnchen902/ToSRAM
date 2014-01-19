@@ -1,6 +1,7 @@
 package tosram.view.strategy;
 
 import java.awt.Component;
+import java.text.MessageFormat;
 
 import javax.swing.JOptionPane;
 import javax.swing.JSlider;
@@ -17,13 +18,14 @@ public class KComboCreater extends DefaultStrategyCreater {
 
 	private int combo = 4;
 
-	/**
-	 * Constructor
-	 */
-	public KComboCreater() {
-		super("K Combo");
+	@Override
+	protected String getName() {
+		return MessageFormat.format(
+				"{0, number, integer} {0, choice, 1#Combo|1<Combos}",
+				new Object[] { combo });
 	}
 
+	@Override
 	public SolutionStrategy createStrategy(SolutionStrategy next) {
 		return new KComboStrategy(next, combo);
 	}

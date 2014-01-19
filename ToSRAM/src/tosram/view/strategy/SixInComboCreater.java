@@ -18,11 +18,9 @@ public class SixInComboCreater extends DefaultStrategyCreater {
 
 	private boolean heartAllowed;
 
-	/**
-	 * Constructor.
-	 */
-	public SixInComboCreater() {
-		super("Six In a Combo");
+	@Override
+	protected String getName() {
+		return "Six In a Combo";
 	}
 
 	@Override
@@ -45,7 +43,7 @@ public class SixInComboCreater extends DefaultStrategyCreater {
 	public void settings(Component parent) {
 		int result = JOptionPane.showConfirmDialog(parent,
 				"Is heart stone counted in? Currently " + heartAllowed,
-				"Six In a Combo", JOptionPane.YES_NO_CANCEL_OPTION);
+				getName(), JOptionPane.YES_NO_CANCEL_OPTION);
 		if (result == JOptionPane.YES_OPTION)
 			heartAllowed = true;
 		else if (result == JOptionPane.NO_OPTION)

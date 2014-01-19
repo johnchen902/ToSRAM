@@ -10,8 +10,9 @@ import tosram.strategy.SolutionStrategy;
  */
 public class NoStackingCreater extends DefaultStrategyCreater {
 
-	public NoStackingCreater() {
-		super("No Stacking");
+	@Override
+	protected String getName() {
+		return "No Stacking";
 	}
 
 	@Override

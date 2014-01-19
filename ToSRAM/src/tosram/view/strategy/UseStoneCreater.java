@@ -7,6 +7,7 @@ import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.text.MessageFormat;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
@@ -44,8 +45,20 @@ public class UseStoneCreater extends DefaultStrategyCreater {
 	 *            the Type
 	 */
 	public UseStoneCreater(Type type) {
-		super("Restrict Stone Usage");
 		this.type = this.selectingType = type;
+	}
+
+	@Override
+	protected String getName() {
+		if (lowerBound == upperBound) {
+			return MessageFormat.format(
+					"Use {0, number, integer} {1}{0, choice, 1#|1<s}",
+					new Object[] { upperBound, type });
+		} else {
+			return MessageFormat
+					.format("Use {0, number, integer} ~ {1, number, integer} {2}{1, choice, 1#|1<s}",
+							new Object[] { lowerBound, upperBound, type });
+		}
 	}
 
 	@Override
@@ -117,7 +130,7 @@ public class UseStoneCreater extends DefaultStrategyCreater {
 		pn.add(pnDown);
 
 		int result = JOptionPane.showConfirmDialog(parent, pn,
-				"Select the type", JOptionPane.OK_CANCEL_OPTION);
+				"Select type and amount", JOptionPane.OK_CANCEL_OPTION);
 		if (result == JOptionPane.OK_OPTION) {
 			type = selectingType;
 			lowerBound = rangeSlider.getValue();

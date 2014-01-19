@@ -25,11 +25,9 @@ public class GroupAttackCreater extends DefaultStrategyCreater {
 	private EnumSet<Type> set = EnumSet.complementOf(EnumSet.of(Type.HEART,
 			Type.UNKNOWN));
 
-	/**
-	 * Constructor.
-	 */
-	public GroupAttackCreater() {
-		super("Group Attack");
+	@Override
+	protected String getName() {
+		return "Group Attack";
 	}
 
 	@Override

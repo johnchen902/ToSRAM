@@ -15,30 +15,30 @@ import javax.swing.JOptionPane;
 public abstract class DefaultStrategyCreater implements StrategyCreater {
 
 	private DefaultListCellRenderer dlcr = new DefaultListCellRenderer();
-	private String text;
 
-	/**
-	 * Create a <code>StrategyCreater</code> with the specified text.
-	 * 
-	 * @param text
-	 *            the text shown
-	 */
-	public DefaultStrategyCreater(String text) {
-		this.text = text;
+	protected String getName() {
+		String name = getClass().getSimpleName();
+		return name.replace("Creater", "").replaceAll("(?<=.)([A-Z])", " $1");
 	}
 
 	@Override
 	public Component getListCellRendererComponent(
 			JList<? extends StrategyCreater> list, StrategyCreater value,
 			int index, boolean isSelected, boolean cellHasFocus) {
+		return createRendererByText(list, getName(), index, isSelected,
+				cellHasFocus);
+	}
+
+	protected Component createRendererByText(
+			JList<? extends StrategyCreater> list, String text, int index,
+			boolean isSelected, boolean cellHasFocus) {
 		return dlcr.getListCellRendererComponent(list, text, index, isSelected,
 				cellHasFocus);
 	}
 
 	@Override
 	public void settings(Component parent) {
-		JOptionPane.showMessageDialog(parent, "No settings available.", text,
-				JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(parent, "No settings available.",
+				getName(), JOptionPane.INFORMATION_MESSAGE);
 	}
-
 }

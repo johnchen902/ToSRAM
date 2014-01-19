@@ -108,7 +108,7 @@ public class StrategyPanel extends JPanel {
 		DefaultListModel<StrategyCreater> model = new DefaultListModel<>();
 		model.addElement(new GroupAttackCreater());
 		model.addElement(new UseStoneCreater());
-		model.addElement(new UseStoneCreater(tosram.RuneStone.Type.FIRE));
+		model.addElement(new UseStoneCreater(tosram.RuneStone.Type.GREEN));
 		model.addElement(new SixInComboCreater());
 		model.addElement(new KComboCreater());
 		model.addElement(new NoStackingCreater());

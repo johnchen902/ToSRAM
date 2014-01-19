@@ -10,11 +10,9 @@ import tosram.strategy.SolutionStrategy;
  */
 public class MaxComboCreater extends DefaultStrategyCreater {
 
-	/**
-	 * Constructor.
-	 */
-	public MaxComboCreater() {
-		super("Max Combo");
+	@Override
+	protected String getName() {
+		return "Max Combo";
 	}
 
 	@Override
