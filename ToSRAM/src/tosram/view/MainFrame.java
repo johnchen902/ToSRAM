@@ -29,7 +29,6 @@ public class MainFrame extends JFrame {
 	private RuneMap realMap;
 	private Path path;
 
-	private boolean settingsVisible;
 	private JSplitPane splitPane;
 	private JPanel pnMain;
 	private JPanel pnSide;
@@ -45,7 +44,6 @@ public class MainFrame extends JFrame {
 	private JButton btnNext; // the "Next" button
 	private JButton btnBack; // the "Back" button
 	private JButton btnInterrupt; // the "Interrupt" button
-	private JCheckBox chckbxSettings; // toggle settings
 
 	private StrategyPanel strategyPane;
 	private SearchStrategyPanel searchStrategyPane;
@@ -83,8 +81,6 @@ public class MainFrame extends JFrame {
 		splitPane.setBorder(null);
 		splitPane.setDividerLocation(384);
 		splitPane.setResizeWeight(2.0 / 3.0);
-
-		settingsVisible = true;
 
 		getContentPane().add(splitPane);
 		setSize(600, 400);
@@ -149,6 +145,13 @@ public class MainFrame extends JFrame {
 				layeredPane.add(pnPath, Integer.valueOf(2));
 
 				tbStones = new RuneMapTable();
+				tbStones.addFocusListener(new FocusAdapter() {
+					@Override
+					public void focusLost(FocusEvent e) {
+						tbStones.setFocusable(false);
+					}
+				});
+				tbStones.setFocusable(false);
 				layeredPane.add(tbStones, Integer.valueOf(1));
 				tbStones.setFont(tbStones.getFont().deriveFont(24f));
 			}
@@ -165,8 +168,17 @@ public class MainFrame extends JFrame {
 			pnMain.add(pnSouth, BorderLayout.SOUTH);
 
 			JLabel lblMap = new JLabel("Map\u2191");
-			lblMap.setLabelFor(tbStones);
 			lblMap.setDisplayedMnemonic('m');
+			lblMap.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+					KeyStroke.getKeyStroke("alt pressed M"), "editMap");
+			lblMap.getActionMap().put("editMap", new AbstractAction() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					tbStones.setFocusable(true);
+					tbStones.requestFocusInWindow();
+				}
+			});
+
 			pnSouth.add(lblMap);
 
 			btnNext = new JButton("Next");
@@ -180,13 +192,6 @@ public class MainFrame extends JFrame {
 			btnInterrupt = new JButton("Interrupt");
 			btnInterrupt.setMnemonic('i');
 			pnSouth.add(btnInterrupt);
-
-			chckbxSettings = new JCheckBox("Settings", true);
-			chckbxSettings.setMnemonic('s');
-			pnSouth.add(chckbxSettings);
-			chckbxSettings.addActionListener(EventHandler.create(
-					ActionListener.class, this, "settingsVisible",
-					"source.selected"));
 		}
 	}
 
@@ -198,7 +203,7 @@ public class MainFrame extends JFrame {
 		{
 			strategyPane = new StrategyPanel();
 			tabbedPane.addTab("Strategies", strategyPane);
-			tabbedPane.setMnemonicAt(0, KeyEvent.VK_T);
+			tabbedPane.setMnemonicAt(0, KeyEvent.VK_S);
 		}
 		{
 			searchStrategyPane = new SearchStrategyPanel();
@@ -217,6 +222,7 @@ public class MainFrame extends JFrame {
 			}
 
 			RuneMapTable rmt = new RuneMapTable();
+			rmt.setFocusable(false);
 			rmt.setEditable(false);
 			rmt.setFont(rmt.getFont().deriveFont(24f));
 			rmt.setRuneMap(map0);
@@ -244,7 +250,6 @@ public class MainFrame extends JFrame {
 			};
 
 			JCheckBox cbx = new JCheckBox("Animate stones");
-			cbx.setMnemonic('o');
 			cbx.setAlignmentX(Component.CENTER_ALIGNMENT);
 			pn.add(cbx);
 			cbx.addItemListener(new ItemListener() {
@@ -260,93 +265,32 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			JLabel lb1 = new JLabel(MessageFormat.format(
-					"Small Delay ({0,number,integer} ~ {1,number,integer})",
-					new Object[] { 90, 1000 }));
-			lb1.setDisplayedMnemonic('d');
+			JLabel lb1 = new JLabel("Small Delay (ms)");
 			lb1.setAlignmentX(Component.CENTER_ALIGNMENT);
 			pn.add(lb1);
 
-			JSpinner sp1 = new JSpinner(new SpinnerNumberModel(
-					pnPath.getSmallDelay(), 90, 1000, 10));
-			lb1.setLabelFor(sp1);
+			JSpinner sp1 = new JSpinner(new SpinnerNumberModel(300, 10, 1000,
+					10));
 			sp1.addChangeListener(EventHandler.create(ChangeListener.class,
 					pnPath, "smallDelay", "source.value"));
 			pn.add(sp1);
 
-			JLabel lb2 = new JLabel(MessageFormat.format(
-					"Big Delay ({0,number,integer} ~ {1,number,integer})",
-					new Object[] { 500, 15000 }));
-			lb2.setDisplayedMnemonic('l');
+			JLabel lb2 = new JLabel("Big Delay (ms)");
 			lb2.setAlignmentX(Component.CENTER_ALIGNMENT);
 			pn.add(lb2);
 
 			JSpinner sp2 = new JSpinner(new SpinnerNumberModel(
 					pnPath.getBigDelay(), 500, 15000, 500));
-			lb2.setLabelFor(sp2);
 			sp2.addChangeListener(EventHandler.create(ChangeListener.class,
 					pnPath, "bigDelay", "source.value"));
 			pn.add(sp2);
 
-			pn.add(Box.createVerticalGlue());
-
 			JPanel pnWrapper = new JPanel();
 			pnWrapper.add(pn);
+
 			tabbedPane.addTab("Miscellaneous", pnWrapper);
-			tabbedPane.setMnemonicAt(3, KeyEvent.VK_A);
+			tabbedPane.setMnemonicAt(3, KeyEvent.VK_C);
 		}
-	}
-
-	/**
-	 * Set whether the settings is visible.
-	 * 
-	 * @param visible
-	 *            <code>true</code> if the settings are visible;
-	 *            <code>false</code> otherwise
-	 */
-	public void setSettingsVisible(boolean visible) {
-		if (visible != settingsVisible) {
-			if (visible) {
-				showSettings();
-			} else {
-				hideSettings();
-			}
-			settingsVisible = visible;
-		}
-	}
-
-	/**
-	 * Get whether the settings is visible
-	 * 
-	 * @return <code>true</code> if the settings are visible; <code>false</code>
-	 *         otherwise
-	 */
-	public boolean isSettingsVisible() {
-		return settingsVisible;
-	}
-
-	private void showSettings() {
-		int mainWidth = pnMain.getWidth();
-		int sideWidth = mainWidth * 200 / 384;
-		int insetsBoth = getInsets().left + getInsets().right;
-		int height = getHeight();
-		getContentPane().remove(pnMain);
-		splitPane.setLeftComponent(pnMain);
-		splitPane.setRightComponent(pnSide);
-		getContentPane().add(splitPane);
-		setSize(insetsBoth + mainWidth + sideWidth, height);
-		validate();
-		splitPane.setDividerLocation(mainWidth);
-	}
-
-	private void hideSettings() {
-		int mainWidth = pnMain.getWidth();
-		int insetsBoth = getInsets().left + getInsets().right;
-		int height = getHeight();
-		getContentPane().remove(splitPane);
-		getContentPane().add(pnMain);
-		setSize(insetsBoth + mainWidth, height);
-		validate();
 	}
 
 	Rectangle getMapArea() {

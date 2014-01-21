@@ -5,12 +5,7 @@ import java.awt.Component;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
 
-import javax.swing.DefaultCellEditor;
-import javax.swing.DropMode;
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.TransferHandler;
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -36,6 +31,7 @@ public class RuneMapTable extends JTable {
 		setDefaultRenderer(RuneStone.class, new RuneMapCellRenderer());
 		setDragEnabled(true);
 		setDropMode(DropMode.ON);
+		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		setEditable(true);
 	}
 
@@ -257,6 +253,8 @@ public class RuneMapTable extends JTable {
 			ReadOnlyTransferHandler {
 		@Override
 		public boolean canImport(TransferSupport support) {
+			if (!support.isDrop())
+				return false;
 			if (!support
 					.isDataFlavorSupported(RuneStoneTransferable.RUNE_STONE_FLAVOR))
 				return false;

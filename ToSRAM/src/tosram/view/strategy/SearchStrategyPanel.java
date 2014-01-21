@@ -43,12 +43,10 @@ public class SearchStrategyPanel extends JPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		JLabel lblSearchStrategies = new JLabel("Search Strategies");
-		lblSearchStrategies.setDisplayedMnemonic('r');
 		lblSearchStrategies.setAlignmentX(Component.CENTER_ALIGNMENT);
 		add(lblSearchStrategies);
 
 		comboBox = new JComboBox<String>();
-		lblSearchStrategies.setLabelFor(comboBox);
 		comboBox.addItem("Improvement");
 		comboBox.addItem("Linear");
 		add(comboBox);
@@ -69,7 +67,6 @@ public class SearchStrategyPanel extends JPanel {
 		add(Box.createVerticalGlue());
 
 		chckbxWeathering = new JCheckBox("Weathering");
-		chckbxWeathering.setMnemonic('w');
 		chckbxWeathering.setAlignmentX(Component.CENTER_ALIGNMENT);
 		add(chckbxWeathering);
 		chckbxWeathering.addItemListener(new ItemListener() {
@@ -81,6 +78,7 @@ public class SearchStrategyPanel extends JPanel {
 		});
 
 		JPanel panel = new JPanel();
+		panel.setFocusCycleRoot(true);
 		add(panel);
 		panel.setLayout(new GridLayout(5, 6, 0, 0));
 		chckbxWeatherStones = new JCheckBox[30];

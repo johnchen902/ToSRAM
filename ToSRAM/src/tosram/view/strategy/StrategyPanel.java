@@ -46,7 +46,6 @@ public class StrategyPanel extends JPanel {
 		setLayout(new BorderLayout(0, 0));
 
 		JLabel lblStrategies = new JLabel("Solution Strategies");
-		lblStrategies.setDisplayedMnemonic('o');
 		lblStrategies.setHorizontalAlignment(SwingConstants.CENTER);
 		add(lblStrategies, BorderLayout.NORTH);
 
@@ -54,7 +53,6 @@ public class StrategyPanel extends JPanel {
 		add(spUsing, BorderLayout.CENTER);
 
 		listUsing = new JList<>(usingModel = createInitialUsingModel());
-		lblStrategies.setLabelFor(listUsing);
 		listUsing.setCellRenderer(new StrategyCreaterRenderer());
 		listUsing.setDropMode(DropMode.INSERT);
 		listUsing.setDragEnabled(true);
@@ -63,7 +61,6 @@ public class StrategyPanel extends JPanel {
 		spUsing.setViewportView(listUsing);
 
 		btnAddRemove = new JButton("Add");
-		btnAddRemove.setMnemonic('d');
 		add(btnAddRemove, BorderLayout.SOUTH);
 		btnAddRemove.addActionListener(new AddListener());
 		btnAddRemove.setTransferHandler(new RemoveTransferHandler());
