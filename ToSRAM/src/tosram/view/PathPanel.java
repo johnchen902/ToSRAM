@@ -8,7 +8,7 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.GeneralPath;
+import java.awt.geom.Path2D;
 import java.util.EventListener;
 import java.util.List;
 import java.util.ListIterator;
@@ -18,6 +18,7 @@ import javax.swing.Timer;
 
 import tosram.Direction;
 import tosram.Path;
+import tosram.RoundPath;
 
 /**
  * A panel showing a path.
@@ -28,11 +29,11 @@ import tosram.Path;
 public class PathPanel extends JPanel {
 
 	private Path path;
-	private GeneralPath gpath;
+	private Path2D gpath;
 	private Shape activeSegement;
 	private PathAnimation pa;
-	private float cellWidth = 50f;
-	private float cellHeight = 50f;
+	private double cellWidth = 50;
+	private double cellHeight = 50;
 	private int smallDelay = 300;
 	private int bigDelay = 3000;
 
@@ -120,7 +121,7 @@ public class PathPanel extends JPanel {
 	 * @param cellH
 	 *            the height of the cell
 	 */
-	public void setCellSize(float cellW, float cellH) {
+	public void setCellSize(double cellW, double cellH) {
 		this.cellWidth = cellW;
 		this.cellHeight = cellH;
 		if (gpath != null && pa != null) {
@@ -163,7 +164,7 @@ public class PathPanel extends JPanel {
 	private RoundPath calculatePath() {
 		RoundPath rpath = new RoundPath();
 		int x = path.getBeginPoint().x, y = path.getBeginPoint().y;
-		rpath.addPoint((x + .5f) * cellWidth, (y + .5f) * cellHeight);
+		rpath.moveTo((x + .5) * cellWidth, (y + .5) * cellHeight);
 		for (Direction dir : path.getDirections()) {
 			switch (dir) {
 			case WEST:
@@ -195,9 +196,8 @@ public class PathPanel extends JPanel {
 			case EAST:
 				break;
 			}
-			rpath.addPoint((x + .5f) * cellWidth, (y + .5f) * cellHeight);
+			rpath.roundTo((x + .5) * cellWidth, (y + .5) * cellHeight);
 		}
-		rpath.end();
 		return rpath;
 	}
 

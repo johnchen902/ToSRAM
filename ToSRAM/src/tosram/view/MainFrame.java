@@ -6,6 +6,7 @@ import java.beans.EventHandler;
 import java.text.MessageFormat;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import tosram.*;
@@ -47,6 +48,8 @@ public class MainFrame extends JFrame {
 
 	private StrategyPanel strategyPane;
 	private SearchStrategyPanel searchStrategyPane;
+	private int movingTimeLimit;
+	private MovingPathGenerator movingPathGenerator;
 
 	private final Robot awtRobot;
 
@@ -229,8 +232,7 @@ public class MainFrame extends JFrame {
 			tabbedPane.addTab("Edit Map", rmt);
 		}
 		{
-			JPanel pn = new JPanel();
-			pn.setLayout(new BoxLayout(pn, BoxLayout.Y_AXIS));
+			Box pn = Box.createVerticalBox();
 
 			final PathPanel.AnimationListener al = new PathPanel.AnimationListener() {
 				@Override
@@ -285,6 +287,53 @@ public class MainFrame extends JFrame {
 					pnPath, "bigDelay", "source.value"));
 			pn.add(sp2);
 
+			JLabel lb3 = new JLabel("Moving Time (ms)");
+			lb3.setAlignmentX(Component.CENTER_ALIGNMENT);
+			pn.add(lb3);
+
+			movingTimeLimit = 5000;
+			JSpinner sp3 = new JSpinner(new SpinnerNumberModel(movingTimeLimit,
+					250, 20000, 250));
+			sp3.addChangeListener(new ChangeListener() {
+				@Override
+				public void stateChanged(ChangeEvent e) {
+					JSpinner spn = (JSpinner) e.getSource();
+					movingTimeLimit = (int) spn.getValue();
+				}
+			});
+			pn.add(sp3);
+
+			JPanel panel = new JPanel();
+			pn.add(panel);
+			panel.setLayout(new GridLayout(0, 1, 0, 0));
+
+			ButtonGroup group = new ButtonGroup();
+
+			JRadioButton rdbtnBasicMove = new JRadioButton("Simple Move");
+			group.add(rdbtnBasicMove);
+			panel.add(rdbtnBasicMove);
+			rdbtnBasicMove.setAlignmentX(Component.CENTER_ALIGNMENT);
+			rdbtnBasicMove.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED)
+						movingPathGenerator = new BasicMovingPathGenerator();
+				}
+			});
+			rdbtnBasicMove.setSelected(true);
+
+			JRadioButton rdbtnHandlikeMove = new JRadioButton("Hand-like Move");
+			group.add(rdbtnHandlikeMove);
+			panel.add(rdbtnHandlikeMove);
+			rdbtnHandlikeMove.setAlignmentX(0.5f);
+			rdbtnHandlikeMove.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED)
+						movingPathGenerator = new HandMovingPathGenerator();
+				}
+			});
+
 			JPanel pnWrapper = new JPanel();
 			pnWrapper.add(pn);
 
@@ -327,6 +376,10 @@ public class MainFrame extends JFrame {
 
 	Robot getRobot() {
 		return awtRobot;
+	}
+
+	int getMovingTimeLimit() {
+		return movingTimeLimit;
 	}
 
 	void transferState(MFState state) {
@@ -404,4 +457,7 @@ public class MainFrame extends JFrame {
 		return strategyPane.createStrategy();
 	}
 
+	MovingPathGenerator getMovingPathGenerator() {
+		return movingPathGenerator;
+	}
 }
