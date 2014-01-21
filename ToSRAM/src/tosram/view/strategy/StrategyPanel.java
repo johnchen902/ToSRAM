@@ -35,9 +35,6 @@ public class StrategyPanel extends JPanel {
 	private JList<StrategyCreater> listUnused;
 	private JButton btnAddRemove;
 
-	/**
-	 * Just create one.
-	 */
 	public StrategyPanel() {
 		initUI();
 	}
@@ -115,7 +112,7 @@ public class StrategyPanel extends JPanel {
 	/**
 	 * Create the final strategy from the strategies user selected.
 	 * 
-	 * @return a <code>Strategy</code>
+	 * @return a <code>SolutionStrategy</code>
 	 */
 	public SolutionStrategy createStrategy() {
 		SolutionStrategy ss = new NullSolutionStrategy();

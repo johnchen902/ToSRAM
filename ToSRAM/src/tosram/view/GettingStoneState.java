@@ -16,23 +16,20 @@ import tosram.RuneStoneGetter;
 class GettingStoneState implements MFState {
 
 	private MainFrame frame;
-	private ActionListener interrupt;
 	private volatile boolean interrupted;
 
 	@Override
 	public void checkIn(MainFrame f0) {
 		frame = f0;
-		frame.setStatus("Getting map...");
+		frame.setStatus("Getting stones...");
 		frame.setPath(null);
 		interrupted = false;
-		frame.getInterruptButton().setEnabled(true);
-		frame.getInterruptButton().addActionListener(
-				interrupt = new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						interrupted = true;
-					}
-				});
+		frame.setInterruptActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				interrupted = true;
+			}
+		});
 		new GettingStoneWorker().execute();
 	}
 
@@ -44,7 +41,7 @@ class GettingStoneState implements MFState {
 		@Override
 		protected RuneMap doInBackground() throws Exception {
 			// get RuneMap until the map become fixed
-			Robot robot = frame.getRobot();
+			Robot robot = new Robot();
 			Rectangle rect = frame.getMapArea();
 
 			RuneMap map = rsg.getRuneStones(robot.createScreenCapture(rect));
@@ -84,9 +81,7 @@ class GettingStoneState implements MFState {
 				ignore.printStackTrace();
 			}
 
-			frame.getInterruptButton().setEnabled(false);
-			frame.getInterruptButton().removeActionListener(interrupt);
-
+			frame.setInterruptActionListener(null);
 			frame.transferState(new ToComputeState());
 		}
 

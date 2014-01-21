@@ -6,7 +6,6 @@ import java.beans.EventHandler;
 import java.text.MessageFormat;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import tosram.*;
@@ -48,25 +47,12 @@ public class MainFrame extends JFrame {
 
 	private StrategyPanel strategyPane;
 	private SearchStrategyPanel searchStrategyPane;
-	private int movingTimeLimit;
-	private MovingPathGenerator movingPathGenerator;
+	private MovingPathGeneratorPanel movingPathGeneratorPane;
 
-	private final Robot awtRobot;
-
-	/**
-	 * Create a <code>MainFrame</code>
-	 */
 	public MainFrame() {
 		super("Tower of Savior Runestone Auto Mover");
 
 		initUI();
-
-		try {
-			awtRobot = new Robot();
-		} catch (AWTException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
 
 		btnNext.setEnabled(false);
 		btnBack.setEnabled(false);
@@ -287,52 +273,8 @@ public class MainFrame extends JFrame {
 					pnPath, "bigDelay", "source.value"));
 			pn.add(sp2);
 
-			JLabel lb3 = new JLabel("Moving Time (ms)");
-			lb3.setAlignmentX(Component.CENTER_ALIGNMENT);
-			pn.add(lb3);
-
-			movingTimeLimit = 5000;
-			JSpinner sp3 = new JSpinner(new SpinnerNumberModel(movingTimeLimit,
-					250, 20000, 250));
-			sp3.addChangeListener(new ChangeListener() {
-				@Override
-				public void stateChanged(ChangeEvent e) {
-					JSpinner spn = (JSpinner) e.getSource();
-					movingTimeLimit = (int) spn.getValue();
-				}
-			});
-			pn.add(sp3);
-
-			JPanel panel = new JPanel();
-			pn.add(panel);
-			panel.setLayout(new GridLayout(0, 1, 0, 0));
-
-			ButtonGroup group = new ButtonGroup();
-
-			JRadioButton rdbtnBasicMove = new JRadioButton("Simple Move");
-			group.add(rdbtnBasicMove);
-			panel.add(rdbtnBasicMove);
-			rdbtnBasicMove.setAlignmentX(Component.CENTER_ALIGNMENT);
-			rdbtnBasicMove.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED)
-						movingPathGenerator = new BasicMovingPathGenerator();
-				}
-			});
-			rdbtnBasicMove.setSelected(true);
-
-			JRadioButton rdbtnHandlikeMove = new JRadioButton("Hand-like Move");
-			group.add(rdbtnHandlikeMove);
-			panel.add(rdbtnHandlikeMove);
-			rdbtnHandlikeMove.setAlignmentX(0.5f);
-			rdbtnHandlikeMove.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED)
-						movingPathGenerator = new HandMovingPathGenerator();
-				}
-			});
+			movingPathGeneratorPane = new MovingPathGeneratorPanel();
+			pn.add(movingPathGeneratorPane);
 
 			JPanel pnWrapper = new JPanel();
 			pnWrapper.add(pn);
@@ -362,24 +304,29 @@ public class MainFrame extends JFrame {
 		return path;
 	}
 
-	JButton getNextButton() {
-		return btnNext;
+	private ActionListener nextActionListener;
+	private ActionListener backActionListener;
+	private ActionListener interruptActionListener;
+
+	void setNextActionListener(ActionListener listener) {
+		if (nextActionListener != null)
+			btnNext.removeActionListener(nextActionListener);
+		btnNext.addActionListener(nextActionListener = listener);
+		btnNext.setEnabled(nextActionListener != null);
 	}
 
-	JButton getBackButton() {
-		return btnBack;
+	void setBackActionListener(ActionListener listener) {
+		if (backActionListener != null)
+			btnBack.removeActionListener(backActionListener);
+		btnBack.addActionListener(backActionListener = listener);
+		btnBack.setEnabled(backActionListener != null);
 	}
 
-	JButton getInterruptButton() {
-		return btnInterrupt;
-	}
-
-	Robot getRobot() {
-		return awtRobot;
-	}
-
-	int getMovingTimeLimit() {
-		return movingTimeLimit;
+	void setInterruptActionListener(ActionListener listener) {
+		if (interruptActionListener != null)
+			btnInterrupt.removeActionListener(interruptActionListener);
+		btnInterrupt.addActionListener(interruptActionListener = listener);
+		btnInterrupt.setEnabled(interruptActionListener != null);
 	}
 
 	void transferState(MFState state) {
@@ -457,7 +404,11 @@ public class MainFrame extends JFrame {
 		return strategyPane.createStrategy();
 	}
 
+	int getMovingTimeLimit() {
+		return movingPathGeneratorPane.getTimeLimit();
+	}
+
 	MovingPathGenerator getMovingPathGenerator() {
-		return movingPathGenerator;
+		return movingPathGeneratorPane.createMovingPathGenerator();
 	}
 }

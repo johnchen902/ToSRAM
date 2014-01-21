@@ -1,7 +1,9 @@
 package tosram.view;
 
+import java.awt.AWTException;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import java.awt.Robot;
 
 class GettingRectangleState implements MFState {
 
@@ -11,9 +13,15 @@ class GettingRectangleState implements MFState {
 		Rectangle screenArea = GraphicsEnvironment
 				.getLocalGraphicsEnvironment().getDefaultScreenDevice()
 				.getDefaultConfiguration().getBounds();
-		Rectangle mapArea = SubimageChooser.showRectangleDialog(frame
-				.getRobot().createScreenCapture(screenArea),
-				"Where are the runestones? Drag a rectangle.");
+		Rectangle mapArea;
+		try {
+			mapArea = SubimageChooser.showRectangleDialog(
+					new Robot().createScreenCapture(screenArea),
+					"Where are the runestones? Drag a rectangle.");
+		} catch (AWTException e) {
+			e.printStackTrace();
+			mapArea = null;
+		}
 		if (mapArea == null) {
 			frame.transferState(new ToGetRectangleState());
 		} else {

@@ -16,21 +16,18 @@ import tosram.strategy.StrategySearchPathRobot;
 class ComputingState implements MFState {
 
 	private MainFrame frame;
-	private ActionListener interrupt;
 	private ComputionWorker computionWorker;
 
 	@Override
 	public void checkIn(MainFrame f0) {
 		frame = f0;
 		frame.setStatus("Computing...");
-		frame.getInterruptButton().setEnabled(true);
-		frame.getInterruptButton().addActionListener(
-				interrupt = new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						computionWorker.interrupt();
-					}
-				});
+		frame.setInterruptActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				computionWorker.interrupt();
+			}
+		});
 		(computionWorker = new ComputionWorker()).execute();
 	}
 
@@ -102,10 +99,7 @@ class ComputingState implements MFState {
 			}
 			frame.setTime(computeTime);
 			frame.setStatus("Computed: " + finalStatus);
-
-			frame.getInterruptButton().setEnabled(false);
-			frame.getInterruptButton().removeActionListener(interrupt);
-
+			frame.setInterruptActionListener(null);
 			frame.transferState(new ToMoveState());
 		}
 	}

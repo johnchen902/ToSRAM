@@ -36,9 +36,6 @@ public class SearchStrategyPanel extends JPanel {
 	private JCheckBox chckbxWeathering;
 	private JCheckBox[] chckbxWeatherStones;
 
-	/**
-	 * Just constructor.
-	 */
 	public SearchStrategyPanel() {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -91,6 +88,11 @@ public class SearchStrategyPanel extends JPanel {
 		add(Box.createVerticalGlue());
 	}
 
+	/**
+	 * Create the search strategy user selected.
+	 * 
+	 * @return a <code>SearchStrategy</code>
+	 */
 	public SearchStrategy createSearchStrategy() {
 		SearchStrategy ss;
 		if (comboBox.getSelectedIndex() == 0)
