@@ -257,8 +257,8 @@ public class MainFrame extends JFrame {
 			lb1.setAlignmentX(Component.CENTER_ALIGNMENT);
 			pn.add(lb1);
 
-			JSpinner sp1 = new JSpinner(new SpinnerNumberModel(300, 10, 1000,
-					10));
+			JSpinner sp1 = new JSpinner(new SpinnerNumberModel(
+					pnPath.getSmallDelay(), 10, 1000, 10));
 			sp1.addChangeListener(EventHandler.create(ChangeListener.class,
 					pnPath, "smallDelay", "source.value"));
 			pn.add(sp1);

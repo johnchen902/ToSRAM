@@ -2,6 +2,7 @@ package tosram.strategy;
 
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.EnumSet;
 
 import tosram.Direction;
 import tosram.RuneMap;
@@ -42,17 +43,20 @@ public class ImprovementStrategy implements SearchStrategy {
 	}
 
 	@Override
-	public boolean isToStop() {
+	public EnumSet<Direction> getDirections() {
+		if (isToStop()) {
+			return EnumSet.noneOf(Direction.class);
+		} else {
+			return EnumSet.range(Direction.WEST, Direction.SOUTH);
+		}
+	}
+
+	private boolean isToStop() {
 		if (steps >= MAX_STEP)
 			return true;
 		if (steps >= HOPEFUL_STEP
 				&& bestQualities[steps - HOPEFUL_STEP] > quality)
 			return true;
-		return false;
-	}
-
-	@Override
-	public boolean isToDiagonal() {
 		return false;
 	}
 

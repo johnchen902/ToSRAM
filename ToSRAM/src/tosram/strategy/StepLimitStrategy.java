@@ -1,6 +1,7 @@
 package tosram.strategy;
 
 import java.util.Deque;
+import java.util.EnumSet;
 
 import tosram.Direction;
 import tosram.RuneMap;
@@ -43,13 +44,12 @@ public class StepLimitStrategy implements SearchStrategy {
 	}
 
 	@Override
-	public boolean isToStop() {
-		return step >= limit || strategy.isToStop();
-	}
-
-	@Override
-	public boolean isToDiagonal() {
-		return strategy.isToDiagonal();
+	public EnumSet<Direction> getDirections() {
+		if (step >= limit) {
+			return EnumSet.noneOf(Direction.class);
+		} else {
+			return strategy.getDirections();
+		}
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.EnumSet;
 import java.util.List;
 
 import tosram.ComboCalculator;
@@ -112,6 +113,40 @@ public class StrategySearchPathRobot implements PathRobot {
 		turn(init, bx, by, pB, pI);
 	}
 
+	private static int getX(int x, Direction direction) {
+		switch (direction) {
+		case WEST:
+		case WEST_NORTH:
+		case WEST_SOUTH:
+			return x - 1;
+		case EAST:
+		case EAST_NORTH:
+		case EAST_SOUTH:
+			return x + 1;
+		case NORTH:
+		case SOUTH:
+		default:
+			return x;
+		}
+	}
+
+	private static int getY(int y, Direction direction) {
+		switch (direction) {
+		case SOUTH:
+		case WEST_SOUTH:
+		case EAST_SOUTH:
+			return y + 1;
+		case NORTH:
+		case WEST_NORTH:
+		case EAST_NORTH:
+			return y - 1;
+		case WEST:
+		case EAST:
+		default:
+			return y;
+		}
+	}
+
 	// pB = the progress when this method starts
 	// pB + pI = the progress when this method ends
 	private void turn(RuneMap cc, int x, int y, double pB, double pI) {
@@ -126,65 +161,32 @@ public class StrategySearchPathRobot implements PathRobot {
 		}
 
 		searchStrategy.submit(cc, x, y, stack, solutionStrategy.getQuality());
-		if (searchStrategy.isToStop())
-			return;
 
 		if (Thread.currentThread().isInterrupted())
 			return;
 
-		boolean diag = searchStrategy.isToDiagonal();
-
 		setProgress(pB);
 
-		double pSI;
-		if (!diag) {
-			int nSI = 3;
-			if (stack.isEmpty())
-				nSI++;
-			if (x == 0 || x == cc.getWidth() - 1)
-				nSI--;
-			if (y == 0 || y == cc.getHeight() - 1)
-				nSI--;
-			pSI = pI / nSI;
-		} else {
-			boolean xBorder = x == 0 || x == cc.getWidth() - 1;
-			boolean yBorder = y == 0 || y == cc.getHeight() - 1;
-			int nSI;
-			if (xBorder && yBorder)
-				nSI = 3 - 1;
-			else if (!xBorder && !yBorder)
-				nSI = 8 - 1;
-			else
-				nSI = 5 - 1;
-			if (stack.isEmpty())
-				nSI++;
-			pSI = pI / nSI;
-		}
+		EnumSet<Direction> directions = searchStrategy.getDirections();
 
-		if (move(cc, x, y, pB, pSI, x - 1, y, WEST))
-			pB += pSI;
-		if (move(cc, x, y, pB, pSI, x + 1, y, EAST))
-			pB += pSI;
-		if (move(cc, x, y, pB, pSI, x, y - 1, NORTH))
-			pB += pSI;
-		if (move(cc, x, y, pB, pSI, x, y + 1, SOUTH))
-			pB += pSI;
-		if (diag) {
-			if (move(cc, x, y, pB, pSI, x - 1, y - 1, WEST_NORTH))
-				pB += pSI;
-			if (move(cc, x, y, pB, pSI, x - 1, y + 1, WEST_SOUTH))
-				pB += pSI;
-			if (move(cc, x, y, pB, pSI, x + 1, y - 1, EAST_NORTH))
-				pB += pSI;
-			if (move(cc, x, y, pB, pSI, x + 1, y + 1, EAST_SOUTH))
-				pB += pSI;
-		}
-	}
+		if (x == 0)
+			directions.removeAll(EnumSet.of(WEST, WEST_NORTH, WEST_SOUTH));
+		else if (x == cc.getWidth() - 1)
+			directions.removeAll(EnumSet.of(EAST, EAST_NORTH, EAST_SOUTH));
+		if (y == 0)
+			directions.removeAll(EnumSet.of(NORTH, WEST_NORTH, EAST_NORTH));
+		else if (y == cc.getHeight() - 1)
+			directions.removeAll(EnumSet.of(SOUTH, WEST_SOUTH, EAST_SOUTH));
+		if (!stack.isEmpty())
+			directions.remove(Direction.getOppsite(stack.peekLast()));
 
-	private boolean move(RuneMap cc, int x, int y, double pB, double pSI,
-			int nx, int ny, Direction dir) {
-		if (nx >= 0 && nx < cc.getWidth() && ny >= 0 && ny < cc.getHeight()
-				&& stack.peekLast() != Direction.getOppsite(dir)) {
+		double pSI = pI / directions.size();
+		ArrayList<Direction> alist = new ArrayList<>(directions);
+		Collections.shuffle(alist);
+
+		for (Direction dir : alist) {
+			int nx = getX(x, dir);
+			int ny = getY(y, dir);
 			RuneStone stone1 = cc.getStone(x, y);
 			RuneStone stone2 = cc.getStone(nx, ny);
 			cc.setRuneStone(x, y, stone2);
@@ -196,10 +198,8 @@ public class StrategySearchPathRobot implements PathRobot {
 
 			cc.setRuneStone(x, y, stone1);
 			cc.setRuneStone(nx, ny, stone2);
-
-			return true;
+			pB += pSI;
 		}
-		return false;
 	}
 
 }

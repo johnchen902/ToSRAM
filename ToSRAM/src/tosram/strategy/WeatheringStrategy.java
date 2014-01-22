@@ -2,6 +2,7 @@ package tosram.strategy;
 
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.EnumSet;
 
 import tosram.Direction;
 import tosram.RuneMap;
@@ -46,13 +47,12 @@ public class WeatheringStrategy implements SearchStrategy {
 	}
 
 	@Override
-	public boolean isToStop() {
-		return mask[position] || strategy.isToStop();
-	}
-
-	@Override
-	public boolean isToDiagonal() {
-		return strategy.isToDiagonal();
+	public EnumSet<Direction> getDirections() {
+		if (mask[position]) {
+			return EnumSet.noneOf(Direction.class);
+		} else {
+			return strategy.getDirections();
+		}
 	}
 
 	@Override

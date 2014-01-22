@@ -1,6 +1,7 @@
 package tosram.strategy;
 
 import java.util.Deque;
+import java.util.EnumSet;
 
 import tosram.Direction;
 import tosram.RuneMap;
@@ -35,13 +36,22 @@ public class LinearStrategy implements SearchStrategy {
 	}
 
 	@Override
-	public boolean isToStop() {
+	public EnumSet<Direction> getDirections() {
+		if (isToStop()) {
+			return EnumSet.noneOf(Direction.class);
+		} else if (isToDiagonal()) {
+			return EnumSet.allOf(Direction.class);
+		} else {
+			return EnumSet.range(Direction.WEST, Direction.SOUTH);
+		}
+	}
+
+	private boolean isToStop() {
 		return steps >= Math.max((int) (MULTIPLIER * quality + CONSTANT),
 				GRUANTEED_STEPS);
 	}
 
-	@Override
-	public boolean isToDiagonal() {
+	private boolean isToDiagonal() {
 		return quality >= DIAGONAL_THEREHOLD
 				&& steps >= MULTIPLIER * quality + DIAGONAL_CONSTANT;
 	}

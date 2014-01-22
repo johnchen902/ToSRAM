@@ -1,6 +1,7 @@
 package tosram.strategy;
 
 import java.util.Deque;
+import java.util.EnumSet;
 
 import tosram.Direction;
 import tosram.RuneMap;
@@ -30,22 +31,6 @@ public interface SearchStrategy {
 			double quality);
 
 	/**
-	 * Do you want to move stones diagonally?
-	 * 
-	 * @return <code>true</code> if to move stones diagonally;
-	 *         <code>false</code> otherwise
-	 */
-	public boolean isToDiagonal();
-
-	/**
-	 * Do you want to stop this branch?
-	 * 
-	 * @return <code>true</code> if to stop this branch; <code>false</code>
-	 *         otherwise
-	 */
-	public boolean isToStop();
-
-	/**
 	 * Adapt the progress calculated by treating each branch equally to the
 	 * progress calculated by estimating remaining calculation time.
 	 * <ul>
@@ -61,4 +46,11 @@ public interface SearchStrategy {
 	 *         <code>1.0</code>
 	 */
 	public double adaptProgress(double progress);
+
+	/**
+	 * The directions to go?
+	 * 
+	 * @return the set of directions to go
+	 */
+	public EnumSet<Direction> getDirections();
 }
