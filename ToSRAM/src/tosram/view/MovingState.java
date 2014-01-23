@@ -5,7 +5,6 @@ import java.awt.Point;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
 import java.util.List;
-
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
@@ -31,6 +30,10 @@ class MovingState implements MFState {
 		private MovingPathGenerator mpg = frame.getMovingPathGenerator();
 		private int timeLimit = frame.getMovingTimeLimit();
 
+		private void delayRobotUntil(Robot robot, long until) {
+			robot.delay(Math.max((int) (until - System.currentTimeMillis()), 0));
+		}
+
 		@Override
 		protected Void doInBackground() throws Exception {
 			List<Move> moves = mpg.getMovePath(frame.getPath(), frame
@@ -40,16 +43,17 @@ class MovingState implements MFState {
 			Robot robot = new Robot();
 			robot.delay(DELAY_BEFORE_TAKEOVER);
 			boolean begin = true;
+			long delayUntil = System.currentTimeMillis();
 			for (Move move : moves) {
 				if (begin) {
 					robot.mouseMove(move.getPoint().x, move.getPoint().y);
-					robot.delay(move.getDelay() / 2);
+					delayRobotUntil(robot, delayUntil += move.getDelay() / 2);
 					robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-					robot.delay(move.getDelay() / 2);
+					delayRobotUntil(robot, delayUntil += move.getDelay() / 2);
 					begin = false;
 				} else {
 					robot.mouseMove(move.getPoint().x, move.getPoint().y);
-					robot.delay(move.getDelay());
+					delayRobotUntil(robot, delayUntil += move.getDelay());
 				}
 			}
 
@@ -64,6 +68,11 @@ class MovingState implements MFState {
 
 		@Override
 		protected void done() {
+			try {
+				get();
+			} catch (Exception ignore) {
+				ignore.printStackTrace();
+			}
 			frame.requestFocus();
 			frame.transferState(new GettingStoneState());
 		}

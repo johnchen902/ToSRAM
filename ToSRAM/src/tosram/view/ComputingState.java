@@ -9,6 +9,7 @@ import javax.swing.SwingWorker;
 import tosram.Path;
 import tosram.PathRobot;
 import tosram.Paths;
+import tosram.RuneMap;
 import tosram.strategy.SearchStrategy;
 import tosram.strategy.SolutionStrategy;
 import tosram.strategy.StrategySearchPathRobot;
@@ -56,7 +57,7 @@ class ComputingState implements MFState {
 			pathRobot.setStatusListener(this);
 
 			long tBegin = System.nanoTime();
-			Path path = pathRobot.getPath(frame.getRealMap());
+			Path path = pathRobot.getPath(new RuneMap(frame.getRealMap()));
 			long tEnd = System.nanoTime();
 
 			computeTime = (tEnd - tBegin) * 1e-9;
