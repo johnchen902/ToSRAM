@@ -358,7 +358,8 @@ public class MainFrame extends JFrame {
 
 	void setTime(double seconds) {
 		if (!Double.isNaN(seconds))
-			lbTime.setText(MessageFormat.format("{0,number,#.###} seconds",
+			lbTime.setText(MessageFormat.format(
+					"{0,number,0.000} second{0,choice,1<|2#s}",
 					new Object[] { seconds }));
 		else
 			lbTime.setText("");

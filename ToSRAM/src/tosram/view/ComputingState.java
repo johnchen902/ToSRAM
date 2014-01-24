@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.SwingWorker;
+import javax.swing.Timer;
 
 import tosram.Path;
 import tosram.PathRobot;
@@ -18,6 +19,7 @@ class ComputingState implements MFState {
 
 	private MainFrame frame;
 	private ComputionWorker computionWorker;
+	private Timer timer;
 
 	@Override
 	public void checkIn(MainFrame f0) {
@@ -29,6 +31,14 @@ class ComputingState implements MFState {
 				computionWorker.interrupt();
 			}
 		});
+		final long timeStart = System.currentTimeMillis();
+		timer = new Timer(1, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.setTime((System.currentTimeMillis() - timeStart) / 1000.0);
+			}
+		});
+		timer.start();
 		(computionWorker = new ComputionWorker()).execute();
 	}
 
@@ -91,6 +101,7 @@ class ComputingState implements MFState {
 
 		@Override
 		protected void done() {
+			timer.stop();
 			try {
 				Path p = get();
 				frame.setPath(p);
