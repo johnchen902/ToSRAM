@@ -4,17 +4,12 @@ import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
-import java.util.EnumMap;
-import java.util.Map.Entry;
-
-import tosram.ComboCalculator;
 import tosram.DefaultPath;
 import tosram.Path;
 import tosram.PathRobot;
 import tosram.RuneMap;
 import tosram.Direction;
 import tosram.RuneStone;
-import tosram.RuneStone.Type;
 
 /**
  * An implementation of <code>PathRobot</code> based on <a
@@ -23,51 +18,6 @@ import tosram.RuneStone.Type;
  * @author johnchen902
  */
 public class IDAStarRobot implements PathRobot {
-
-	private static int getPossibleCombo(int count) {
-		if (count <= 20)
-			return count / 3;
-		switch (count) {
-		case 21:
-		case 22:
-			return 5;
-		case 23:
-			return 4;
-		case 24:
-		case 25:
-			return 3;
-		case 26:
-			return 2;
-		case 27:
-		case 28:
-		case 29:
-		case 30:
-			return 1;
-		default:
-			return 0;
-		}
-	}
-
-	private static int getMaxCombo(RuneMap runemap) {
-		EnumMap<Type, Integer> map = new EnumMap<>(Type.class);
-		for (Type type : Type.values())
-			map.put(type, 0);
-		for (int y = 0; y < runemap.getHeight(); y++)
-			for (int x = 0; x < runemap.getWidth(); x++) {
-				Type t = runemap.getStone(x, y).getType();
-				map.put(t, map.get(t) + 1);
-			}
-		int combo = 0;
-		boolean pureColor = false;
-		for (Entry<Type, Integer> e : map.entrySet()) {
-			if (e.getKey() != Type.UNKNOWN) {
-				combo += getPossibleCombo(e.getValue());
-				if (e.getValue() >= 18)
-					pureColor = true;
-			}
-		}
-		return pureColor ? -combo : combo;
-	}
 
 	private static int getX(int x, Direction direction) {
 		switch (direction) {
@@ -103,34 +53,31 @@ public class IDAStarRobot implements PathRobot {
 		}
 	}
 
+	private final GoalSeriesFactory gsf;
+	private Goal finalGoal, nextGoal, currentGoal, madeGoal;
+
 	private StatusListener listener;
 	private Deque<Direction> stack = new ArrayDeque<Direction>();
 	private int bx, by;
-	private int maxCombo;
-	private int targetCombo;
 	private int currentDiagonalCount;
 	private int currentMoveCount;
-	private boolean pureColor;
 
-	private int heuristicCostEstimate(ComboCalculator.Describer combo) {
-		return 3 * (targetCombo - combo.getFullComboCount());
+	public IDAStarRobot(GoalSeriesFactory goalSeriesfactory) {
+		this.gsf = goalSeriesfactory;
 	}
 
 	private int cost(Direction d) {
 		return d.ordinal() < 4 ? 1 : 2;
 	}
 
-	private boolean isGoal(ComboCalculator.Describer combo) {
-		return targetCombo <= combo.getFullComboCount();
-	}
-
 	private DefaultPath search(RuneMap m, int x, int y, int g, int bound,
 			double pa, double pb) {
-		ComboCalculator.Describer combo = ComboCalculator.getDescriber(m);
-		int f = g + heuristicCostEstimate(combo);
+		Goal.Result goalResult = currentGoal.getResult(m);
+		int f = g + goalResult.heuristicCostEstimate();
 		if (f > bound || Thread.currentThread().isInterrupted())
 			return null;
-		if (isGoal(combo)) {
+		if (goalResult.isMade()) {
+			nextGoal = goalResult.getNext();
 			return new DefaultPath(new Point(bx, by), new ArrayDeque<>(stack));
 		}
 		if (listener != null)
@@ -176,9 +123,9 @@ public class IDAStarRobot implements PathRobot {
 	}
 
 	private Path runIDAStar(RuneMap stones) {
-		int bound = heuristicCostEstimate(ComboCalculator.getDescriber(stones));
+		int bound = currentGoal.getResult(stones).heuristicCostEstimate();
 		while (!Thread.currentThread().isInterrupted()) {
-			updateMilestone(targetCombo - 1, bound);
+			updateMilestone(bound);
 			DefaultPath result = search(stones, bound);
 			if (result != null)
 				return result;
@@ -199,44 +146,40 @@ public class IDAStarRobot implements PathRobot {
 	@Override
 	public Path getPath(RuneMap stones) {
 		stones = new RuneMap(stones);
-		maxCombo = getMaxCombo(stones);
-		pureColor = false;
-		if (maxCombo < 0) {
-			pureColor = true;
-			maxCombo = -maxCombo;
-		}
 		Path path = new DefaultPath(new Point(0, 0),
 				Collections.<Direction> emptyList());
-		for (targetCombo = 1; targetCombo <= maxCombo; targetCombo++) {
+
+		Goal[] goalPair = gsf.createGoalSeries(new RuneMap(stones));
+		madeGoal = currentGoal = goalPair[0];
+		finalGoal = goalPair[1];
+		while (true) {
 			Path result = runIDAStar(stones);
 			if (result == null) {
-				updateMilestone(targetCombo - 1, -1);
+				updateMilestone(-1);
 				break;
 			}
 			path = result;
 
 			currentMoveCount = path.getDirections().size();
 			currentDiagonalCount = countDiagonal(path);
+			madeGoal = currentGoal;
 
-			updateMilestone(targetCombo, -1);
+			updateMilestone(-1);
+			if (currentGoal.equals(finalGoal))
+				break;
+			currentGoal = nextGoal;
 		}
 		if (listener != null)
 			listener.updateProgress(1.0);
 		return path;
 	}
 
-	private void updateMilestone(int currentCombo, int bound) {
+	private void updateMilestone(int bound) {
 		if (listener == null)
 			return;
 		StringBuilder builder = new StringBuilder();
 
-		builder.append(currentCombo);
-		if (currentCombo != maxCombo)
-			builder.append(" / ").append(maxCombo);
-		builder.append(" combo");
-
-		if (pureColor)
-			builder.append(" (W:PURE!!)");
+		builder.append(gsf.describeGoal(madeGoal, finalGoal));
 
 		builder.append(' ').append(currentMoveCount).append(" step");
 		if (currentMoveCount > 1)
