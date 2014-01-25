@@ -11,9 +11,6 @@ import tosram.Path;
 import tosram.PathRobot;
 import tosram.Paths;
 import tosram.RuneMap;
-import tosram.strategy.SearchStrategy;
-import tosram.strategy.SolutionStrategy;
-import tosram.strategy.StrategySearchPathRobot;
 
 class ComputingState implements MFState {
 
@@ -51,9 +48,7 @@ class ComputingState implements MFState {
 		private Thread thread;
 
 		public ComputionWorker() {
-			SearchStrategy ses = frame.getSearchStrategy();
-			SolutionStrategy ss = frame.getSolutionStrategy();
-			pathRobot = new StrategySearchPathRobot(ses, ss);
+			pathRobot = frame.createPathRobot();
 		}
 
 		public void interrupt() {

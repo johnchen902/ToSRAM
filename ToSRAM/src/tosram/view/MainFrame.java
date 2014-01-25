@@ -4,15 +4,12 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.EventHandler;
 import java.text.MessageFormat;
+import java.util.Map.Entry;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
 import tosram.*;
-import tosram.strategy.SearchStrategy;
-import tosram.strategy.SolutionStrategy;
-import tosram.view.strategy.SearchStrategyPanel;
-import tosram.view.strategy.StrategyPanel;
 
 /**
  * The frame shown on the screen. Please don't try to serialize me. I don't
@@ -32,6 +29,7 @@ public class MainFrame extends JFrame {
 	private JSplitPane splitPane;
 	private JPanel pnMain;
 	private JPanel pnSide;
+	private JTabbedPane tabbedPane;
 
 	private JProgressBar pbProgress; // progress of computing
 	private JLabel lbStatus; // general states and computing milestones
@@ -45,8 +43,7 @@ public class MainFrame extends JFrame {
 	private JButton btnBack; // the "Back" button
 	private JButton btnInterrupt; // the "Interrupt" button
 
-	private StrategyPanel strategyPane;
-	private SearchStrategyPanel searchStrategyPane;
+	private PathRobotCreater robotCreater;
 	private MovingPathGeneratorPanel movingPathGeneratorPane;
 
 	public MainFrame() {
@@ -187,17 +184,14 @@ public class MainFrame extends JFrame {
 	private void initSidePanel() {
 		pnSide = new JPanel(new GridLayout(1, 1));
 
-		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane = new JTabbedPane();
 		pnSide.add(tabbedPane);
 		{
-			strategyPane = new StrategyPanel();
-			tabbedPane.addTab("Strategies", strategyPane);
-			tabbedPane.setMnemonicAt(0, KeyEvent.VK_S);
-		}
-		{
-			searchStrategyPane = new SearchStrategyPanel();
-			tabbedPane.addTab("Searching", searchStrategyPane);
-			tabbedPane.setMnemonicAt(1, KeyEvent.VK_E);
+			JPanel pnWrapper = new JPanel();
+			pnWrapper.add(createMiscellaneousPanel());
+
+			tabbedPane.addTab("Miscellaneous", pnWrapper);
+			tabbedPane.setMnemonicAt(0, KeyEvent.VK_C);
 		}
 		{
 			RuneStone.Type[] types = RuneStone.Type.values();
@@ -218,70 +212,92 @@ public class MainFrame extends JFrame {
 			tabbedPane.addTab("Edit Map", rmt);
 		}
 		{
-			Box pn = Box.createVerticalBox();
-
-			final PathPanel.AnimationListener al = new PathPanel.AnimationListener() {
-				@Override
-				public void animationStop() {
-					setRuneMapShown(Paths.follow(realMap, path));
-				}
-
-				@Override
-				public void animationStart() {
-					setRuneMapShown(realMap);
-				}
-
-				@Override
-				public void animate(int index) {
-					setRuneMapShown(Paths.follow(realMap, path, index + 1));
-				}
-			};
-
-			JCheckBox cbx = new JCheckBox("Animate stones");
-			cbx.setAlignmentX(Component.CENTER_ALIGNMENT);
-			pn.add(cbx);
-			cbx.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						pnPath.addAnimationListener(al);
-					} else {
-						pnPath.removeAnimationListener(al);
-						if (realMap != null && path != null)
-							setRuneMapShown(Paths.follow(realMap, path));
-					}
-				}
-			});
-
-			JLabel lb1 = new JLabel("Small Delay (ms)");
-			lb1.setAlignmentX(Component.CENTER_ALIGNMENT);
-			pn.add(lb1);
-
-			JSpinner sp1 = new JSpinner(new SpinnerNumberModel(
-					pnPath.getSmallDelay(), 10, 1000, 10));
-			sp1.addChangeListener(EventHandler.create(ChangeListener.class,
-					pnPath, "smallDelay", "source.value"));
-			pn.add(sp1);
-
-			JLabel lb2 = new JLabel("Big Delay (ms)");
-			lb2.setAlignmentX(Component.CENTER_ALIGNMENT);
-			pn.add(lb2);
-
-			JSpinner sp2 = new JSpinner(new SpinnerNumberModel(
-					pnPath.getBigDelay(), 500, 15000, 500));
-			sp2.addChangeListener(EventHandler.create(ChangeListener.class,
-					pnPath, "bigDelay", "source.value"));
-			pn.add(sp2);
-
-			movingPathGeneratorPane = new MovingPathGeneratorPanel();
-			pn.add(movingPathGeneratorPane);
-
-			JPanel pnWrapper = new JPanel();
-			pnWrapper.add(pn);
-
-			tabbedPane.addTab("Miscellaneous", pnWrapper);
-			tabbedPane.setMnemonicAt(3, KeyEvent.VK_C);
+			robotCreater = new tosram.view.strategy.StrategyRobotCreater();
+			for (Entry<String, Component> e : robotCreater.getSettingsTabs().entrySet()) {
+				tabbedPane.addTab(e.getKey(), e.getValue());
+			}
 		}
+	}
+
+	private JComponent createMiscellaneousPanel() {
+		Box pn = Box.createVerticalBox();
+
+		final JComboBox<PathRobotCreater> comboBox = new JComboBox<>();
+		comboBox.addItem(new tosram.view.strategy.StrategyRobotCreater());
+		comboBox.addItem(new tosram.view.xrobot.IDAStarRobotCreater());
+		comboBox.setSelectedIndex(0);
+		comboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				while (tabbedPane.getTabCount() > 2) {
+					tabbedPane.removeTabAt(tabbedPane.getTabCount() - 1);
+				}
+				robotCreater = (PathRobotCreater) comboBox.getSelectedItem();
+				for (Entry<String, Component> e : robotCreater.getSettingsTabs()
+						.entrySet()) {
+					tabbedPane.addTab(e.getKey(), e.getValue());
+				}
+			}
+		});
+		pn.add(comboBox);
+
+		final PathPanel.AnimationListener al = new PathPanel.AnimationListener() {
+			@Override
+			public void animationStop() {
+				setRuneMapShown(Paths.follow(realMap, path));
+			}
+
+			@Override
+			public void animationStart() {
+				setRuneMapShown(realMap);
+			}
+
+			@Override
+			public void animate(int index) {
+				setRuneMapShown(Paths.follow(realMap, path, index + 1));
+			}
+		};
+
+		JCheckBox cbx = new JCheckBox("Animate stones");
+		cbx.setAlignmentX(Component.CENTER_ALIGNMENT);
+		pn.add(cbx);
+		cbx.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					pnPath.addAnimationListener(al);
+				} else {
+					pnPath.removeAnimationListener(al);
+					if (realMap != null && path != null)
+						setRuneMapShown(Paths.follow(realMap, path));
+				}
+			}
+		});
+
+		JLabel lb1 = new JLabel("Small Delay (ms)");
+		lb1.setAlignmentX(Component.CENTER_ALIGNMENT);
+		pn.add(lb1);
+
+		JSpinner sp1 = new JSpinner(new SpinnerNumberModel(
+				pnPath.getSmallDelay(), 10, 1000, 10));
+		sp1.addChangeListener(EventHandler.create(ChangeListener.class, pnPath,
+				"smallDelay", "source.value"));
+		pn.add(sp1);
+
+		JLabel lb2 = new JLabel("Big Delay (ms)");
+		lb2.setAlignmentX(Component.CENTER_ALIGNMENT);
+		pn.add(lb2);
+
+		JSpinner sp2 = new JSpinner(new SpinnerNumberModel(
+				pnPath.getBigDelay(), 500, 15000, 500));
+		sp2.addChangeListener(EventHandler.create(ChangeListener.class, pnPath,
+				"bigDelay", "source.value"));
+		pn.add(sp2);
+
+		movingPathGeneratorPane = new MovingPathGeneratorPanel();
+		pn.add(movingPathGeneratorPane);
+
+		return pn;
 	}
 
 	Rectangle getMapArea() {
@@ -397,12 +413,8 @@ public class MainFrame extends JFrame {
 				/ tbStones.getRowCount());
 	}
 
-	SearchStrategy getSearchStrategy() {
-		return searchStrategyPane.createSearchStrategy();
-	}
-
-	SolutionStrategy getSolutionStrategy() {
-		return strategyPane.createStrategy();
+	PathRobot createPathRobot() {
+		return robotCreater.createPathRobot();
 	}
 
 	int getMovingTimeLimit() {
