@@ -54,6 +54,7 @@ public class IDAStarRobot implements PathRobot {
 	}
 
 	private final GoalSeriesFactory gsf;
+	private final Moving moving;
 	private Goal finalGoal, nextGoal, currentGoal, madeGoal;
 
 	private StatusListener listener;
@@ -62,12 +63,9 @@ public class IDAStarRobot implements PathRobot {
 	private int currentDiagonalCount;
 	private int currentMoveCount;
 
-	public IDAStarRobot(GoalSeriesFactory goalSeriesfactory) {
+	public IDAStarRobot(GoalSeriesFactory goalSeriesfactory, Moving moving) {
 		this.gsf = goalSeriesfactory;
-	}
-
-	private int cost(Direction d) {
-		return d.ordinal() < 4 ? 1 : 2;
+		this.moving = moving;
 	}
 
 	private DefaultPath search(RuneMap m, int x, int y, int g, int bound,
@@ -82,7 +80,8 @@ public class IDAStarRobot implements PathRobot {
 		}
 		if (listener != null)
 			listener.updateProgress(pa);
-		for (Direction dir : Direction.values()) {
+		Direction[] directions = moving.getDirections(x, y);
+		for (Direction dir : directions) {
 			if (stack.peekLast() == Direction.getOppsite(dir))
 				continue;
 			int nx = getX(x, dir);
@@ -96,9 +95,9 @@ public class IDAStarRobot implements PathRobot {
 			m.setRuneStone(nx, ny, stone1);
 
 			stack.addLast(dir);
-			DefaultPath result = search(m, nx, ny, g + cost(dir), bound, pa,
-					pb / 8);
-			pa += pb / 8;
+			DefaultPath result = search(m, nx, ny, g + moving.cost(dir), bound,
+					pa, pb / directions.length);
+			pa += pb / directions.length;
 			stack.removeLast();
 
 			m.setRuneStone(x, y, stone1);
