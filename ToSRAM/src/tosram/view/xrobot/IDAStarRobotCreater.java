@@ -1,6 +1,8 @@
 package tosram.view.xrobot;
 
 import java.awt.Component;
+import java.awt.GridLayout;
+import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.EventHandler;
 import java.util.HashMap;
@@ -27,6 +29,8 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 	private JPanel wrapper;
 	private JCheckBox cbxDiagonal;
 	private JSpinner spnDiagonalCost;
+	private JCheckBox chckbxWeathering;
+	private JCheckBox[] chckbxWeatherStones;
 
 	private void initialize() {
 		if (wrapper != null)
@@ -50,6 +54,28 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 
 		cbxDiagonal.addItemListener(EventHandler.create(ItemListener.class,
 				spnDiagonalCost, "enabled", "source.selected"));
+
+		chckbxWeathering = new JCheckBox("Weathering");
+		chckbxWeathering.setAlignmentX(Component.CENTER_ALIGNMENT);
+		box.add(chckbxWeathering);
+		chckbxWeathering.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				for (JCheckBox cbx : chckbxWeatherStones)
+					cbx.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+			}
+		});
+
+		JPanel panel = new JPanel();
+		panel.setFocusCycleRoot(true);
+		box.add(panel);
+		panel.setLayout(new GridLayout(5, 6, 0, 0));
+		chckbxWeatherStones = new JCheckBox[30];
+		for (int i = 0; i < 30; i++) {
+			panel.add(chckbxWeatherStones[i] = new JCheckBox("     "));
+			chckbxWeatherStones[i].setEnabled(false);
+			chckbxWeatherStones[i].setHorizontalTextPosition(JCheckBox.CENTER);
+		}
 	}
 
 	@Override
@@ -60,6 +86,12 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 			moving = new DiagonalMoving((int) spnDiagonalCost.getValue());
 		} else {
 			moving = new NoDiagonalMoving();
+		}
+		if (chckbxWeathering.isSelected()) {
+			boolean[] bools = new boolean[30];
+			for (int i = 0; i < 30; i++)
+				bools[i] = chckbxWeatherStones[i].isSelected();
+			moving = new WeatheringMoving(moving, bools);
 		}
 		return new IDAStarRobot(new MaxComboGoalSeriesFactory(), moving);
 	}
