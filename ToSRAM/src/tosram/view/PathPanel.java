@@ -16,9 +16,7 @@ import java.util.ListIterator;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import tosram.Direction;
 import tosram.Path;
-import tosram.RoundPath;
 
 /**
  * A panel showing a path.
@@ -105,7 +103,7 @@ public class PathPanel extends JPanel {
 			gpath = null;
 			activeSegement = null;
 		} else {
-			RoundPath rpath = calculatePath();
+			PathPanelCalculator.Result rpath = calculatePath();
 			gpath = rpath.getPath();
 			pa = new PathAnimation(rpath.getSegements());
 			pa.start();
@@ -125,7 +123,7 @@ public class PathPanel extends JPanel {
 		this.cellWidth = cellW;
 		this.cellHeight = cellH;
 		if (gpath != null && pa != null) {
-			RoundPath rpath = calculatePath();
+			PathPanelCalculator.Result rpath = calculatePath();
 			gpath = rpath.getPath();
 			pa.setSegements(rpath.getSegements());
 		}
@@ -161,44 +159,8 @@ public class PathPanel extends JPanel {
 		this.bigDelay = bigDelay;
 	}
 
-	private RoundPath calculatePath() {
-		RoundPath rpath = new RoundPath();
-		int x = path.getBeginPoint().x, y = path.getBeginPoint().y;
-		rpath.moveTo((x + .5) * cellWidth, (y + .5) * cellHeight);
-		for (Direction dir : path.getDirections()) {
-			switch (dir) {
-			case WEST:
-			case WEST_NORTH:
-			case WEST_SOUTH:
-				x--;
-				break;
-			case EAST:
-			case EAST_NORTH:
-			case EAST_SOUTH:
-				x++;
-				break;
-			case NORTH:
-			case SOUTH:
-				break;
-			}
-			switch (dir) {
-			case SOUTH:
-			case WEST_SOUTH:
-			case EAST_SOUTH:
-				y++;
-				break;
-			case NORTH:
-			case WEST_NORTH:
-			case EAST_NORTH:
-				y--;
-				break;
-			case WEST:
-			case EAST:
-				break;
-			}
-			rpath.roundTo((x + .5) * cellWidth, (y + .5) * cellHeight);
-		}
-		return rpath;
+	private PathPanelCalculator.Result calculatePath() {
+		return PathPanelCalculator.calculatePath(path, cellWidth, cellHeight);
 	}
 
 	@Override
