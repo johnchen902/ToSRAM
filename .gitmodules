@@ -1,0 +1,3 @@
+[submodule "ToSRAM/lib/Swing-range-slider"]
+	path = ToSRAM/lib/Swing-range-slider
+	url = git://github.com/johnchen902/Swing-range-slider
