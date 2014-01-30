@@ -406,11 +406,12 @@ public class MainFrame extends JFrame {
 
 	private void adjustRuneMapShown() {
 		float tableWidth = tbStones.getWidth();
-		float tableHeight = 0f;
+		float tableHeight = tbStones.getHeight();
 		for (int row = 0; row < tbStones.getRowCount(); row++)
-			tableHeight += tbStones.getRowHeight(row);
-		pnPath.setCellSize(tableWidth / tbStones.getColumnCount(), tableHeight
-				/ tbStones.getRowCount());
+			tbStones.setRowHeight(row,
+					(int) (tableHeight / tbStones.getRowCount()));
+		pnPath.setCellSize(tableWidth / tbStones.getColumnCount(),
+				(int) (tableHeight / tbStones.getRowCount()));
 	}
 
 	PathRobot createPathRobot() {

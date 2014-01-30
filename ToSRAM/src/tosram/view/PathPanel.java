@@ -8,6 +8,7 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.util.EventListener;
 import java.util.List;
@@ -15,6 +16,8 @@ import java.util.ListIterator;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
+
+import org.javatuples.Pair;
 
 import tosram.Path;
 
@@ -103,9 +106,9 @@ public class PathPanel extends JPanel {
 			gpath = null;
 			activeSegement = null;
 		} else {
-			PathPanelCalculator.Result rpath = calculatePath();
-			gpath = rpath.getPath();
-			pa = new PathAnimation(rpath.getSegements());
+			Pair<Path2D, List<Shape>> rpath = calculatePath();
+			gpath = rpath.getValue0();
+			pa = new PathAnimation(rpath.getValue1());
 			pa.start();
 		}
 		repaint();
@@ -123,9 +126,9 @@ public class PathPanel extends JPanel {
 		this.cellWidth = cellW;
 		this.cellHeight = cellH;
 		if (gpath != null && pa != null) {
-			PathPanelCalculator.Result rpath = calculatePath();
-			gpath = rpath.getPath();
-			pa.setSegements(rpath.getSegements());
+			Pair<Path2D, List<Shape>> rpath = calculatePath();
+			gpath = rpath.getValue0();
+			pa.setSegements(rpath.getValue1());
 		}
 	}
 
@@ -159,8 +162,10 @@ public class PathPanel extends JPanel {
 		this.bigDelay = bigDelay;
 	}
 
-	private PathPanelCalculator.Result calculatePath() {
-		return PathPanelCalculator.calculatePath(path, cellWidth, cellHeight);
+	private Pair<Path2D, List<Shape>> calculatePath() {
+		double dis = Math.min(cellWidth, cellHeight) / 6.3;
+		return PathPanelCalculator.calculatePath(path, cellWidth, cellHeight,
+				dis);
 	}
 
 	@Override
@@ -180,11 +185,12 @@ public class PathPanel extends JPanel {
 		g.draw(gpath);
 
 		if (activeSegement != null) {
-			g.setStroke(new BasicStroke(5f, BasicStroke.CAP_ROUND,
-					BasicStroke.JOIN_ROUND));
+			Shape s = new Area(new BasicStroke(5f, BasicStroke.CAP_ROUND,
+					BasicStroke.JOIN_ROUND).createStrokedShape(activeSegement));
+
 			g.setColor(Color.BLACK);
-			g.draw(activeSegement);
-			Shape s = g.getStroke().createStrokedShape(activeSegement);
+			g.fill(s);
+
 			g.setStroke(new BasicStroke(1f));
 			g.setColor(Color.WHITE);
 			g.draw(s);
