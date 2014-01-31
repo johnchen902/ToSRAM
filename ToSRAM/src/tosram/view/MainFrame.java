@@ -213,7 +213,8 @@ public class MainFrame extends JFrame {
 		}
 		{
 			robotCreater = new tosram.view.strategy.StrategyRobotCreater();
-			for (Entry<String, Component> e : robotCreater.getSettingsTabs().entrySet()) {
+			for (Entry<String, Component> e : robotCreater.getSettingsTabs()
+					.entrySet()) {
 				tabbedPane.addTab(e.getKey(), e.getValue());
 			}
 		}
@@ -233,8 +234,8 @@ public class MainFrame extends JFrame {
 					tabbedPane.removeTabAt(tabbedPane.getTabCount() - 1);
 				}
 				robotCreater = (PathRobotCreater) comboBox.getSelectedItem();
-				for (Entry<String, Component> e : robotCreater.getSettingsTabs()
-						.entrySet()) {
+				for (Entry<String, Component> e : robotCreater
+						.getSettingsTabs().entrySet()) {
 					tabbedPane.addTab(e.getKey(), e.getValue());
 				}
 			}
@@ -420,6 +421,10 @@ public class MainFrame extends JFrame {
 
 	int getMovingTimeLimit() {
 		return movingPathGeneratorPane.getTimeLimit();
+	}
+
+	boolean isMovingFastStart() {
+		return movingPathGeneratorPane.isFastStart();
 	}
 
 	MovingPathGenerator getMovingPathGenerator() {

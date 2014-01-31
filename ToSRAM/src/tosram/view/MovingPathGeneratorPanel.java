@@ -1,15 +1,15 @@
 package tosram.view;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-
 import java.awt.GridLayout;
 
-import javax.swing.JRadioButton;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 import tosram.BasicMovingPathGenerator;
 import tosram.HandMovingPathGenerator;
@@ -26,6 +26,7 @@ public class MovingPathGeneratorPanel extends JPanel {
 	private JSpinner spnTimeLimit;
 	private JRadioButton btnHand;
 	private JRadioButton btnSimple;
+	private JCheckBox chckbxFastStart;
 
 	public MovingPathGeneratorPanel() {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -34,7 +35,8 @@ public class MovingPathGeneratorPanel extends JPanel {
 		label.setAlignmentX(0.5f);
 		add(label);
 
-		spnTimeLimit = new JSpinner(new SpinnerNumberModel(5000, 250, 20000, 250));
+		spnTimeLimit = new JSpinner(new SpinnerNumberModel(5000, 250, 20000,
+				250));
 		add(spnTimeLimit);
 
 		JPanel panel = new JPanel();
@@ -53,6 +55,9 @@ public class MovingPathGeneratorPanel extends JPanel {
 		btnHand.setAlignmentX(0.5f);
 		panel.add(btnHand);
 		group.add(btnHand);
+
+		chckbxFastStart = new JCheckBox("Fast Start");
+		panel.add(chckbxFastStart);
 	}
 
 	/**
@@ -62,6 +67,16 @@ public class MovingPathGeneratorPanel extends JPanel {
 	 */
 	public int getTimeLimit() {
 		return (int) spnTimeLimit.getValue();
+	}
+
+	/**
+	 * Whether the user want to start fast.
+	 * 
+	 * @return <code>true</code> if the user want to start fast;
+	 *         <code>false</code> otherwise
+	 */
+	public boolean isFastStart() {
+		return chckbxFastStart.isSelected();
 	}
 
 	/**

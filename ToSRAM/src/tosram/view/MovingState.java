@@ -24,11 +24,17 @@ class MovingState implements MFState {
 
 	private class MovingWorker extends SwingWorker<Void, Void> {
 
-		private static final int DELAY_BEFORE_TAKEOVER = 400;
-		private static final int DELAY_AFTER_RELEASE = 100;
-
 		private MovingPathGenerator mpg = frame.getMovingPathGenerator();
 		private int timeLimit = frame.getMovingTimeLimit();
+		private boolean isFastStart = frame.isMovingFastStart();
+
+		private int getDelayBeforeTakeover() {
+			return isFastStart ? 40 : 400;
+		}
+
+		private int getDelayAfterRelease() {
+			return isFastStart ? 10 : 100;
+		}
 
 		private void delayRobotUntil(Robot robot, long until) {
 			robot.delay(Math.max((int) (until - System.currentTimeMillis()), 0));
@@ -38,10 +44,10 @@ class MovingState implements MFState {
 		protected Void doInBackground() throws Exception {
 			List<Move> moves = mpg.getMovePath(frame.getPath(), frame
 					.getMapArea(), new Dimension(frame.getRealMap().getWidth(),
-					frame.getRealMap().getHeight()), timeLimit, false);
+					frame.getRealMap().getHeight()), timeLimit, isFastStart);
 
 			Robot robot = new Robot();
-			robot.delay(DELAY_BEFORE_TAKEOVER);
+			robot.delay(getDelayBeforeTakeover());
 			boolean begin = true;
 			long delayUntil = System.currentTimeMillis();
 			for (Move move : moves) {
@@ -59,7 +65,7 @@ class MovingState implements MFState {
 
 			// release
 			robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-			robot.delay(DELAY_AFTER_RELEASE);
+			robot.delay(getDelayAfterRelease());
 			Point p = new Point(frame.getWidth() / 2, frame.getHeight() / 2);
 			SwingUtilities.convertPointToScreen(p, frame); // XXX access UI
 			robot.mouseMove(p.x, p.y);
