@@ -10,7 +10,8 @@ class ToGetStoneState implements MFState {
 	@Override
 	public void checkIn(MainFrame f0) {
 		frame = f0;
-		frame.setStatus("To get stones...");
+		frame.setStatus("Ready to read runestones");
+		frame.setNextText("Read");
 		frame.setNextActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -28,8 +29,8 @@ class ToGetStoneState implements MFState {
 	}
 
 	private void checkOut() {
+		frame.setNextText(null);
 		frame.setNextActionListener(null);
 		frame.setBackActionListener(null);
 	}
-
 }

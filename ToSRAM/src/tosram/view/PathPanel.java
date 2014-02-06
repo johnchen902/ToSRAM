@@ -29,14 +29,15 @@ import tosram.Path;
 @SuppressWarnings("serial")
 public class PathPanel extends JPanel {
 
+	private static final int SMALL_DELAY = 300;
+	private static final int BIG_DELAY = 3000;
+
 	private Path path;
 	private Path2D gpath;
 	private Shape activeSegement;
 	private PathAnimation pa;
 	private double cellWidth = 50;
 	private double cellHeight = 50;
-	private int smallDelay = 300;
-	private int bigDelay = 3000;
 
 	/**
 	 * Create an empty <code>PathPanel</code>
@@ -97,7 +98,7 @@ public class PathPanel extends JPanel {
 	 *            the path shown; <code>null</code> if nothing is shown
 	 */
 	public void setPath(Path path) {
-		this.path = path;
+		this.path = path == null ? path : new Path(path);
 		if (pa != null) {
 			pa.stop();
 			pa = null;
@@ -112,6 +113,10 @@ public class PathPanel extends JPanel {
 			pa.start();
 		}
 		repaint();
+	}
+
+	public Path getPath() {
+		return path == null ? null : new Path(path);
 	}
 
 	/**
@@ -130,36 +135,6 @@ public class PathPanel extends JPanel {
 			gpath = rpath.getValue0();
 			pa.setSegements(rpath.getValue1());
 		}
-	}
-
-	/**
-	 * @return the delay of animation between moves
-	 */
-	public int getSmallDelay() {
-		return smallDelay;
-	}
-
-	/**
-	 * @param smallDelay
-	 *            the delay of animation between moves
-	 */
-	public void setSmallDelay(int smallDelay) {
-		this.smallDelay = smallDelay;
-	}
-
-	/**
-	 * @return the delay of animation before start and after end
-	 */
-	public int getBigDelay() {
-		return bigDelay;
-	}
-
-	/**
-	 * @param bigDelay
-	 *            the delay of animation before start and after end
-	 */
-	public void setBigDelay(int bigDelay) {
-		this.bigDelay = bigDelay;
 	}
 
 	private Pair<Path2D, List<Shape>> calculatePath() {
@@ -232,7 +207,7 @@ public class PathPanel extends JPanel {
 		private ListIterator<Shape> iterator;
 
 		public PathAnimation(List<Shape> segements) {
-			super(bigDelay, null);
+			super(BIG_DELAY, null);
 			setInitialDelay(0);
 			this.segements = segements;
 			this.iterator = segements.listIterator();
@@ -259,13 +234,13 @@ public class PathPanel extends JPanel {
 						o.animate(i - 1);
 				}
 				activeSegement = iterator.next();
-				setDelay(iterator.hasNext() ? smallDelay : bigDelay);
+				setDelay(iterator.hasNext() ? SMALL_DELAY : BIG_DELAY);
 			} else {
 				iterator = segements.listIterator();
 				activeSegement = null;
 				for (AnimationListener o : getAnimationListeners())
 					o.animationStop();
-				setDelay(bigDelay);
+				setDelay(BIG_DELAY);
 			}
 			repaint();
 		}

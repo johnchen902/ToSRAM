@@ -1,8 +1,9 @@
 package tosram.view.strategy;
 
 import java.awt.Component;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
+import org.javatuples.LabelValue;
 
 import tosram.PathRobot;
 import tosram.strategy.StrategySearchPathRobot;
@@ -34,12 +35,11 @@ public class StrategyRobotCreater implements PathRobotCreater {
 	}
 
 	@Override
-	public Map<String, Component> getSettingsTabs() {
+	public List<LabelValue<String, Component>> getSettingsTabs() {
 		initialize();
-		Map<String, Component> map = new LinkedHashMap<String, Component>();
-		map.put("Strategies", strategyPanel);
-		map.put("Searching", searchPanel);
-		return map;
+		return Arrays.asList(
+				LabelValue.with("Strategies", (Component) strategyPanel),
+				LabelValue.with("Searching", (Component) searchPanel));
 	}
 
 	@Override

@@ -18,7 +18,6 @@ import java.util.EnumSet;
 import java.util.List;
 
 import tosram.ComboCalculator;
-import tosram.DefaultPath;
 import tosram.Direction;
 import tosram.Path;
 import tosram.PathRobot;
@@ -155,7 +154,7 @@ public class StrategySearchPathRobot implements PathRobot {
 
 		if (solutionStrategy.compareSolution() > 0) {
 			solutionStrategy.solutionAccepted();
-			bestSolution = new DefaultPath(new Point(bx, by), stack);
+			bestSolution = new Path(new Point(bx, by), stack);
 			if (listener != null)
 				listener.updateMilestone(solutionStrategy.getMilestone());
 		}

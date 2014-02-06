@@ -5,15 +5,16 @@ import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.EventHandler;
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.Arrays;
+import java.util.List;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+
+import org.javatuples.LabelValue;
 
 import tosram.PathRobot;
 import tosram.view.PathRobotCreater;
@@ -45,7 +46,7 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 		cbxDiagonal.setAlignmentX(Component.CENTER_ALIGNMENT);
 		box.add(cbxDiagonal);
 
-		JLabel label = new JLabel("Cost of Diagonal:");
+		JLabel label = new JLabel("Cost of diagonal:");
 		label.setAlignmentX(Component.CENTER_ALIGNMENT);
 		box.add(label);
 
@@ -97,11 +98,10 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 	}
 
 	@Override
-	public Map<String, Component> getSettingsTabs() {
+	public List<LabelValue<String, Component>> getSettingsTabs() {
 		initialize();
-		Map<String, Component> map = new HashMap<String, Component>();
-		map.put("IDA* Robot Settings", wrapper);
-		return map;
+		return Arrays.asList(LabelValue.with("IDA* Robot Settings",
+				(Component) wrapper));
 	}
 
 	@Override

@@ -18,7 +18,7 @@ class MovingState implements MFState {
 	@Override
 	public void checkIn(MainFrame f0) {
 		frame = f0;
-		frame.setStatus("Moving...");
+		frame.setStatus("Moving... Don't move you mouse");
 		new MovingWorker().execute();
 	}
 
@@ -27,6 +27,11 @@ class MovingState implements MFState {
 		private MovingPathGenerator mpg = frame.getMovingPathGenerator();
 		private int timeLimit = frame.getMovingTimeLimit();
 		private boolean isFastStart = frame.isMovingFastStart();
+		private Point frameCenter;
+		{
+			frameCenter = new Point(frame.getWidth() / 2, frame.getHeight() / 2);
+			SwingUtilities.convertPointToScreen(frameCenter, frame);
+		}
 
 		private int getDelayBeforeTakeover() {
 			return isFastStart ? 40 : 400;
@@ -66,9 +71,7 @@ class MovingState implements MFState {
 			// release
 			robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 			robot.delay(getDelayAfterRelease());
-			Point p = new Point(frame.getWidth() / 2, frame.getHeight() / 2);
-			SwingUtilities.convertPointToScreen(p, frame); // XXX access UI
-			robot.mouseMove(p.x, p.y);
+			robot.mouseMove(frameCenter.x, frameCenter.y);
 			return null;
 		}
 
@@ -79,6 +82,9 @@ class MovingState implements MFState {
 			} catch (Exception ignore) {
 				ignore.printStackTrace();
 			}
+			frame.setPath(null);
+			frame.setRealMap(null);
+			frame.setRuneMapShown(null);
 			frame.requestFocus();
 			frame.transferState(new GettingStoneState());
 		}

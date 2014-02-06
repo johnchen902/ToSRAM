@@ -9,15 +9,15 @@ class GettingRectangleState implements MFState {
 
 	@Override
 	public void checkIn(MainFrame frame) {
-		frame.setStatus("Getting rectangle...");
+		frame.setStatus("Getting where're the runestones...");
 		Rectangle screenArea = GraphicsEnvironment
 				.getLocalGraphicsEnvironment().getDefaultScreenDevice()
 				.getDefaultConfiguration().getBounds();
 		Rectangle mapArea;
 		try {
+			String msg = "Where are the runestones? Click and drag to draw a rectanglular selection.";
 			mapArea = SubimageChooser.showRectangleDialog(
-					new Robot().createScreenCapture(screenArea),
-					"Where are the runestones? Drag a rectangle.");
+					new Robot().createScreenCapture(screenArea), msg);
 		} catch (AWTException e) {
 			e.printStackTrace();
 			mapArea = null;
@@ -29,5 +29,4 @@ class GettingRectangleState implements MFState {
 			frame.transferState(new GettingStoneState());
 		}
 	}
-
 }

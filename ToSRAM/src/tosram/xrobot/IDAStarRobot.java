@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
-import tosram.DefaultPath;
 import tosram.Path;
 import tosram.PathRobot;
 import tosram.RuneMap;
@@ -68,15 +67,15 @@ public class IDAStarRobot implements PathRobot {
 		this.moving = moving;
 	}
 
-	private DefaultPath search(RuneMap m, int x, int y, int g, int bound,
-			double pa, double pb) {
+	private Path search(RuneMap m, int x, int y, int g, int bound, double pa,
+			double pb) {
 		Goal.Result goalResult = currentGoal.getResult(m);
 		int f = g + goalResult.heuristicCostEstimate();
 		if (f > bound || Thread.currentThread().isInterrupted())
 			return null;
 		if (goalResult.isMade()) {
 			nextGoal = goalResult.getNext();
-			return new DefaultPath(new Point(bx, by), new ArrayDeque<>(stack));
+			return new Path(new Point(bx, by), new ArrayDeque<>(stack));
 		}
 		if (listener != null)
 			listener.updateProgress(pa);
@@ -95,8 +94,8 @@ public class IDAStarRobot implements PathRobot {
 			m.setRuneStone(nx, ny, stone1);
 
 			stack.addLast(dir);
-			DefaultPath result = search(m, nx, ny, g + moving.cost(dir), bound,
-					pa, pb / directions.length);
+			Path result = search(m, nx, ny, g + moving.cost(dir), bound, pa, pb
+					/ directions.length);
 			pa += pb / directions.length;
 			stack.removeLast();
 
@@ -109,11 +108,11 @@ public class IDAStarRobot implements PathRobot {
 		return null;
 	}
 
-	private DefaultPath search(RuneMap m, int bound) {
+	private Path search(RuneMap m, int bound) {
 		double pa = 0;
 		for (by = 0; by < m.getHeight(); by++)
 			for (bx = 0; bx < m.getWidth(); bx++) {
-				DefaultPath result = search(m, bx, by, 0, bound, pa, 1.0 / 30);
+				Path result = search(m, bx, by, 0, bound, pa, 1.0 / 30);
 				pa += 1.0 / 30;
 				if (result != null)
 					return result;
@@ -125,7 +124,7 @@ public class IDAStarRobot implements PathRobot {
 		int bound = currentGoal.getResult(stones).heuristicCostEstimate();
 		while (!Thread.currentThread().isInterrupted()) {
 			updateMilestone(bound);
-			DefaultPath result = search(stones, bound);
+			Path result = search(stones, bound);
 			if (result != null)
 				return result;
 			else
@@ -145,7 +144,7 @@ public class IDAStarRobot implements PathRobot {
 	@Override
 	public Path getPath(RuneMap stones) {
 		stones = new RuneMap(stones);
-		Path path = new DefaultPath(new Point(0, 0),
+		Path path = new Path(new Point(0, 0),
 				Collections.<Direction> emptyList());
 
 		Goal[] goalPair = gsf.createGoalSeries(new RuneMap(stones));

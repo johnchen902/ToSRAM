@@ -1,7 +1,8 @@
 package tosram.view;
 
 import java.awt.Component;
-import java.util.Map;
+import java.util.List;
+import org.javatuples.LabelValue;
 
 import tosram.PathRobot;
 
@@ -17,7 +18,7 @@ public interface PathRobotCreater {
 	 * 
 	 * @return some title-component pair
 	 */
-	public Map<String, Component> getSettingsTabs();
+	public List<LabelValue<String, Component>> getSettingsTabs();
 
 	/**
 	 * Create the <code>PathRobot</code>

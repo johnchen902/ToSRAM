@@ -9,7 +9,6 @@ import javax.swing.Timer;
 
 import tosram.Path;
 import tosram.PathRobot;
-import tosram.Paths;
 import tosram.RuneMap;
 
 class ComputingState implements MFState {
@@ -100,15 +99,13 @@ class ComputingState implements MFState {
 			try {
 				Path p = get();
 				frame.setPath(p);
-				frame.setRuneMapShown(Paths.follow(frame.getRealMap(), p));
+				frame.setRuneMapShown(Path.follow(frame.getRealMap(), p));
 			} catch (Exception ignore) {
 				ignore.printStackTrace();
 			}
 			frame.setTime(computeTime);
-			frame.setStatus("Computed: " + finalStatus);
 			frame.setInterruptActionListener(null);
-			frame.transferState(new ToMoveState());
+			frame.transferState(new ToMoveState(finalStatus));
 		}
 	}
-
 }

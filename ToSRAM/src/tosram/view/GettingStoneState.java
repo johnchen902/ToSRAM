@@ -21,8 +21,7 @@ class GettingStoneState implements MFState {
 	@Override
 	public void checkIn(MainFrame f0) {
 		frame = f0;
-		frame.setStatus("Getting stones...");
-		frame.setPath(null);
+		frame.setStatus("Reading runestones...");
 		interrupted = false;
 		frame.setInterruptActionListener(new ActionListener() {
 			@Override
@@ -84,7 +83,5 @@ class GettingStoneState implements MFState {
 			frame.setInterruptActionListener(null);
 			frame.transferState(new ToComputeState());
 		}
-
 	}
-
 }

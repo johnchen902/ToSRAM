@@ -23,7 +23,7 @@ public class RuneMapTable extends JTable {
 	private boolean editable;
 
 	/**
-	 * Construct a table that <code>RuneMapTable</code>.
+	 * Create a not editable table.
 	 */
 	public RuneMapTable() {
 		setTableHeader(null);
@@ -32,7 +32,7 @@ public class RuneMapTable extends JTable {
 		setDragEnabled(true);
 		setDropMode(DropMode.ON);
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		setEditable(true);
+		setEditable(false);
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class RuneMapTable extends JTable {
 	 *            the <code>RuneMap</code> shown; can be <code>null</code>
 	 */
 	public void setRuneMap(RuneMap map) {
-		tableModel.setRuneMap(map);
+		tableModel.setRuneMap(map == null ? null : new RuneMap(map));
 		if (map != null)
 			adjustRowHeight();
 	}
@@ -85,7 +85,8 @@ public class RuneMapTable extends JTable {
 	 * @return the <code>RuneMap</code> shown; can be <code>null</code>
 	 */
 	public RuneMap getRuneMap() {
-		return tableModel.getRunemap();
+		RuneMap map = tableModel.getRunemap();
+		return map == null ? null : new RuneMap(map);
 	}
 
 	private void adjustRowHeight() {
@@ -243,9 +244,12 @@ public class RuneMapTable extends JTable {
 		@Override
 		protected Transferable createTransferable(JComponent c) {
 			JTable table = (JTable) c;
-			RuneStone value = (RuneStone) table.getValueAt(
-					table.getSelectedRow(), table.getSelectedColumn());
-			return new RuneStoneTransferable(value);
+			if (table.getSelectedRow() != -1 && table.getSelectedRow() != -1) {
+				RuneStone value = (RuneStone) table.getValueAt(
+						table.getSelectedRow(), table.getSelectedColumn());
+				return new RuneStoneTransferable(value);
+			} else
+				return null;
 		}
 	}
 
