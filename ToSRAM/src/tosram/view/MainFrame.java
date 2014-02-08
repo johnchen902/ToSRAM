@@ -1,14 +1,53 @@
 package tosram.view;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.beans.EventHandler;
 import java.text.MessageFormat;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeListener;
 
 import org.javatuples.LabelValue;
 
-import tosram.*;
+import tosram.MovingPathGenerator;
+import tosram.Path;
+import tosram.PathRobot;
+import tosram.RuneMap;
+import tosram.view.strategy.StrategyRobotCreater;
+import tosram.view.xrobot.IDAStarRobotCreater;
 
 /**
  * The frame shown on the screen. Please don't try to serialize me. I don't
@@ -27,8 +66,7 @@ public class MainFrame extends JFrame {
 
 	private JSplitPane splitPane;
 	private JPanel pnMain;
-	private JPanel pnSide;
-	private JTabbedPane tabbedPane;
+	private JTabbedPane pnSide;
 
 	private JProgressBar pbProgress; // progress of computing
 	private JLabel lbStatus; // general states and computing milestones
@@ -42,9 +80,8 @@ public class MainFrame extends JFrame {
 	private JButton btnBack; // the "Back" button
 	private JButton btnInterrupt; // the "Interrupt" button
 
-	private JComboBox<PathRobotCreater> cbxRobot;
 	private PathRobotCreater robotCreater;
-	private MovingPathGeneratorPanel movingPathGeneratorPane;
+	private MovingPane movingPane;
 
 	public MainFrame() {
 		super("Tower of Savior Runestone Auto Mover");
@@ -182,45 +219,33 @@ public class MainFrame extends JFrame {
 	}
 
 	private void initSidePanel() {
-		pnSide = new JPanel(new GridLayout(1, 1));
-
-		tabbedPane = new JTabbedPane();
-		pnSide.add(tabbedPane);
+		pnSide = new JTabbedPane();
 		{
 			JPanel pnWrapper = new JPanel();
 			pnWrapper.add(createMiscellaneousPanel());
 
-			tabbedPane.addTab("Miscellaneous", pnWrapper);
-			tabbedPane.setMnemonicAt(0, KeyEvent.VK_C);
+			pnSide.addTab("Miscellaneous", pnWrapper);
+			pnSide.setMnemonicAt(0, KeyEvent.VK_C);
 		}
 		{
 			JPanel pnWrapper = new JPanel();
-			tabbedPane.addTab("Edit Map", pnWrapper);
+			pnSide.addTab("Edit Map", pnWrapper);
 			pnWrapper.setLayout(new BorderLayout(0, 0));
 
-			RuneStone.Type[] types = RuneStone.Type.values();
-			RuneMap map0 = new RuneMap(2, types.length);
-			for (int i = 0; i < types.length; i++) {
-				RuneStone.Type type = types[i];
-				map0.setRuneStone(0, i, new RuneStone(type, false));
-				map0.setRuneStone(1, i, new RuneStone(type, true));
-			}
-
-			RuneMapTable rmt = new RuneMapTable();
+			RuneMapTable rmt = RuneMapTable.createAllStonesInstance();
 			pnWrapper.add(rmt);
 			rmt.setFocusable(false);
 			rmt.setFont(rmt.getFont().deriveFont(24f));
-			rmt.setRuneMap(map0);
 
-			JButton btnHelp = new JButton("How to edit map");
+			JButton btnHelp = new JButton("How to edit map?");
 			pnWrapper.add(btnHelp, BorderLayout.SOUTH);
 			btnHelp.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					String msg = "You can edit the map in the following ways:\n"
-							+ "* Drag from a cell in the \"Edit Map\" tab, and drop to one in the map.\n"
-							+ "* Drag from a cell in the map, and drop to another one.\n"
-							+ "* Double-click a cell in the map, and enter the corresponding code.\n";
+							+ "    * Drag from a cell in the \"Edit Map\" tab, and drop to one in the map.\n"
+							+ "    * Drag from a cell in the map, and drop to another one.\n"
+							+ "    * Double-click a cell in the map, and enter the corresponding code.\n";
 
 					JOptionPane.showMessageDialog(MainFrame.this, msg,
 							"How to edit map", JOptionPane.INFORMATION_MESSAGE);
@@ -228,52 +253,60 @@ public class MainFrame extends JFrame {
 			});
 		}
 		{
-			// Also invoke itemStateChanged
-			int defaultRobotIndex = 1;
-			if (defaultRobotIndex == 0)
-				robotSelected();
-			else
-				cbxRobot.setSelectedIndex(defaultRobotIndex);
-			if (tabbedPane.getTabCount() >= 3)
-				tabbedPane.setSelectedIndex(2);
+			selectRobot(robotCreater);
+			if (pnSide.getTabCount() >= 3)
+				pnSide.setSelectedIndex(2);
 		}
 	}
 
-	private void robotSelected() {
-		while (tabbedPane.getTabCount() > 2) {
-			tabbedPane.removeTabAt(tabbedPane.getTabCount() - 1);
+	private void selectRobot(PathRobotCreater prc) {
+		while (pnSide.getTabCount() > 2) {
+			pnSide.removeTabAt(pnSide.getTabCount() - 1);
 		}
-		robotCreater = (PathRobotCreater) cbxRobot.getSelectedItem();
+		robotCreater = prc;
 		for (LabelValue<String, Component> e : robotCreater.getSettingsTabs()) {
-			tabbedPane.addTab(e.getLabel(), e.getValue());
+			pnSide.addTab(e.getLabel(), e.getValue());
 		}
 	}
 
 	private JComponent createMiscellaneousPanel() {
 		Box pn = Box.createVerticalBox();
 
-		cbxRobot = new JComboBox<>();
-		cbxRobot.addItem(new tosram.view.strategy.StrategyRobotCreater());
-		cbxRobot.addItem(new tosram.view.xrobot.IDAStarRobotCreater());
-		cbxRobot.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				if (event.getStateChange() == ItemEvent.SELECTED)
-					robotSelected();
-			}
-		});
-		pn.add(cbxRobot);
+		JPanel pnRobot = new JPanel();
+		pn.add(pnRobot);
+		pnRobot.setAlignmentX(Component.LEFT_ALIGNMENT);
+		pnRobot.setBorder(BorderFactory.createTitledBorder("Robot"));
+		pnRobot.setLayout(new GridLayout(0, 1));
 
-		pn.add(Box.createVerticalStrut(15));
+		final String ROBOT = "robot";
+		ButtonGroup groupRobot = new ButtonGroup();
+		JRadioButton btnFast = new JRadioButton("Fast", true);
+		pnRobot.add(btnFast);
+		groupRobot.add(btnFast);
+		btnFast.putClientProperty(ROBOT, new IDAStarRobotCreater());
+		JRadioButton btnFlexible = new JRadioButton("Flexible");
+		pnRobot.add(btnFlexible);
+		groupRobot.add(btnFlexible);
+		btnFlexible.putClientProperty(ROBOT, new StrategyRobotCreater());
+		ActionListener alRobot = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JComponent bt = (JComponent) e.getSource();
+				selectRobot((PathRobotCreater) bt.getClientProperty(ROBOT));
+			}
+		};
+		btnFast.addActionListener(alRobot);
+		btnFlexible.addActionListener(alRobot);
+		robotCreater = (PathRobotCreater) btnFast.getClientProperty(ROBOT);
 
 		final PathPanel.AnimationListener al = new PathPanel.AnimationListener() {
 			@Override
-			public void animationStop() {
+			public void animationCycleStop() {
 				setRuneMapShown(Path.follow(realMap, path));
 			}
 
 			@Override
-			public void animationStart() {
+			public void animationCycleStart() {
 				setRuneMapShown(realMap);
 			}
 
@@ -283,9 +316,25 @@ public class MainFrame extends JFrame {
 			}
 		};
 
-		JCheckBox cbx = new JCheckBox("Animate stones");
-		cbx.setAlignmentX(Component.CENTER_ALIGNMENT);
-		pn.add(cbx);
+		Box pnAnima = Box.createVerticalBox();
+		pnAnima.setBorder(BorderFactory.createTitledBorder("Animation"));
+
+		JPanel pnSpeed = new JPanel();
+		pnAnima.add(pnSpeed);
+		pnSpeed.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+		JLabel lbSpeed = new JLabel("Speed:");
+		pnSpeed.add(lbSpeed);
+		lbSpeed.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		JSpinner spnSpeed = new JSpinner(new SpinnerNumberModel(1, 0.5, 8, 0.5));
+		pnSpeed.add(spnSpeed);
+		spnSpeed.setEditor(new JSpinner.NumberEditor(spnSpeed, "#.#x"));
+		spnSpeed.addChangeListener(EventHandler.create(ChangeListener.class,
+				pnPath, "animationSpeed", "source.value"));
+
+		JCheckBox cbx = new JCheckBox("Animate Stones");
+		pnAnima.add(cbx);
 		cbx.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
@@ -300,11 +349,12 @@ public class MainFrame extends JFrame {
 		});
 		cbx.setSelected(true);
 
-		pn.add(Box.createVerticalStrut(15));
+		pn.add(pnAnima);
 
-		movingPathGeneratorPane = new MovingPathGeneratorPanel();
-		pn.add(movingPathGeneratorPane);
-
+		movingPane = new MovingPane();
+		movingPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+		pn.add(movingPane);
+		movingPane.setBorder(BorderFactory.createTitledBorder("Moving"));
 		return pn;
 	}
 
@@ -439,14 +489,14 @@ public class MainFrame extends JFrame {
 	}
 
 	int getMovingTimeLimit() {
-		return movingPathGeneratorPane.getTimeLimit();
+		return movingPane.getTimeLimit();
 	}
 
 	boolean isMovingFastStart() {
-		return movingPathGeneratorPane.isFastStart();
+		return movingPane.isFastStart();
 	}
 
 	MovingPathGenerator getMovingPathGenerator() {
-		return movingPathGeneratorPane.createMovingPathGenerator();
+		return movingPane.createMovingPathGenerator();
 	}
 }

@@ -1,7 +1,5 @@
 package tosram.view;
 
-import java.awt.GridLayout;
-
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -16,48 +14,44 @@ import tosram.HandMovingPathGenerator;
 import tosram.MovingPathGenerator;
 
 /**
- * A panel that let user choose time limit to move stone and a
- * {@link MovingPathGenerator}.
+ * A panel that let user choose settings about moving.
  * 
  * @author johnchen902
  */
 @SuppressWarnings("serial")
-public class MovingPathGeneratorPanel extends JPanel {
-	private JSpinner spnTimeLimit;
+public class MovingPane extends JPanel {
+	private JSpinner spnTime;
 	private JRadioButton btnHand;
 	private JRadioButton btnSimple;
 	private JCheckBox chckbxFastStart;
 
-	public MovingPathGeneratorPanel() {
+	public MovingPane() {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-		JLabel label = new JLabel("Moving Time (ms)");
-		label.setAlignmentX(0.5f);
-		add(label);
+		JPanel pnTime = new JPanel();
+		pnTime.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+		add(pnTime);
 
-		spnTimeLimit = new JSpinner(new SpinnerNumberModel(5000, 250, 20000,
-				250));
-		add(spnTimeLimit);
+		JLabel label = new JLabel("Time:");
+		pnTime.add(label);
+		label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 
-		JPanel panel = new JPanel();
-		add(panel);
-		panel.setLayout(new GridLayout(0, 1, 0, 0));
+		spnTime = new JSpinner(new SpinnerNumberModel(5.0, 1.25, 20.0, 0.25));
+		pnTime.add(spnTime);
+		spnTime.setEditor(new JSpinner.NumberEditor(spnTime, "#.##s"));
 
 		ButtonGroup group = new ButtonGroup();
 
-		btnSimple = new JRadioButton("Simple Move");
-		btnSimple.setSelected(true);
-		btnSimple.setAlignmentX(0.5f);
-		panel.add(btnSimple);
+		btnSimple = new JRadioButton("Simple Path", true);
+		add(btnSimple);
 		group.add(btnSimple);
 
-		btnHand = new JRadioButton("Hand-like Move");
-		btnHand.setAlignmentX(0.5f);
-		panel.add(btnHand);
+		btnHand = new JRadioButton("Hand-like Path");
+		add(btnHand);
 		group.add(btnHand);
 
 		chckbxFastStart = new JCheckBox("Fast Start");
-		panel.add(chckbxFastStart);
+		add(chckbxFastStart);
 	}
 
 	/**
@@ -66,7 +60,7 @@ public class MovingPathGeneratorPanel extends JPanel {
 	 * @return the maximum time to move stone in milliseconds
 	 */
 	public int getTimeLimit() {
-		return (int) spnTimeLimit.getValue();
+		return (int) (1000 * ((Number) spnTime.getValue()).doubleValue());
 	}
 
 	/**

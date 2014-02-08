@@ -4,8 +4,16 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-import javax.swing.*;
+import javax.swing.DefaultCellEditor;
+import javax.swing.DropMode;
+import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.TransferHandler;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -22,9 +30,6 @@ public class RuneMapTable extends JTable {
 	private RuneMapModel tableModel;
 	private boolean editable;
 
-	/**
-	 * Create a not editable table.
-	 */
 	public RuneMapTable() {
 		setTableHeader(null);
 		setModel(tableModel = new RuneMapModel());
@@ -32,25 +37,39 @@ public class RuneMapTable extends JTable {
 		setDragEnabled(true);
 		setDropMode(DropMode.ON);
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		setEditable(false);
+
+		// setEditable(false);
+		setTransferHandler(new ReadOnlyTransferHandler());
+		setDefaultEditor(RuneStone.class, null);
+
+		addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if (evt.getPropertyName().equals("font")
+						|| evt.getPropertyName().equals("runeMap"))
+					adjustRowHeight();
+			}
+		});
 	}
 
 	/**
-	 * Get whether the table is editable
+	 * Get whether the table is editable. Not editable by default.
 	 * 
 	 * @return a <code>true</code> if the table is editable; <code>false</code>
 	 *         otherwise
+	 * @see #setEditable(boolean)
 	 */
 	public boolean isEditable() {
 		return editable;
 	}
 
 	/**
-	 * Set whether the table is editable
+	 * Set whether the table is editable.
 	 * 
 	 * @param editable
 	 *            <code>true</code> if the table is editable; <code>false</code>
 	 *            otherwise
+	 * @see #isEditable()
 	 */
 	public void setEditable(boolean editable) {
 		if (this.editable != editable) {
@@ -66,23 +85,33 @@ public class RuneMapTable extends JTable {
 	}
 
 	/**
-	 * Set the <code>RuneMap</code> shown in this map. Modifying the argument
-	 * map modifies the shown map.
+	 * Set the <code>RuneMap</code> shown in this map.
 	 * 
 	 * @param map
 	 *            the <code>RuneMap</code> shown; can be <code>null</code>
+	 * @see #getRuneMap()
 	 */
 	public void setRuneMap(RuneMap map) {
-		tableModel.setRuneMap(map == null ? null : new RuneMap(map));
-		if (map != null)
-			adjustRowHeight();
+		if (map == null) {
+			if (tableModel.getRunemap() != null) {
+				RuneMap oldMap = getRuneMap();
+				tableModel.setRuneMap(null);
+				firePropertyChange("runeMap", oldMap, null);
+			}
+		} else {
+			if (!map.equals(tableModel.getRunemap())) {
+				RuneMap oldMap = getRuneMap();
+				tableModel.setRuneMap(new RuneMap(map));
+				firePropertyChange("runeMap", oldMap, new RuneMap(map));
+			}
+		}
 	}
 
 	/**
-	 * Get the <code>RuneMap</code> shown in this map. Modifying the returned
-	 * map modifies the shown map.
+	 * Get the <code>RuneMap</code> shown in this map.
 	 * 
 	 * @return the <code>RuneMap</code> shown; can be <code>null</code>
+	 * @see #setRuneMap(RuneMap)
 	 */
 	public RuneMap getRuneMap() {
 		RuneMap map = tableModel.getRunemap();
@@ -100,6 +129,26 @@ public class RuneMapTable extends JTable {
 			}
 			setRowHeight(row, rowHeight);
 		}
+	}
+
+	/**
+	 * Create a <code>RuneMapTable</code> that contains all types and strengths
+	 * of stones.
+	 * 
+	 * @return a <code>RuneMapTable</code>
+	 */
+	public static RuneMapTable createAllStonesInstance() {
+		RuneStone.Type[] types = RuneStone.Type.values();
+		RuneMap map0 = new RuneMap(2, types.length);
+		for (int i = 0; i < types.length; i++) {
+			RuneStone.Type type = types[i];
+			map0.setRuneStone(0, i, new RuneStone(type, false));
+			map0.setRuneStone(1, i, new RuneStone(type, true));
+		}
+
+		RuneMapTable rmt = new RuneMapTable();
+		rmt.setRuneMap(map0);
+		return rmt;
 	}
 
 	private static class RuneMapModel extends AbstractTableModel {
@@ -244,7 +293,7 @@ public class RuneMapTable extends JTable {
 		@Override
 		protected Transferable createTransferable(JComponent c) {
 			JTable table = (JTable) c;
-			if (table.getSelectedRow() != -1 && table.getSelectedRow() != -1) {
+			if (table.getSelectedRow() != -1 && table.getSelectedColumn() != -1) {
 				RuneStone value = (RuneStone) table.getValueAt(
 						table.getSelectedRow(), table.getSelectedColumn());
 				return new RuneStoneTransferable(value);

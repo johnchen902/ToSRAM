@@ -29,8 +29,7 @@ import tosram.Path;
 @SuppressWarnings("serial")
 public class PathPanel extends JPanel {
 
-	private static final int SMALL_DELAY = 300;
-	private static final int BIG_DELAY = 3000;
+	private static final int BASE_DELAY = 300;
 
 	private Path path;
 	private Path2D gpath;
@@ -38,6 +37,7 @@ public class PathPanel extends JPanel {
 	private PathAnimation pa;
 	private double cellWidth = 50;
 	private double cellHeight = 50;
+	private double animationSpeed = 1.0;
 
 	/**
 	 * Create an empty <code>PathPanel</code>
@@ -137,6 +137,28 @@ public class PathPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Get the animation speed, relative to the default.
+	 * 
+	 * @return a double
+	 */
+	public double getAnimationSpeed() {
+		return animationSpeed;
+	}
+
+	/**
+	 * Set the animation speed, relative to the default.
+	 * 
+	 * @return a double
+	 */
+	public void setAnimationSpeed(double animationSpeed) {
+		if (animationSpeed <= 0)
+			throw new IllegalArgumentException("animationSpeed <= 0");
+		this.animationSpeed = animationSpeed;
+		if (pa != null)
+			pa.setDelay((int) (BASE_DELAY / animationSpeed));
+	}
+
 	private Pair<Path2D, List<Shape>> calculatePath() {
 		double dis = Math.min(cellWidth, cellHeight) / 6.3;
 		return PathPanelCalculator.calculatePath(path, cellWidth, cellHeight,
@@ -175,19 +197,20 @@ public class PathPanel extends JPanel {
 	}
 
 	/**
-	 * A callback when the panel start animating, animates and stop animating.
+	 * A callback when the panel start an animation cycle, animates and stop an
+	 * animation cycle.
 	 * 
 	 * @author johnchen902
 	 */
 	public interface AnimationListener extends EventListener {
 
 		/**
-		 * Called when the panel start animating.
+		 * Called when the panel started an animation cycle.
 		 */
-		public void animationStart();
+		public void animationCycleStart();
 
 		/**
-		 * Called when the panel animates a move.
+		 * Called when the panel animated a move.
 		 * 
 		 * @param directionIndex
 		 *            the index of the animated direction in the
@@ -196,21 +219,23 @@ public class PathPanel extends JPanel {
 		public void animate(int directionIndex);
 
 		/**
-		 * Called when the panel stop animating.
+		 * Called when the panel stopped an animation cycle.
 		 */
-		public void animationStop();
+		public void animationCycleStop();
 	}
 
 	private class PathAnimation extends Timer implements ActionListener {
 
 		private List<Shape> segements;
 		private ListIterator<Shape> iterator;
+		private int countDown;
 
 		public PathAnimation(List<Shape> segements) {
-			super(BIG_DELAY, null);
+			super((int) (BASE_DELAY / animationSpeed), null);
 			setInitialDelay(0);
 			this.segements = segements;
 			this.iterator = segements.listIterator();
+			this.countDown = 1;
 			super.addActionListener(this);
 		}
 
@@ -224,23 +249,26 @@ public class PathPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			if (--countDown > 0)
+				return;
 			if (iterator.hasNext()) {
 				int i = iterator.nextIndex();
 				if (i == 0) {
 					for (AnimationListener o : getAnimationListeners())
-						o.animationStart();
+						o.animationCycleStart();
+					countDown = 10;
 				} else {
 					for (AnimationListener o : getAnimationListeners())
 						o.animate(i - 1);
+					countDown = 1;
 				}
 				activeSegement = iterator.next();
-				setDelay(iterator.hasNext() ? SMALL_DELAY : BIG_DELAY);
 			} else {
 				iterator = segements.listIterator();
 				activeSegement = null;
 				for (AnimationListener o : getAnimationListeners())
-					o.animationStop();
-				setDelay(BIG_DELAY);
+					o.animationCycleStop();
+				countDown = 10;
 			}
 			repaint();
 		}

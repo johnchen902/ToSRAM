@@ -3,6 +3,7 @@ package tosram.view.strategy;
 import java.awt.Component;
 import java.util.Arrays;
 import java.util.List;
+
 import org.javatuples.LabelValue;
 
 import tosram.PathRobot;
@@ -40,10 +41,5 @@ public class StrategyRobotCreater implements PathRobotCreater {
 		return Arrays.asList(
 				LabelValue.with("Strategies", (Component) strategyPanel),
 				LabelValue.with("Searching", (Component) searchPanel));
-	}
-
-	@Override
-	public String toString() {
-		return "Strategy Robot";
 	}
 }

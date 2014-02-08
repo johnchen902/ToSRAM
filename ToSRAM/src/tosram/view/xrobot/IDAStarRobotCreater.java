@@ -1,24 +1,32 @@
 package tosram.view.xrobot;
 
 import java.awt.Component;
-import java.awt.GridLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.EventHandler;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.border.EmptyBorder;
 
 import org.javatuples.LabelValue;
 
 import tosram.PathRobot;
 import tosram.view.PathRobotCreater;
-import tosram.xrobot.*;
+import tosram.view.WeatheringPane;
+import tosram.xrobot.DiagonalMoving;
+import tosram.xrobot.IDAStarRobot;
+import tosram.xrobot.MaxComboGoalSeriesFactory;
+import tosram.xrobot.Moving;
+import tosram.xrobot.NoDiagonalMoving;
+import tosram.xrobot.WeatheringMoving;
 
 /**
  * A <code>PathRobotCreater</code> that creates a {@link IDAStarRobot}.
@@ -31,7 +39,7 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 	private JCheckBox cbxDiagonal;
 	private JSpinner spnDiagonalCost;
 	private JCheckBox chckbxWeathering;
-	private JCheckBox[] chckbxWeatherStones;
+	private WeatheringPane weatheringPane;
 
 	private void initialize() {
 		if (wrapper != null)
@@ -43,40 +51,53 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 		wrapper.add(box);
 
 		cbxDiagonal = new JCheckBox("Diagonal", true);
-		cbxDiagonal.setAlignmentX(Component.CENTER_ALIGNMENT);
 		box.add(cbxDiagonal);
 
-		JLabel label = new JLabel("Cost of diagonal:");
-		label.setAlignmentX(Component.CENTER_ALIGNMENT);
-		box.add(label);
+		JPanel pnCost = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		pnCost.setAlignmentX(Component.LEFT_ALIGNMENT);
+		pnCost.setBorder(new EmptyBorder(0, 16, 0, 0));
+		box.add(pnCost);
+
+		JLabel lblCost = new JLabel("Cost:");
+		pnCost.add(lblCost);
+		cbxDiagonal.addItemListener(EventHandler.create(ItemListener.class,
+				lblCost, "enabled", "source.selected"));
 
 		spnDiagonalCost = new JSpinner(new SpinnerNumberModel(2, 1, 10, 1));
-		box.add(spnDiagonalCost);
-
+		pnCost.add(spnDiagonalCost);
+		lblCost.setLabelFor(spnDiagonalCost);
+		spnDiagonalCost.setAlignmentX(JSpinner.LEFT_ALIGNMENT);
+		String toolTipText = "The cost of a diagonal move relative to a normal one.";
+		spnDiagonalCost.setToolTipText(toolTipText);
 		cbxDiagonal.addItemListener(EventHandler.create(ItemListener.class,
 				spnDiagonalCost, "enabled", "source.selected"));
 
 		chckbxWeathering = new JCheckBox("Weathering");
-		chckbxWeathering.setAlignmentX(Component.CENTER_ALIGNMENT);
 		box.add(chckbxWeathering);
 		chckbxWeathering.addItemListener(new ItemListener() {
+			boolean[] stored;
+
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				for (JCheckBox cbx : chckbxWeatherStones)
-					cbx.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+				weatheringPane.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					if (stored != null)
+						weatheringPane.setWeathered(stored);
+				} else {
+					stored = weatheringPane.getWeathered();
+					weatheringPane.setWeathered(new boolean[30]); // all false
+				}
 			}
 		});
 
 		JPanel panel = new JPanel();
-		panel.setFocusCycleRoot(true);
+		panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		panel.setBorder(new EmptyBorder(0, 12, 0, 0));
 		box.add(panel);
-		panel.setLayout(new GridLayout(5, 6, 0, 0));
-		chckbxWeatherStones = new JCheckBox[30];
-		for (int i = 0; i < 30; i++) {
-			panel.add(chckbxWeatherStones[i] = new JCheckBox("     "));
-			chckbxWeatherStones[i].setEnabled(false);
-			chckbxWeatherStones[i].setHorizontalTextPosition(JCheckBox.CENTER);
-		}
+
+		weatheringPane = new WeatheringPane();
+		panel.add(weatheringPane);
+		weatheringPane.setEnabled(false);
 	}
 
 	@Override
@@ -89,10 +110,7 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 			moving = new NoDiagonalMoving();
 		}
 		if (chckbxWeathering.isSelected()) {
-			boolean[] bools = new boolean[30];
-			for (int i = 0; i < 30; i++)
-				bools[i] = chckbxWeatherStones[i].isSelected();
-			moving = new WeatheringMoving(moving, bools);
+			moving = new WeatheringMoving(moving, weatheringPane.getWeathered());
 		}
 		return new IDAStarRobot(new MaxComboGoalSeriesFactory(), moving);
 	}
@@ -100,12 +118,7 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 	@Override
 	public List<LabelValue<String, Component>> getSettingsTabs() {
 		initialize();
-		return Arrays.asList(LabelValue.with("IDA* Robot Settings",
+		return Arrays.asList(LabelValue.with("Diagonal and Weathering",
 				(Component) wrapper));
-	}
-
-	@Override
-	public String toString() {
-		return "IDA* Robot";
 	}
 }
