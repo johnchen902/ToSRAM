@@ -1,9 +1,8 @@
 package tosram.view.strategy;
 
-import slider.RangeSlider;
-
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -16,10 +15,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import tosram.RuneStoneFormatter;
+import slider.RangeSlider;
 import tosram.RuneStone.Type;
+import tosram.RuneStoneFormatter;
 import tosram.strategy.SolutionStrategy;
 import tosram.strategy.UseStoneStrategy;
+import tosram.view.MnemonicsDispatcher;
 
 /**
  * A <code>StrategyCreater</code> who creates {@link UseStoneStrategy}
@@ -103,22 +104,33 @@ public class UseStoneCreater extends DefaultStrategyCreater {
 
 	@Override
 	public void settings(Component parent) {
-		JPanel pnUp = new JPanel();
+		JPanel pnSettings = new JPanel(new GridLayout(2, 1));
+
+		JPanel pnUp = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		pnSettings.add(pnUp);
+		pnUp.add(new JLabel("Type:"));
+
+		JPanel pnTypes = new JPanel(new GridLayout(2, 3));
+		pnUp.add(pnTypes);
 		ButtonGroup group = new ButtonGroup();
 
-		pnUp.add(createRadioButtonForType(group, Type.FIRE));
-		pnUp.add(createRadioButtonForType(group, Type.WATER));
-		pnUp.add(createRadioButtonForType(group, Type.GREEN));
-		pnUp.add(createRadioButtonForType(group, Type.LIGHT));
-		pnUp.add(createRadioButtonForType(group, Type.DARK));
-		pnUp.add(createRadioButtonForType(group, Type.HEART));
+		pnTypes.add(createRadioButtonForType(group, Type.FIRE));
+		pnTypes.add(createRadioButtonForType(group, Type.WATER));
+		pnTypes.add(createRadioButtonForType(group, Type.GREEN));
+		pnTypes.add(createRadioButtonForType(group, Type.LIGHT));
+		pnTypes.add(createRadioButtonForType(group, Type.DARK));
+		pnTypes.add(createRadioButtonForType(group, Type.HEART));
 
-		JPanel pnDown = new JPanel();
+		JPanel pnDown = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		pnSettings.add(pnDown);
 
-		pnDown.add(new JLabel("Stone Used:"));
+		JLabel lb = new JLabel("Number:");
+		pnDown.add(lb);
+		MnemonicsDispatcher.registerComponent(lb);
 
 		RangeSlider rangeSlider = new RangeSlider();
 		pnDown.add(rangeSlider);
+		lb.setLabelFor(rangeSlider);
 		rangeSlider.setMinimum(0);
 		rangeSlider.setMaximum(10);
 		rangeSlider.setValue(lowerBound);
@@ -127,12 +139,8 @@ public class UseStoneCreater extends DefaultStrategyCreater {
 		rangeSlider.setPaintTicks(true);
 		rangeSlider.setPaintLabels(true);
 
-		JPanel pn = new JPanel(new GridLayout(2, 1));
-		pn.add(pnUp);
-		pn.add(pnDown);
-
-		int result = JOptionPane.showConfirmDialog(parent, pn,
-				"Select type and amount", JOptionPane.OK_CANCEL_OPTION);
+		int result = JOptionPane.showConfirmDialog(parent, pnSettings,
+				"Use a Number of Runestones", JOptionPane.OK_CANCEL_OPTION);
 		if (result == JOptionPane.OK_OPTION) {
 			type = selectingType;
 			lowerBound = rangeSlider.getValue();
@@ -147,6 +155,7 @@ public class UseStoneCreater extends DefaultStrategyCreater {
 				btType == type);
 		jrb.addItemListener(new SelectItemListener(btType));
 		group.add(jrb);
+		MnemonicsDispatcher.registerComponent(jrb);
 		return jrb;
 	}
 

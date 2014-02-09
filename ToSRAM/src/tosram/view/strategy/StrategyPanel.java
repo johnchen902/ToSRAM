@@ -40,6 +40,7 @@ import javax.swing.TransferHandler;
 
 import tosram.strategy.NullSolutionStrategy;
 import tosram.strategy.SolutionStrategy;
+import tosram.view.MnemonicsDispatcher;
 
 /**
  * A panel that let user choose and order some strategies and create final one
@@ -80,6 +81,7 @@ public class StrategyPanel extends JPanel {
 		add(btnAddRemove, BorderLayout.SOUTH);
 		btnAddRemove.addActionListener(new AddListener());
 		btnAddRemove.setTransferHandler(new RemoveTransferHandler());
+		MnemonicsDispatcher.registerComponent(btnAddRemove);
 
 		listUnused = new JList<>(unusedModel = createInitialUnusedModel());
 		listUnused.setCellRenderer(new StrategyCreaterRenderer());
@@ -134,6 +136,16 @@ public class StrategyPanel extends JPanel {
 		}
 	}
 
+	/*
+	 * Create JMenuItem with an action and register it to the
+	 * MnemonicsDispatcher
+	 */
+	private JMenuItem createMenuItem(Action action) {
+		JMenuItem menuItem = new JMenuItem(action);
+		MnemonicsDispatcher.registerComponent(menuItem);
+		return menuItem;
+	}
+
 	private void initActions() {
 		InputMap im = listUsing.getInputMap();
 		im.put(getKeyStroke('\n'), "settings");
@@ -156,14 +168,14 @@ public class StrategyPanel extends JPanel {
 		JPopupMenu usingPopup = new JPopupMenu();
 		listUsing.addMouseListener(new PopupListener(listUsing, usingPopup));
 		ac.put("showPopup", new PopupAction(listUsing, usingPopup));
-		usingPopup.add(new JMenuItem(new SettingsAction(listUsing)));
+		usingPopup.add(createMenuItem(new SettingsAction(listUsing)));
 		usingPopup.addSeparator();
-		usingPopup.add(new JMenuItem(new MoveAction(MoveAction.MOVE_UP)));
-		usingPopup.add(new JMenuItem(new MoveAction(MoveAction.MOVE_DOWN)));
-		usingPopup.add(new JMenuItem(new MoveAction(MoveAction.MOVE_TOP)));
-		usingPopup.add(new JMenuItem(new MoveAction(MoveAction.MOVE_BOTTOM)));
+		usingPopup.add(createMenuItem(new MoveAction(MoveAction.MOVE_UP)));
+		usingPopup.add(createMenuItem(new MoveAction(MoveAction.MOVE_DOWN)));
+		usingPopup.add(createMenuItem(new MoveAction(MoveAction.MOVE_TOP)));
+		usingPopup.add(createMenuItem(new MoveAction(MoveAction.MOVE_BOTTOM)));
 		usingPopup.addSeparator();
-		usingPopup.add(new JMenuItem(new RemoveAction()));
+		usingPopup.add(createMenuItem(new RemoveAction()));
 
 		InputMap im2 = listUnused.getInputMap();
 		im2.put(getKeyStroke('\n'), "settings");
@@ -175,7 +187,7 @@ public class StrategyPanel extends JPanel {
 		JPopupMenu unusedPopup = new JPopupMenu();
 		listUnused.addMouseListener(new PopupListener(listUnused, unusedPopup));
 		ac2.put("showPopup", new PopupAction(listUnused, unusedPopup));
-		unusedPopup.add(new JMenuItem(new SettingsAction(listUnused)));
+		unusedPopup.add(createMenuItem(new SettingsAction(listUnused)));
 	}
 
 	private DefaultListModel<StrategyCreater> createInitialUsingModel() {
@@ -333,9 +345,9 @@ public class StrategyPanel extends JPanel {
 			case MOVE_DOWN:
 				return "Move Down";
 			case MOVE_TOP:
-				return "Move To Top";
+				return "Move to Top";
 			case MOVE_BOTTOM:
-				return "Move To Bottom";
+				return "Move to Bottom";
 			default:
 				return "Unknown Move " + move;
 			}

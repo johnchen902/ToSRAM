@@ -19,6 +19,7 @@ import javax.swing.border.EmptyBorder;
 import org.javatuples.LabelValue;
 
 import tosram.PathRobot;
+import tosram.view.MnemonicsDispatcher;
 import tosram.view.PathRobotCreater;
 import tosram.view.WeatheringPane;
 import tosram.xrobot.DiagonalMoving;
@@ -52,6 +53,7 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 
 		cbxDiagonal = new JCheckBox("Diagonal", true);
 		box.add(cbxDiagonal);
+		MnemonicsDispatcher.registerComponent(cbxDiagonal);
 
 		JPanel pnCost = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		pnCost.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -62,6 +64,7 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 		pnCost.add(lblCost);
 		cbxDiagonal.addItemListener(EventHandler.create(ItemListener.class,
 				lblCost, "enabled", "source.selected"));
+		MnemonicsDispatcher.registerComponent(lblCost);
 
 		spnDiagonalCost = new JSpinner(new SpinnerNumberModel(2, 1, 10, 1));
 		pnCost.add(spnDiagonalCost);
@@ -89,6 +92,7 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 				}
 			}
 		});
+		MnemonicsDispatcher.registerComponent(chckbxWeathering);
 
 		JPanel panel = new JPanel();
 		panel.setAlignmentX(Component.LEFT_ALIGNMENT);

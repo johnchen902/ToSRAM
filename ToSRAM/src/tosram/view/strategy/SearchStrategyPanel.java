@@ -21,6 +21,7 @@ import tosram.strategy.LinearStrategy;
 import tosram.strategy.SearchStrategy;
 import tosram.strategy.StepLimitStrategy;
 import tosram.strategy.WeatheringStrategy;
+import tosram.view.MnemonicsDispatcher;
 import tosram.view.WeatheringPane;
 
 /**
@@ -47,15 +48,18 @@ public class SearchStrategyPanel extends JPanel {
 
 		JLabel lblSearchStrategies = new JLabel("Base:");
 		pnCombobox.add(lblSearchStrategies);
+		MnemonicsDispatcher.registerComponent(lblSearchStrategies);
 
 		comboBox = new JComboBox<String>();
 		pnCombobox.add(comboBox);
+		lblSearchStrategies.setLabelFor(comboBox);
 		comboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 		comboBox.addItem("Improvement");
 		comboBox.addItem("Linear");
 
 		chckbxStepLimit = new JCheckBox("Step Limit");
 		box.add(chckbxStepLimit);
+		MnemonicsDispatcher.registerComponent(chckbxStepLimit);
 
 		JPanel indentStepLimit = new JPanel();
 		indentStepLimit.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -87,6 +91,7 @@ public class SearchStrategyPanel extends JPanel {
 				}
 			}
 		});
+		MnemonicsDispatcher.registerComponent(chckbxWeathering);
 
 		JPanel indentWeathering = new JPanel();
 		indentWeathering.setAlignmentX(Component.LEFT_ALIGNMENT);

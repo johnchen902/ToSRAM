@@ -2,19 +2,23 @@ package tosram.view.strategy;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.EnumSet;
 
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import tosram.RuneStoneFormatter;
 import tosram.RuneStone.Type;
+import tosram.RuneStoneFormatter;
 import tosram.strategy.GroupAttackStrategy;
 import tosram.strategy.SolutionStrategy;
+import tosram.view.MnemonicsDispatcher;
 
 /**
  * A <code>StrategyCreater</code> who creates {@link GroupAttackStrategy}
@@ -73,7 +77,13 @@ public class GroupAttackCreater extends DefaultStrategyCreater {
 
 	@Override
 	public void settings(Component parent) {
-		JPanel pn = new JPanel();
+		JPanel pnSettings = new JPanel();
+		pnSettings.add(new JLabel("Types:"));
+
+		JPanel pn = new JPanel(new GridLayout(2, 3));
+		pnSettings.add(pn);
+		pn.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+
 		EnumSet<Type> set = EnumSet.copyOf(this.set);
 		pn.add(createCheckBoxForType(set, Type.FIRE));
 		pn.add(createCheckBoxForType(set, Type.WATER));
@@ -81,8 +91,8 @@ public class GroupAttackCreater extends DefaultStrategyCreater {
 		pn.add(createCheckBoxForType(set, Type.LIGHT));
 		pn.add(createCheckBoxForType(set, Type.DARK));
 		pn.add(createCheckBoxForType(set, Type.HEART));
-		int result = JOptionPane.showConfirmDialog(parent, pn, "Select types",
-				JOptionPane.OK_CANCEL_OPTION);
+		int result = JOptionPane.showConfirmDialog(parent, pnSettings,
+				getName(), JOptionPane.OK_CANCEL_OPTION);
 		if (result == JOptionPane.OK_OPTION) {
 			if (set.size() == 0) {
 				JOptionPane.showMessageDialog(parent,
@@ -98,6 +108,7 @@ public class GroupAttackCreater extends DefaultStrategyCreater {
 		JCheckBox cbx = new JCheckBox(RuneStoneFormatter.format(type),
 				set.contains(type));
 		cbx.addItemListener(new ToggleItemListener(set, type));
+		MnemonicsDispatcher.registerComponent(cbx);
 		return cbx;
 	}
 

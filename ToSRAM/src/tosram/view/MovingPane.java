@@ -35,8 +35,10 @@ public class MovingPane extends JPanel {
 		JLabel label = new JLabel("Time:");
 		pnTime.add(label);
 		label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		MnemonicsDispatcher.registerComponent(label);
 
 		spnTime = new JSpinner(new SpinnerNumberModel(5.0, 1.25, 20.0, 0.25));
+		label.setLabelFor(spnTime);
 		pnTime.add(spnTime);
 		spnTime.setEditor(new JSpinner.NumberEditor(spnTime, "#.##s"));
 
@@ -45,13 +47,16 @@ public class MovingPane extends JPanel {
 		btnSimple = new JRadioButton("Simple Path", true);
 		add(btnSimple);
 		group.add(btnSimple);
+		MnemonicsDispatcher.registerComponent(btnSimple);
 
 		btnHand = new JRadioButton("Hand-like Path");
 		add(btnHand);
 		group.add(btnHand);
+		MnemonicsDispatcher.registerComponent(btnHand);
 
 		chckbxFastStart = new JCheckBox("Fast Start");
 		add(chckbxFastStart);
+		MnemonicsDispatcher.registerComponent(chckbxFastStart);
 	}
 
 	/**

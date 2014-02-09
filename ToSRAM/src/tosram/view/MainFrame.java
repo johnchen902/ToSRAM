@@ -12,10 +12,12 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
 import java.beans.EventHandler;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.MessageFormat;
 
 import javax.swing.AbstractAction;
@@ -191,9 +193,21 @@ public class MainFrame extends JFrame {
 			pnMain.add(pnSouth, BorderLayout.SOUTH);
 
 			JLabel lblMap = new JLabel("Map\u2191");
-			lblMap.setDisplayedMnemonic('m');
-			lblMap.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-					KeyStroke.getKeyStroke("alt pressed M"), "editMap");
+			MnemonicsDispatcher.registerComponent(lblMap);
+			PropertyChangeListener mnemonicChanged = new PropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent e) {
+					JLabel lb = (JLabel) e.getSource();
+					lb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+							KeyStroke.getKeyStroke((int) e.getOldValue(),
+									InputEvent.ALT_DOWN_MASK, false), null);
+					lb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+							.put(KeyStroke.getKeyStroke((int) e.getNewValue(),
+									InputEvent.ALT_DOWN_MASK, false), "editMap");
+				}
+			};
+			lblMap.addPropertyChangeListener("displayedMnemonic",
+					mnemonicChanged);
 			lblMap.getActionMap().put("editMap", new AbstractAction() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -205,15 +219,15 @@ public class MainFrame extends JFrame {
 			pnSouth.add(lblMap);
 
 			btnNext = new JButton("Next");
-			btnNext.setMnemonic('n');
+			MnemonicsDispatcher.registerComponent(btnNext);
 			pnSouth.add(btnNext);
 
 			btnBack = new JButton("Back");
-			btnBack.setMnemonic('b');
+			MnemonicsDispatcher.registerComponent(btnBack);
 			pnSouth.add(btnBack);
 
 			btnInterrupt = new JButton("Interrupt");
-			btnInterrupt.setMnemonic('i');
+			MnemonicsDispatcher.registerComponent(btnInterrupt);
 			pnSouth.add(btnInterrupt);
 		}
 	}
@@ -225,7 +239,6 @@ public class MainFrame extends JFrame {
 			pnWrapper.add(createMiscellaneousPanel());
 
 			pnSide.addTab("Miscellaneous", pnWrapper);
-			pnSide.setMnemonicAt(0, KeyEvent.VK_C);
 		}
 		{
 			JPanel pnWrapper = new JPanel();
@@ -251,6 +264,7 @@ public class MainFrame extends JFrame {
 							"How to edit map", JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
+			MnemonicsDispatcher.registerComponent(btnHelp);
 		}
 		{
 			selectRobot(robotCreater);
@@ -284,10 +298,14 @@ public class MainFrame extends JFrame {
 		pnRobot.add(btnFast);
 		groupRobot.add(btnFast);
 		btnFast.putClientProperty(ROBOT, new IDAStarRobotCreater());
+		MnemonicsDispatcher.registerComponent(btnFast);
+
 		JRadioButton btnFlexible = new JRadioButton("Flexible");
 		pnRobot.add(btnFlexible);
 		groupRobot.add(btnFlexible);
 		btnFlexible.putClientProperty(ROBOT, new StrategyRobotCreater());
+		MnemonicsDispatcher.registerComponent(btnFlexible);
+
 		ActionListener alRobot = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -326,9 +344,11 @@ public class MainFrame extends JFrame {
 		JLabel lbSpeed = new JLabel("Speed:");
 		pnSpeed.add(lbSpeed);
 		lbSpeed.setAlignmentX(Component.CENTER_ALIGNMENT);
+		MnemonicsDispatcher.registerComponent(lbSpeed);
 
 		JSpinner spnSpeed = new JSpinner(new SpinnerNumberModel(1, 0.5, 8, 0.5));
 		pnSpeed.add(spnSpeed);
+		lbSpeed.setLabelFor(spnSpeed);
 		spnSpeed.setEditor(new JSpinner.NumberEditor(spnSpeed, "#.#x"));
 		spnSpeed.addChangeListener(EventHandler.create(ChangeListener.class,
 				pnPath, "animationSpeed", "source.value"));
@@ -348,6 +368,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 		cbx.setSelected(true);
+		MnemonicsDispatcher.registerComponent(cbx);
 
 		pn.add(pnAnima);
 
