@@ -23,8 +23,7 @@ public class KComboCreater extends DefaultStrategyCreater {
 
 	@Override
 	protected String getName() {
-		return MessageFormat.format(
-				"{0, number, integer} {0, choice, 1#Combo|1<Combos}",
+		return MessageFormat.format("{0, number, integer} Combo",
 				new Object[] { combo });
 	}
 

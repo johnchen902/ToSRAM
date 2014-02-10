@@ -11,7 +11,7 @@ class MilestoneFormatter {
 	}
 
 	static String formatCombo(int combo) {
-		return format("{0} combo{0,choice,1#|1<s} ", new Object[] { combo });
+		return format("{0} combo ", new Object[] { combo });
 	}
 
 	static String formatSteps(int steps) {
