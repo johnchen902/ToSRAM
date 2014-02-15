@@ -128,13 +128,9 @@ public class UseStoneCreater extends DefaultStrategyCreater {
 		pnDown.add(lb);
 		MnemonicsDispatcher.registerComponent(lb);
 
-		RangeSlider rangeSlider = new RangeSlider();
+		RangeSlider rangeSlider = new RangeSlider(0, 10, lowerBound, upperBound);
 		pnDown.add(rangeSlider);
 		lb.setLabelFor(rangeSlider);
-		rangeSlider.setMinimum(0);
-		rangeSlider.setMaximum(10);
-		rangeSlider.setValue(lowerBound);
-		rangeSlider.setUpperValue(upperBound);
 		rangeSlider.setMajorTickSpacing(1);
 		rangeSlider.setPaintTicks(true);
 		rangeSlider.setPaintLabels(true);
