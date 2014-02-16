@@ -12,8 +12,7 @@ class ToComputeState implements MFState {
 		frame = f0;
 		frame.setStatus("Ready to compute");
 		frame.setRuneMapEditable(true);
-		frame.setNextText("Compute");
-		frame.setNextActionListener(new ActionListener() {
+		frame.addButton("Compute", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				frame.setRealMap(frame.getRuneMapShown());
@@ -21,21 +20,28 @@ class ToComputeState implements MFState {
 				frame.transferState(new ComputingState());
 			}
 		});
-		frame.setBackActionListener(new ActionListener() {
+		frame.addButton("Read Again", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				frame.setRuneMapShown(null);
 				frame.setRealMap(null);
 				checkOut();
-				frame.transferState(new ToGetStoneState());
+				frame.transferState(new GettingStoneState());
+			}
+		});
+		frame.addButton("Back", new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.setRuneMapShown(null);
+				frame.setRealMap(null);
+				checkOut();
+				frame.transferState(new ToGetRectangleState());
 			}
 		});
 	}
 
 	private void checkOut() {
 		frame.setRuneMapEditable(false);
-		frame.setNextText(null);
-		frame.setNextActionListener(null);
-		frame.setBackActionListener(null);
+		frame.removeButtons();
 	}
 }

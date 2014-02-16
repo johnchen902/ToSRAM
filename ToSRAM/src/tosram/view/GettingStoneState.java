@@ -23,7 +23,7 @@ class GettingStoneState implements MFState {
 		frame = f0;
 		frame.setStatus("Reading runestones...");
 		interrupted = false;
-		frame.setInterruptActionListener(new ActionListener() {
+		frame.addButton("Interrupt", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				interrupted = true;
@@ -80,7 +80,7 @@ class GettingStoneState implements MFState {
 				ignore.printStackTrace();
 			}
 
-			frame.setInterruptActionListener(null);
+			frame.removeButtons();
 			frame.transferState(new ToComputeState());
 		}
 	}

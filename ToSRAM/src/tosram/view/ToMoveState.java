@@ -16,15 +16,14 @@ class ToMoveState implements MFState {
 	public void checkIn(MainFrame f0) {
 		frame = f0;
 		frame.setStatus("Ready to move: " + finalStatus);
-		frame.setNextText("Move");
-		frame.setNextActionListener(new ActionListener() {
+		frame.addButton("Move", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				checkOut();
 				frame.transferState(new MovingState());
 			}
 		});
-		frame.setBackActionListener(new ActionListener() {
+		frame.addButton("Back", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				checkOut();
@@ -36,8 +35,6 @@ class ToMoveState implements MFState {
 	}
 
 	private void checkOut() {
-		frame.setNextText(null);
-		frame.setNextActionListener(null);
-		frame.setBackActionListener(null);
+		frame.removeButtons();
 	}
 }

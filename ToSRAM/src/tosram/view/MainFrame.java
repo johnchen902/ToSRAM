@@ -19,6 +19,8 @@ import java.beans.EventHandler;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -78,9 +80,7 @@ public class MainFrame extends JFrame {
 	private RuneMapTable tbStones;
 	private DirectionList listDir;
 
-	private JButton btnNext; // the "Next" button
-	private JButton btnBack; // the "Back" button
-	private JButton btnInterrupt; // the "Interrupt" button
+	private JPanel buttonsPanel;
 
 	private PathRobotCreater robotCreater;
 	private MovingPane movingPane;
@@ -90,9 +90,6 @@ public class MainFrame extends JFrame {
 
 		initUI();
 
-		btnNext.setEnabled(false);
-		btnBack.setEnabled(false);
-		btnInterrupt.setEnabled(false);
 		transferState(new ToGetRectangleState());
 	}
 
@@ -189,8 +186,8 @@ public class MainFrame extends JFrame {
 			}
 		}
 		{
-			JPanel pnSouth = new JPanel();
-			pnMain.add(pnSouth, BorderLayout.SOUTH);
+			buttonsPanel = new JPanel();
+			pnMain.add(buttonsPanel, BorderLayout.SOUTH);
 
 			JLabel lblMap = new JLabel("Map\u2191");
 			MnemonicsDispatcher.registerComponent(lblMap);
@@ -216,19 +213,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			pnSouth.add(lblMap);
-
-			btnNext = new JButton("Next");
-			MnemonicsDispatcher.registerComponent(btnNext);
-			pnSouth.add(btnNext);
-
-			btnBack = new JButton("Back");
-			MnemonicsDispatcher.registerComponent(btnBack);
-			pnSouth.add(btnBack);
-
-			btnInterrupt = new JButton("Interrupt");
-			MnemonicsDispatcher.registerComponent(btnInterrupt);
-			pnSouth.add(btnInterrupt);
+			buttonsPanel.add(lblMap);
 		}
 	}
 
@@ -399,33 +384,22 @@ public class MainFrame extends JFrame {
 		return path;
 	}
 
-	void setNextText(String str) {
-		btnNext.setText(str == null ? "Next" : str);
+	private List<JButton> buttons = new ArrayList<>();
+
+	void addButton(String text, ActionListener listener) {
+		JButton bt = new JButton(text);
+		bt.addActionListener(listener);
+		MnemonicsDispatcher.registerComponent(bt);
+		buttons.add(bt);
+		buttonsPanel.add(bt);
+		validate();
 	}
 
-	private ActionListener nextActionListener;
-	private ActionListener backActionListener;
-	private ActionListener interruptActionListener;
-
-	void setNextActionListener(ActionListener listener) {
-		if (nextActionListener != null)
-			btnNext.removeActionListener(nextActionListener);
-		btnNext.addActionListener(nextActionListener = listener);
-		btnNext.setEnabled(nextActionListener != null);
-	}
-
-	void setBackActionListener(ActionListener listener) {
-		if (backActionListener != null)
-			btnBack.removeActionListener(backActionListener);
-		btnBack.addActionListener(backActionListener = listener);
-		btnBack.setEnabled(backActionListener != null);
-	}
-
-	void setInterruptActionListener(ActionListener listener) {
-		if (interruptActionListener != null)
-			btnInterrupt.removeActionListener(interruptActionListener);
-		btnInterrupt.addActionListener(interruptActionListener = listener);
-		btnInterrupt.setEnabled(interruptActionListener != null);
+	void removeButtons() {
+		for (JButton c : buttons)
+			buttonsPanel.remove(c);
+		buttons.clear();
+		validate();
 	}
 
 	void transferState(MFState state) {

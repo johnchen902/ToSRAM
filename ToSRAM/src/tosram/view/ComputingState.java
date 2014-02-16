@@ -21,7 +21,7 @@ class ComputingState implements MFState {
 	public void checkIn(MainFrame f0) {
 		frame = f0;
 		frame.setStatus("Computing...");
-		frame.setInterruptActionListener(new ActionListener() {
+		frame.addButton("Interrupt", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				computionWorker.interrupt();
@@ -104,7 +104,7 @@ class ComputingState implements MFState {
 				ignore.printStackTrace();
 			}
 			frame.setTime(computeTime);
-			frame.setInterruptActionListener(null);
+			frame.removeButtons();
 			frame.transferState(new ToMoveState(finalStatus));
 		}
 	}
