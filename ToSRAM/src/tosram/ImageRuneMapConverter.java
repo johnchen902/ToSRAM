@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
  * 
  * @author johnchen902
  */
-public interface RuneStoneGetter {
+public interface ImageRuneMapConverter {
 	/**
 	 * Extract runestones from the given image.
 	 * 
@@ -15,5 +15,5 @@ public interface RuneStoneGetter {
 	 *            the image that contains runestones
 	 * @return the extracted runestones
 	 */
-	public RuneMap getRuneStones(BufferedImage image);
+	public RuneMap convert(BufferedImage image);
 }

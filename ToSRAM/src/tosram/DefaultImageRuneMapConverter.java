@@ -9,40 +9,10 @@ import tosram.RuneStone.Type;
 
 /**
  * An implementation of <code>RuneStoneGetter</code>.
- * <table>
- * <tr>
- * <td style="background-color:#E92814">FIRE<br>
- * 0xE9_28_14</td>
- * <td style="background-color:#4AA6E8">WATER<br>
- * 0x4A_A6_E8</td>
- * <td style="background-color:#1CCA2D">GREEN<br>
- * 0x1C_CA_2D</td>
- * <td style="background-color:#CA9A00">LIGHT<br>
- * 0xCA_9A_00</td>
- * <td style="background-color:#D22CF4">DARK<br>
- * 0xD2_2C_F4</td>
- * <td style="background-color:#EA84C0">HEART<br>
- * 0xEA_84_C0</td>
- * </tr>
- * <tr>
- * <td style="background-color:#FA673D">STRONG FIRE<br>
- * 0xFA_67_3D</td>
- * <td style="background-color:#71D7FE">STRONG WATER<br>
- * 0x71_D7_FE</td>
- * <td style="background-color:#15E61E">STRONG GREEN<br>
- * 0x15_E6_1E</td>
- * <td style="background-color:#F5BE2D">STRONG LIGHT<br>
- * 0xF5_BE_2D</td>
- * <td style="background-color:#FE4BFC">STRONG DARK<br>
- * 0xFE_4B_FC</td>
- * <td style="background-color:#FBD3DD">STRONG HEART<br>
- * 0xFB_D3_DD</td>
- * </tr>
- * </table>
  * 
  * @author johnchen902
  */
-public class DefaultRuneStoneGetter implements RuneStoneGetter {
+public class DefaultImageRuneMapConverter implements ImageRuneMapConverter {
 
 	// The size of expected RuneMap
 	private static final int WIDTH = 6;
@@ -71,42 +41,29 @@ public class DefaultRuneStoneGetter implements RuneStoneGetter {
 	// The maximal distance between the RuneStone's color and standard color
 	private static final int REJECT_THEREHOLD = 2500;
 
-	// The value of standard colors of each kinds of RuneStone
-	private static final int RGB_FIRE = 0xE9_28_14;
-	private static final int RGB_WATER = 0x4A_A6_E8;
-	private static final int RGB_GREEN = 0x1C_CA_2D;
-	private static final int RGB_LIGHT = 0xCA_9A_00;
-	private static final int RGB_DARK = 0xD2_2C_F4;
-	private static final int RGB_HEART = 0xEA_84_C0;
-	private static final int RGB_STRONG_FIRE = 0xFA_67_3D;
-	private static final int RGB_STRONG_WATER = 0x71_D7_FE;
-	private static final int RGB_STRONG_GREEN = 0x15_E6_1E;
-	private static final int RGB_STRONG_LIGHT = 0xF5_BE_2D;
-	private static final int RGB_STRONG_DARK = 0xFE_4B_FC;
-	private static final int RGB_STRONG_HEART = 0xFB_D3_DD;
-
-	// A map from the value of standard colors to the corresponding RuneStone
-	private static final Map<Integer, RuneStone> RGB_MAP;
-
-	static {
+	/**
+	 * Create a default RGB-&gt;ReneStone mapping.
+	 */
+	private static Map<Integer, RuneStone> defaultRGBMap() {
 		Map<Integer, RuneStone> map0 = new HashMap<Integer, RuneStone>();
-		map0.put(RGB_FIRE, new RuneStone(Type.FIRE));
-		map0.put(RGB_WATER, new RuneStone(Type.WATER));
-		map0.put(RGB_GREEN, new RuneStone(Type.GREEN));
-		map0.put(RGB_LIGHT, new RuneStone(Type.LIGHT));
-		map0.put(RGB_DARK, new RuneStone(Type.DARK));
-		map0.put(RGB_HEART, new RuneStone(Type.HEART));
-		map0.put(RGB_STRONG_FIRE, new RuneStone(Type.FIRE, true));
-		map0.put(RGB_STRONG_WATER, new RuneStone(Type.WATER, true));
-		map0.put(RGB_STRONG_GREEN, new RuneStone(Type.GREEN, true));
-		map0.put(RGB_STRONG_LIGHT, new RuneStone(Type.LIGHT, true));
-		map0.put(RGB_STRONG_DARK, new RuneStone(Type.DARK, true));
-		map0.put(RGB_STRONG_HEART, new RuneStone(Type.HEART, true));
-		RGB_MAP = Collections.unmodifiableMap(map0);
+		map0.put(0xE9_28_14, new RuneStone(Type.FIRE));
+		map0.put(0x4A_A6_E8, new RuneStone(Type.WATER));
+		map0.put(0x1C_CA_2D, new RuneStone(Type.GREEN));
+		map0.put(0xCA_9A_00, new RuneStone(Type.LIGHT));
+		map0.put(0xD2_2C_F4, new RuneStone(Type.DARK));
+		map0.put(0xEA_84_C0, new RuneStone(Type.HEART));
+		map0.put(0xFA_67_3D, new RuneStone(Type.FIRE, true));
+		map0.put(0x71_D7_FE, new RuneStone(Type.WATER, true));
+		map0.put(0x15_E6_1E, new RuneStone(Type.GREEN, true));
+		map0.put(0xF5_BE_2D, new RuneStone(Type.LIGHT, true));
+		map0.put(0xFE_4B_FC, new RuneStone(Type.DARK, true));
+		map0.put(0xFB_D3_DD, new RuneStone(Type.HEART, true));
+		map0.put(0xFF_FF_FF, new RuneStone(Type.UNKNOWN));
+		return Collections.unmodifiableMap(map0);
 	}
 
 	@Override
-	public RuneMap getRuneStones(BufferedImage image) {
+	public RuneMap convert(BufferedImage image) {
 		RuneMap stones = new RuneMap(6, 5);
 		for (int y = 0; y < HEIGHT; y++)
 			for (int x = 0; x < WIDTH; x++) {
@@ -151,10 +108,6 @@ public class DefaultRuneStoneGetter implements RuneStoneGetter {
 		g = (g >> 8) / FETCH_POINT;
 		b = (b >> 0) / FETCH_POINT;
 
-		// System.out.printf("0x%02X_%02X_%02X ", r, g, b);
-		// if (x == WIDTH - 1)
-		// System.out.println();
-
 		return (r << 16) + (g << 8) + (b << 0);
 	}
 
@@ -169,9 +122,10 @@ public class DefaultRuneStoneGetter implements RuneStoneGetter {
 	 * @return the <code>RuneStone</code> chosen by this method
 	 */
 	private static RuneStone getRuneStone(int rgb) {
+		Map<Integer, RuneStone> rgbMap = defaultRGBMap();
 		int minDistance = Integer.MAX_VALUE;
 		RuneStone bestStone = RuneStone.UNKNOWN;
-		for (Map.Entry<Integer, RuneStone> entry : RGB_MAP.entrySet()) {
+		for (Map.Entry<Integer, RuneStone> entry : rgbMap.entrySet()) {
 			if (minDistance > distance(rgb, entry.getKey())) {
 				minDistance = distance(rgb, entry.getKey());
 				bestStone = entry.getValue();

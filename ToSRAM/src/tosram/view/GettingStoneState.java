@@ -8,10 +8,10 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
-import tosram.DefaultRuneStoneGetter;
+import tosram.DefaultImageRuneMapConverter;
 import tosram.RuneMap;
 import tosram.RuneStone;
-import tosram.RuneStoneGetter;
+import tosram.ImageRuneMapConverter;
 
 class GettingStoneState implements MFState {
 
@@ -35,7 +35,7 @@ class GettingStoneState implements MFState {
 	private class GettingStoneWorker extends SwingWorker<RuneMap, RuneMap> {
 
 		private static final int DELAY_BETWEEN_READ_STONE = 500;
-		private final RuneStoneGetter rsg = new DefaultRuneStoneGetter();
+		private final ImageRuneMapConverter irmc = new DefaultImageRuneMapConverter();
 
 		@Override
 		protected RuneMap doInBackground() throws Exception {
@@ -43,12 +43,12 @@ class GettingStoneState implements MFState {
 			Robot robot = new Robot();
 			Rectangle rect = frame.getMapArea();
 
-			RuneMap map = rsg.getRuneStones(robot.createScreenCapture(rect));
+			RuneMap map = irmc.convert(robot.createScreenCapture(rect));
 
 			while (!interrupted) {
 				robot.delay(DELAY_BETWEEN_READ_STONE);
 				RuneMap prevmap = map;
-				map = rsg.getRuneStones(robot.createScreenCapture(rect));
+				map = irmc.convert(robot.createScreenCapture(rect));
 
 				publish(map);
 

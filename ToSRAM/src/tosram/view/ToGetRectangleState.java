@@ -11,7 +11,7 @@ class ToGetRectangleState implements MFState {
 	public void checkIn(MainFrame f0) {
 		frame = f0;
 		frame.setStatus("Where are the runestones?");
-		frame.addButton("Find", new ActionListener() {
+		frame.addButton("On Screen", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				frame.removeButtons();

@@ -2,6 +2,7 @@ package tosram.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -16,78 +17,73 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 /**
- * Ask user to choose an rectangle of an image. Please don't try to serialize
- * me. I don't regard the serialized form.
+ * Ask user to choose an rectangle of an image.<br>
+ * Example:
+ * 
+ * <pre>
+ * SubimageChooser chooser = new SubimageChooser(image);
+ * chooser.setTitle(&quot;Hello&quot;);
+ * chooser.setAnswerArea(new Rectangle(5, 5, 10, 10)); // initial selection
+ * chooser.setVisible(true); // blocking
+ * if (chooser.isCanceled())
+ * 	System.out.println(&quot;Canceled&quot;);
+ * else
+ * 	System.out.println(chooser.getAnswerArea());
+ * </pre>
  * 
  * @author johnchen902
  */
 @SuppressWarnings("serial")
 public class SubimageChooser extends JDialog {
 
+	private BufferedImage image;
+	private Point p1, p2;
 	private ImagePanel panel;
-	private boolean done;
+	private boolean canceled;
+	private int selectId;
 
-	/**
-	 * Ask user to choose an rectangle of the image.
-	 * 
-	 * @param image
-	 *            the image shown
-	 * @param title
-	 *            the title shown
-	 * @return the chosen rectangle or <code>null</code> if user close the
-	 *         dialog.
-	 */
-	public static Rectangle showRectangleDialog(BufferedImage image,
-			String title) {
-		SubimageChooser sc = new SubimageChooser(image);
-		sc.setTitle(title);
-		sc.setVisible(true);
-		if (!sc.isDone())
-			return null;
-		return sc.getAnswerArea();
-	}
+	public SubimageChooser(BufferedImage img) {
+		this.image = img;
 
-	/**
-	 * Ask user to choose an rectangle of the image.
-	 * 
-	 * @param image
-	 *            the image shown
-	 * @param title
-	 *            the title shown
-	 * @param init
-	 *            the initial selection
-	 * @return the chosen rectangle or <code>null</code> if user close the
-	 *         dialog.
-	 */
-	public static Rectangle showRectangleDialog(BufferedImage image,
-			String title, Rectangle init) {
-		SubimageChooser sc = new SubimageChooser(image);
-		sc.panel.setP1(new Point(init.x, init.y));
-		sc.panel.setP2(new Point(init.x + init.width, init.y + init.height));
-		sc.setTitle(title);
-		sc.setVisible(true);
-		if (!sc.isDone())
-			return null;
-		return sc.getAnswerArea();
-	}
-
-	private SubimageChooser(BufferedImage img) {
 		JPanel pnLeft = new JPanel();
-
-		JButton btn = new JButton("Done");
-		pnLeft.add(btn);
 		getContentPane().add(pnLeft, BorderLayout.WEST);
-		btn.addActionListener(new ActionListener() {
+
+		JButton btnOK = new JButton(UIManager.get("OptionPane.okButtonText")
+				.toString());
+		btnOK.setAlignmentX(Component.CENTER_ALIGNMENT);
+		getRootPane().setDefaultButton(btnOK);
+		btnOK.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				done = true;
+				canceled = false;
+				dispose();
+			}
+		});
+		JButton btnCancel = new JButton(UIManager.get(
+				"OptionPane.cancelButtonText").toString());
+		btnCancel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		pnLeft.setLayout(new BoxLayout(pnLeft, BoxLayout.Y_AXIS));
+
+		pnLeft.add(Box.createVerticalGlue());
+		pnLeft.add(btnOK);
+		pnLeft.add(Box.createVerticalStrut(5));
+		pnLeft.add(btnCancel);
+		pnLeft.add(Box.createVerticalGlue());
+
+		btnCancel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				canceled = true;
 				dispose();
 			}
 		});
@@ -98,9 +94,8 @@ public class SubimageChooser extends JDialog {
 
 		panel = new ImagePanel();
 		scroll.setViewportView(panel);
-		panel.setImage(img);
-		panel.setP1(new Point(img.getWidth() / 3, img.getHeight() / 3));
-		panel.setP2(new Point(img.getWidth() * 2 / 3, img.getHeight() * 2 / 3));
+		setAnswerArea(new Rectangle(img.getWidth() / 3, img.getHeight() / 3,
+				img.getWidth() / 3, img.getHeight() / 3));
 		MouseAdapter ma = new MyMouseAdapter();
 		panel.addMouseListener(ma);
 		panel.addMouseMotionListener(ma);
@@ -118,7 +113,7 @@ public class SubimageChooser extends JDialog {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				done = false;
+				canceled = true;
 				dispose();
 			}
 		});
@@ -126,30 +121,63 @@ public class SubimageChooser extends JDialog {
 		setModal(true);
 	}
 
-	boolean isDone() {
-		return done;
+	public boolean isCanceled() {
+		return canceled;
 	}
 
-	Rectangle getAnswerArea() {
+	public void setAnswerArea(Rectangle rect) {
+		setP1(new Point(rect.x, rect.y));
+		setP2(new Point(rect.x + rect.width, rect.y + rect.height));
+	}
+
+	public Rectangle getAnswerArea() {
 		Rectangle choosenArea = new Rectangle();
-		choosenArea.setFrameFromDiagonal(panel.getP1(), panel.getP2());
+		choosenArea.setFrameFromDiagonal(getP1(), getP2());
 		return choosenArea;
+	}
+
+	private Point getPoint(int i) {
+		if (i == 1)
+			return getP1();
+		else if (i == 2)
+			return getP2();
+		return null;
+	}
+
+	private void setPoint(int i, Point p) {
+		if (i == 1)
+			setP1(p);
+		else if (i == 2)
+			setP2(p);
+	}
+
+	private Point getP1() {
+		return new Point(p1);
+	}
+
+	private void setP1(Point p1) {
+		this.p1 = new Point(p1);
+	}
+
+	private Point getP2() {
+		return new Point(p2);
+	}
+
+	private void setP2(Point p2) {
+		this.p2 = new Point(p2);
 	}
 
 	private class MyMouseAdapter extends MouseAdapter {
 
-		private int selectId;
-		private Point offset = new Point();
-
 		private void updateCursor(Point mp) {
 			int cursorId;
 			if (selectId != 0) {
-				cursorId = Cursor.MOVE_CURSOR;
-			} else if (panel.getP1().distance(mp) < 10.0
-					|| panel.getP2().distance(mp) < 10.0) {
+				cursorId = Cursor.CROSSHAIR_CURSOR;
+			} else if (getP1().distance(mp) < 10.0
+					|| getP2().distance(mp) < 10.0) {
 				cursorId = Cursor.HAND_CURSOR;
 			} else {
-				cursorId = Cursor.DEFAULT_CURSOR;
+				cursorId = Cursor.CROSSHAIR_CURSOR;
 			}
 			panel.setCursor(Cursor.getPredefinedCursor(cursorId));
 		}
@@ -164,21 +192,26 @@ public class SubimageChooser extends JDialog {
 			double minDis = 10.0;
 			selectId = 0;
 			for (int i = 1; i <= 2; i++) {
-				if (panel.getPoint(i).distance(e.getPoint()) < minDis) {
+				if (getPoint(i).distance(e.getPoint()) < minDis) {
 					selectId = i;
-					minDis = panel.getPoint(i).distance(e.getPoint());
+					minDis = getPoint(i).distance(e.getPoint());
 				}
 			}
 			if (selectId != 0) {
-				offset.x = panel.getPoint(selectId).x - e.getX();
-				offset.y = panel.getPoint(selectId).y - e.getY();
-				updateCursor(e.getPoint());
+				setPoint(selectId, e.getPoint());
+			} else {
+				setP1(e.getPoint());
+				setP2(e.getPoint());
+				selectId = 2;
 			}
+			panel.repaint();
+			updateCursor(e.getPoint());
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			selectId = 0;
+			panel.repaint();
 			updateCursor(e.getPoint());
 		}
 
@@ -186,54 +219,12 @@ public class SubimageChooser extends JDialog {
 		public void mouseDragged(MouseEvent e) {
 			if (selectId == 0)
 				return;
-			Point p = new Point(e.getX() + offset.x, e.getY() + offset.y);
-			panel.setPoint(selectId, p);
+			setPoint(selectId, e.getPoint());
 			panel.repaint();
 		}
 	}
 
-	static class ImagePanel extends JPanel {
-		private BufferedImage image;
-		private Point p1, p2;
-
-		public BufferedImage getImage() {
-			return image;
-		}
-
-		public void setImage(BufferedImage image) {
-			this.image = image;
-		}
-
-		public Point getPoint(int i) {
-			if (i == 1)
-				return getP1();
-			else if (i == 2)
-				return getP2();
-			return null;
-		}
-
-		public void setPoint(int i, Point p) {
-			if (i == 1)
-				setP1(p);
-			else if (i == 2)
-				setP2(p);
-		}
-
-		public Point getP1() {
-			return new Point(p1);
-		}
-
-		public void setP1(Point p1) {
-			this.p1 = new Point(p1);
-		}
-
-		public Point getP2() {
-			return new Point(p2);
-		}
-
-		public void setP2(Point p2) {
-			this.p2 = new Point(p2);
-		}
+	class ImagePanel extends JPanel {
 
 		@Override
 		public Dimension getPreferredSize() {
@@ -261,12 +252,16 @@ public class SubimageChooser extends JDialog {
 			g.setColor(Color.WHITE);
 			g.setXORMode(Color.BLACK);
 			final int arm = 10;
-			g.drawLine(p1.x - arm, p1.y, p1.x + arm, p1.y);
-			g.drawLine(p1.x, p1.y - arm, p1.x, p1.y - 1);
-			g.drawLine(p1.x, p1.y + 1, p1.x, p1.y + arm);
-			g.drawLine(p2.x - arm, p2.y, p2.x + arm, p2.y);
-			g.drawLine(p2.x, p2.y - arm, p2.x, p2.y - 1);
-			g.drawLine(p2.x, p2.y + 1, p2.x, p2.y + arm);
+			if (selectId != 1) {
+				g.drawLine(p1.x - arm, p1.y, p1.x + arm, p1.y);
+				g.drawLine(p1.x, p1.y - arm, p1.x, p1.y - 1);
+				g.drawLine(p1.x, p1.y + 1, p1.x, p1.y + arm);
+			}
+			if (selectId != 2) {
+				g.drawLine(p2.x - arm, p2.y, p2.x + arm, p2.y);
+				g.drawLine(p2.x, p2.y - arm, p2.x, p2.y - 1);
+				g.drawLine(p2.x, p2.y + 1, p2.x, p2.y + arm);
+			}
 		}
 	}
 }
