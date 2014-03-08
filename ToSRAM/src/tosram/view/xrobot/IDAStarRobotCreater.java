@@ -23,6 +23,8 @@ import tosram.view.MnemonicsDispatcher;
 import tosram.view.PathRobotCreater;
 import tosram.view.WeatheringPane;
 import tosram.xrobot.DiagonalMoving;
+import tosram.xrobot.EndAtTopGoalSeriesFactory;
+import tosram.xrobot.GoalSeriesFactory;
 import tosram.xrobot.IDAStarRobot;
 import tosram.xrobot.MaxComboGoalSeriesFactory;
 import tosram.xrobot.Moving;
@@ -41,6 +43,7 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 	private JSpinner spnDiagonalCost;
 	private JCheckBox chckbxWeathering;
 	private WeatheringPane weatheringPane;
+	private JCheckBox cbxEndAtTop;
 
 	private void initialize() {
 		if (wrapper != null)
@@ -102,6 +105,9 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 		weatheringPane = new WeatheringPane();
 		panel.add(weatheringPane);
 		weatheringPane.setEnabled(false);
+
+		cbxEndAtTop = new JCheckBox("End at Top");
+		box.add(cbxEndAtTop);
 	}
 
 	@Override
@@ -116,7 +122,10 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 		if (chckbxWeathering.isSelected()) {
 			moving = new WeatheringMoving(moving, weatheringPane.getWeathered());
 		}
-		return new IDAStarRobot(new MaxComboGoalSeriesFactory(), moving);
+		GoalSeriesFactory series = new MaxComboGoalSeriesFactory();
+		if (cbxEndAtTop.isSelected())
+			series = new EndAtTopGoalSeriesFactory(series);
+		return new IDAStarRobot(series, moving);
 	}
 
 	@Override

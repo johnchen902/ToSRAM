@@ -18,6 +18,19 @@ public interface Goal {
 	public Goal.Result getResult(RuneMap runemap);
 
 	/**
+	 * Get a result about the specified map and the position of the stone held.
+	 * 
+	 * @param runemap
+	 *            the specified map.
+	 * @param x
+	 *            the X coordinate of the position of the stone held
+	 * @param y
+	 *            the Y coordinate of the position of the stone held
+	 * @return a Goal.Result
+	 */
+	public Goal.Result getResult(RuneMap runemap, int x, int y);
+
+	/**
 	 * A result includes a estimated heuristic cost, a "whether goal is make"
 	 * and the next goal to work on.
 	 * 

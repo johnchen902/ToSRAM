@@ -4,10 +4,11 @@ import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
+
+import tosram.Direction;
 import tosram.Path;
 import tosram.PathRobot;
 import tosram.RuneMap;
-import tosram.Direction;
 import tosram.RuneStone;
 
 /**
@@ -69,7 +70,7 @@ public class IDAStarRobot implements PathRobot {
 
 	private Path search(RuneMap m, int x, int y, int g, int bound, double pa,
 			double pb) {
-		Goal.Result goalResult = currentGoal.getResult(m);
+		Goal.Result goalResult = currentGoal.getResult(m, x, y);
 		int f = g + goalResult.heuristicCostEstimate();
 		if (f > bound || Thread.currentThread().isInterrupted())
 			return null;

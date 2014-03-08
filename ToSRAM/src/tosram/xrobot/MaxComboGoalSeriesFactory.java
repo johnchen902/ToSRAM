@@ -89,6 +89,11 @@ public class MaxComboGoalSeriesFactory implements GoalSeriesFactory {
 		}
 
 		@Override
+		public Result getResult(RuneMap runemap, int x, int y) {
+			return getResult(runemap);
+		}
+
+		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
