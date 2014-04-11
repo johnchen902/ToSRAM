@@ -1,5 +1,7 @@
 package tosram.xrobot;
 
+import java.util.Deque;
+
 import tosram.Direction;
 
 /**
@@ -25,7 +27,10 @@ public interface Moving {
 	 * 
 	 * @param d
 	 *            the move
+	 * @param stack
+	 *            the previous moves excluding <code>d</code>; should not be
+	 *            modified
 	 * @return the cost
 	 */
-	public int cost(Direction d);
+	public int cost(Direction d, Deque<Direction> stack);
 }

@@ -1,6 +1,7 @@
 package tosram.xrobot;
 
 import java.util.Arrays;
+import java.util.Deque;
 
 import tosram.Direction;
 
@@ -11,10 +12,12 @@ import tosram.Direction;
  */
 public class NoDiagonalMoving implements Moving {
 
-	public int cost(Direction d) {
+	@Override
+	public int cost(Direction d, Deque<Direction> stack) {
 		return 1;
 	}
 
+	@Override
 	public Direction[] getDirections(int x, int y) {
 		return Arrays.copyOf(Direction.values(), 4);
 	}

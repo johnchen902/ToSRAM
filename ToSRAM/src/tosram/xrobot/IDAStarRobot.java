@@ -94,8 +94,10 @@ public class IDAStarRobot implements PathRobot {
 			m.setRuneStone(x, y, stone2);
 			m.setRuneStone(nx, ny, stone1);
 
+			int cost = moving.cost(dir, stack);
+
 			stack.addLast(dir);
-			Path result = search(m, nx, ny, g + moving.cost(dir), bound, pa, pb
+			Path result = search(m, nx, ny, g + cost, bound, pa, pb
 					/ directions.length);
 			pa += pb / directions.length;
 			stack.removeLast();

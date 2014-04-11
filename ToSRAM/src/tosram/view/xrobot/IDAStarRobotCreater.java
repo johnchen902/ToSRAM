@@ -4,10 +4,10 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.beans.EventHandler;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -24,6 +24,7 @@ import tosram.view.PathRobotCreater;
 import tosram.view.WeatheringPane;
 import tosram.xrobot.DiagonalMoving;
 import tosram.xrobot.EndAtTopGoalSeriesFactory;
+import tosram.xrobot.ForwardMoving;
 import tosram.xrobot.GoalSeriesFactory;
 import tosram.xrobot.IDAStarRobot;
 import tosram.xrobot.MaxComboGoalSeriesFactory;
@@ -40,10 +41,13 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 
 	private JPanel wrapper;
 	private JCheckBox cbxDiagonal;
-	private JSpinner spnDiagonalCost;
+	private JLabel lblCost;
+	private JSpinner spnCost;
 	private JCheckBox chckbxWeathering;
 	private WeatheringPane weatheringPane;
 	private JCheckBox cbxEndAtTop;
+
+	private int lastCost;
 
 	private void initialize() {
 		if (wrapper != null)
@@ -63,20 +67,33 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 		pnCost.setBorder(new EmptyBorder(0, 16, 0, 0));
 		box.add(pnCost);
 
-		JLabel lblCost = new JLabel("Cost:");
+		lblCost = new JLabel();
 		pnCost.add(lblCost);
-		cbxDiagonal.addItemListener(EventHandler.create(ItemListener.class,
-				lblCost, "enabled", "source.selected"));
 		MnemonicsDispatcher.registerComponent(lblCost);
 
-		spnDiagonalCost = new JSpinner(new SpinnerNumberModel(2, 1, 10, 1));
-		pnCost.add(spnDiagonalCost);
-		lblCost.setLabelFor(spnDiagonalCost);
-		spnDiagonalCost.setAlignmentX(JSpinner.LEFT_ALIGNMENT);
-		String toolTipText = "The cost of a diagonal move relative to a normal one.";
-		spnDiagonalCost.setToolTipText(toolTipText);
-		cbxDiagonal.addItemListener(EventHandler.create(ItemListener.class,
-				spnDiagonalCost, "enabled", "source.selected"));
+		spnCost = new JSpinner(new SpinnerNumberModel(2, 1, 10, 1));
+		pnCost.add(spnCost);
+		lblCost.setLabelFor(spnCost);
+		spnCost.setAlignmentX(JSpinner.LEFT_ALIGNMENT);
+
+		diagonalSelected();
+		spnCost.setValue(2);
+		lastCost = 1;
+
+		cbxDiagonal.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				AbstractButton bt = (AbstractButton) e.getSource();
+				boolean selected = bt.isSelected();
+				if (selected)
+					diagonalSelected();
+				else
+					diagonalDeselected();
+				int oldCost = (int) spnCost.getValue();
+				spnCost.setValue(lastCost);
+				lastCost = oldCost;
+			}
+		});
 
 		chckbxWeathering = new JCheckBox("Weathering");
 		box.add(chckbxWeathering);
@@ -108,16 +125,34 @@ public class IDAStarRobotCreater implements PathRobotCreater {
 
 		cbxEndAtTop = new JCheckBox("End at Top");
 		box.add(cbxEndAtTop);
+		MnemonicsDispatcher.registerComponent(cbxEndAtTop);
+	}
+
+	private void diagonalSelected() {
+		lblCost.setText("Diagonal Cost:");
+		String toolTipText = "Relative cost of a diagonal move.";
+		spnCost.setToolTipText(toolTipText);
+	}
+
+	private void diagonalDeselected() {
+		lblCost.setText("Turn Cost:");
+		String toolTipText = "Relative cost of a direction changing move."
+				+ " (Take more time with higher value)";
+		spnCost.setToolTipText(toolTipText);
 	}
 
 	@Override
 	public PathRobot createPathRobot() {
 		initialize();
 		Moving moving;
+		int costValue = (int) spnCost.getValue();
 		if (cbxDiagonal.isSelected()) {
-			moving = new DiagonalMoving((int) spnDiagonalCost.getValue());
+			moving = new DiagonalMoving(costValue);
 		} else {
-			moving = new NoDiagonalMoving();
+			if (costValue == 1)
+				moving = new NoDiagonalMoving();
+			else
+				moving = new ForwardMoving(costValue);
 		}
 		if (chckbxWeathering.isSelected()) {
 			moving = new WeatheringMoving(moving, weatheringPane.getWeathered());

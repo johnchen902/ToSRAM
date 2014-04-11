@@ -1,6 +1,8 @@
 package tosram.xrobot;
 
 import java.util.Arrays;
+import java.util.Deque;
+
 import tosram.Direction;
 
 /**
@@ -39,7 +41,7 @@ public class WeatheringMoving implements Moving {
 	}
 
 	@Override
-	public int cost(Direction d) {
-		return moving.cost(d);
+	public int cost(Direction d, Deque<Direction> stack) {
+		return moving.cost(d, stack);
 	}
 }

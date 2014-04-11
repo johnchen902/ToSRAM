@@ -1,5 +1,7 @@
 package tosram.xrobot;
 
+import java.util.Deque;
+
 import tosram.Direction;
 
 /**
@@ -32,7 +34,7 @@ public class DiagonalMoving implements Moving {
 	}
 
 	@Override
-	public int cost(Direction d) {
+	public int cost(Direction d, Deque<Direction> stack) {
 		return d.ordinal() < 4 ? 1 : diagonalCost;
 	}
 
