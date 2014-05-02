@@ -259,7 +259,7 @@ public class RuneMapTable extends JTable {
 		@Override
 		public boolean stopCellEditing() {
 			try {
-				RuneStone.valueOf(((JTextField) editorComponent).getText());
+				getCellEditorValue();
 			} catch (IllegalArgumentException e) {
 				editorComponent.getToolkit().beep();
 				return false;
@@ -269,7 +269,10 @@ public class RuneMapTable extends JTable {
 
 		@Override
 		public Object getCellEditorValue() {
-			return RuneStone.valueOf(((JTextField) editorComponent).getText());
+			String str = ((JTextField) editorComponent).getText();
+			if (str.length() > 1)
+				str = String.valueOf(str.charAt(str.length() - 1));
+			return RuneStone.valueOf(str);
 		}
 	}
 

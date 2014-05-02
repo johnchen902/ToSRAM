@@ -15,6 +15,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.EventHandler;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -171,6 +173,12 @@ public class MainFrame extends JFrame {
 					@Override
 					public void focusLost(FocusEvent e) {
 						tbStones.setFocusable(false);
+					}
+				});
+				tbStones.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						tbStones.setFocusable(true);
 					}
 				});
 				tbStones.setFocusable(false);
