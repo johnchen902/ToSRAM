@@ -40,7 +40,7 @@ public class RuneStone {
 		/**
 		 * The type indicate the type is unknown.
 		 */
-		UNKNOWN('x');
+		UNKNOWN('?');
 		private final char shortName;
 
 		private Type(char s) {
@@ -128,7 +128,7 @@ public class RuneStone {
 	 * 
 	 * @return one of <code>"r"</code>, <code>"b"</code>, <code>"g"</code>,
 	 *         <code>"y"</code>, <code>"d"</code>, <code>"p"</code>,
-	 *         <code>"x"</code> or its upper case.
+	 *         <code>"?"</code> or its upper case.
 	 */
 	@Override
 	public String toString() {
