@@ -5,7 +5,7 @@ import java.util.Deque;
 import tosram.ComboCalculator;
 import tosram.Direction;
 import tosram.RuneMap;
-import tosram.RuneStone.Type;
+import tosram.RuneStone;
 
 /**
  * A strategy that requires six stones to be removed in the same combo.
@@ -46,7 +46,7 @@ public class SixInComboStrategy extends FilterSolutionStrategy {
 		hasSix = false;
 		for (ComboCalculator.Combo ccc : cd.getFullComboList()) {
 			if (Long.bitCount(ccc.getMask()) >= 6
-					&& (ccc.getType() != Type.HEART || heartAllowed)) {
+					&& (ccc.getType() != RuneStone.HEART || heartAllowed)) {
 				hasSix = true;
 				break;
 			}

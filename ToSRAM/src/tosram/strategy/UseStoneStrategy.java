@@ -5,7 +5,7 @@ import java.util.Deque;
 import tosram.ComboCalculator;
 import tosram.Direction;
 import tosram.RuneMap;
-import tosram.RuneStone.Type;
+import tosram.RuneStone;
 
 /**
  * A strategy that restrict the usage of a specified type of stone.
@@ -14,7 +14,7 @@ import tosram.RuneStone.Type;
  */
 public class UseStoneStrategy extends FilterSolutionStrategy {
 
-	private final Type type;
+	private final RuneStone type;
 	private final int lower, upper;
 	private int minDifference;
 
@@ -31,7 +31,7 @@ public class UseStoneStrategy extends FilterSolutionStrategy {
 	 * @param upper
 	 *            the upper limit of the specified range (including)
 	 */
-	public UseStoneStrategy(SolutionStrategy next, Type type, int lower,
+	public UseStoneStrategy(SolutionStrategy next, RuneStone type, int lower,
 			int upper) {
 		super(next);
 		if (lower > upper)

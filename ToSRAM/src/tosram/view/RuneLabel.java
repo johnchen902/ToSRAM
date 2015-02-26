@@ -20,7 +20,7 @@ public class RuneLabel extends JLabel {
 	}
 
 	private Color getBackgroundColor(RuneStone stone) {
-		switch (stone.getType()) {
+		switch (stone) {
 		case FIRE:
 			return Color.RED;
 		case WATER:
@@ -40,10 +40,7 @@ public class RuneLabel extends JLabel {
 	}
 
 	private Color getForegroundColor(RuneStone stone) {
-		if (stone.isStronger() && stone.getType() != RuneStone.Type.UNKNOWN)
-			return Color.WHITE;
-		else
-			return Color.BLACK;
+		return Color.BLACK;
 	}
 
 	public static RuneMapTable.Renderer factory() {

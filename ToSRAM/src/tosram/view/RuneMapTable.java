@@ -47,7 +47,7 @@ public class RuneMapTable extends JPanel {
 		RuneMap m = new RuneMap(6, 5);
 		for (int i = 0; i < m.getWidth(); i++)
 			for (int j = 0; j < m.getHeight(); j++)
-				m.setRuneStone(i, j, RuneStone.UNKNOWN);
+				m.setRuneStone(i, j, RuneStone.FIRE);
 		return m;
 	}
 

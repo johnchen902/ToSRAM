@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import tosram.RuneStone.Type;
-
 /**
  * A calculator of combo in a map.
  * 
@@ -97,9 +95,9 @@ public class ComboCalculator {
 	public static class Combo {
 
 		private/* mutable */long mask; // see getMask
-		private final Type type;
+		private final RuneStone type;
 
-		public Combo(long mask, Type type) {
+		public Combo(long mask, RuneStone type) {
 			this.mask = mask;
 			this.type = type;
 		}
@@ -144,7 +142,7 @@ public class ComboCalculator {
 		 * 
 		 * @return a <code>Type</code>
 		 */
-		public Type getType() {
+		public RuneStone getType() {
 			return type;
 		}
 
@@ -201,8 +199,8 @@ public class ComboCalculator {
 		return new Describer();
 	}
 
-	private static Type typeOf(RuneMap map, int x, int y) {
-		return map.getStone(x, y).getType();
+	private static RuneStone typeOf(RuneMap map, int x, int y) {
+		return map.getStone(x, y);
 	}
 
 	private static long neighborMask(long mask) {
@@ -215,8 +213,8 @@ public class ComboCalculator {
 			List<Combo> comboList) {
 		for (int y = 0; y < HEIGHT; y++) {
 			for (int x = 0; x < WIDTH - 2; x++) {
-				Type type = typeOf(map, x + 2, y);
-				if (type == Type.UNKNOWN) {
+				RuneStone type = typeOf(map, x + 2, y);
+				if (type == RuneStone.UNKNOWN) {
 					x += 2;
 				} else {
 					if (typeOf(map, x + 1, y) == type) {
@@ -249,8 +247,8 @@ public class ComboCalculator {
 	private static void scanForVerticalCombo(RuneMap map, List<Combo> comboList) {
 		for (int x = 0; x < WIDTH; x++) {
 			for (int y = 0; y < HEIGHT - 2; y++) {
-				Type type = typeOf(map, x, y + 2);
-				if (type == Type.UNKNOWN) {
+				RuneStone type = typeOf(map, x, y + 2);
+				if (type == RuneStone.UNKNOWN) {
 					y += 2;
 				} else {
 					if (typeOf(map, x, y + 1) == type) {

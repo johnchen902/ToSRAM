@@ -6,7 +6,7 @@ import java.util.EnumSet;
 import tosram.ComboCalculator;
 import tosram.Direction;
 import tosram.RuneMap;
-import tosram.RuneStone.Type;
+import tosram.RuneStone;
 
 /**
  * A strategy that tries to find most group attacks.
@@ -15,7 +15,7 @@ import tosram.RuneStone.Type;
  */
 public class GroupAttackStrategy extends FilterSolutionStrategy {
 
-	private final EnumSet<Type> requirements;
+	private final EnumSet<RuneStone> requirements;
 	private int bestGroupAttacks;
 
 	/**
@@ -26,7 +26,7 @@ public class GroupAttackStrategy extends FilterSolutionStrategy {
 	 *            the filtered strategy
 	 */
 	public GroupAttackStrategy(SolutionStrategy next) {
-		this(next, EnumSet.complementOf(EnumSet.of(Type.HEART)));
+		this(next, EnumSet.complementOf(EnumSet.of(RuneStone.HEART)));
 	}
 
 	/**
@@ -38,7 +38,7 @@ public class GroupAttackStrategy extends FilterSolutionStrategy {
 	 * @param type
 	 *            the type of group attack required
 	 */
-	public GroupAttackStrategy(SolutionStrategy next, Type type) {
+	public GroupAttackStrategy(SolutionStrategy next, RuneStone type) {
 		this(next, EnumSet.of(type));
 	}
 
@@ -51,7 +51,7 @@ public class GroupAttackStrategy extends FilterSolutionStrategy {
 	 * @param typeSet
 	 *            the set of type of group attack required
 	 */
-	public GroupAttackStrategy(SolutionStrategy next, EnumSet<Type> typeSet) {
+	public GroupAttackStrategy(SolutionStrategy next, EnumSet<RuneStone> typeSet) {
 		super(next);
 		this.requirements = EnumSet.copyOf(typeSet);
 	}
@@ -68,7 +68,7 @@ public class GroupAttackStrategy extends FilterSolutionStrategy {
 	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
 			ComboCalculator.Describer cd) {
 		super.submit(map, x, y, stack, cd);
-		EnumSet<Type> types = EnumSet.noneOf(Type.class);
+		EnumSet<RuneStone> types = EnumSet.noneOf(RuneStone.class);
 		for (ComboCalculator.Combo ccc : cd.getFullComboList()) {
 			if (Long.bitCount(ccc.getMask()) >= 5) {
 				types.add(ccc.getType());

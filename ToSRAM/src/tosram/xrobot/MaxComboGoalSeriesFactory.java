@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 
 import tosram.ComboCalculator;
 import tosram.RuneMap;
-import tosram.RuneStone.Type;
+import tosram.RuneStone;
 
 /**
  * A factory that produce a series of goal leading to the maximum combo.
@@ -40,17 +40,17 @@ public class MaxComboGoalSeriesFactory implements GoalSeriesFactory {
 
 	@Override
 	public Goal[] createGoalSeries(RuneMap initialMap) {
-		EnumMap<Type, Integer> map = new EnumMap<>(Type.class);
-		for (Type type : Type.values())
+		EnumMap<RuneStone, Integer> map = new EnumMap<>(RuneStone.class);
+		for (RuneStone type : RuneStone.values())
 			map.put(type, 0);
 		for (int y = 0; y < initialMap.getHeight(); y++)
 			for (int x = 0; x < initialMap.getWidth(); x++) {
-				Type t = initialMap.getStone(x, y).getType();
+				RuneStone t = initialMap.getStone(x, y);
 				map.put(t, map.get(t) + 1);
 			}
 		int maxCombo = 0;
-		for (Entry<Type, Integer> e : map.entrySet()) {
-			if (e.getKey() != Type.UNKNOWN) {
+		for (Entry<RuneStone, Integer> e : map.entrySet()) {
+			if (e.getKey() != RuneStone.UNKNOWN) {
 				maxCombo += getPossibleCombo(e.getValue());
 			}
 		}

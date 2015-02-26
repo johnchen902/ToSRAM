@@ -3,6 +3,8 @@ package tosram.view;
 import java.awt.Color;
 
 import javax.swing.JButton;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
 
 import tosram.RuneMap;
 import tosram.RuneStone;
@@ -18,10 +20,13 @@ public class RuneButton extends JButton {
 		setBackground(getBackgroundColor(stone));
 		setForeground(getForegroundColor(stone));
 		setHorizontalAlignment(CENTER);
+		Border border = getBorder();
+		if (border instanceof CompoundBorder)
+			setBorder(((CompoundBorder) border).getOutsideBorder());
 	}
 
 	private Color getBackgroundColor(RuneStone stone) {
-		switch (stone.getType()) {
+		switch (stone) {
 		case FIRE:
 			return Color.RED;
 		case WATER:
@@ -41,10 +46,7 @@ public class RuneButton extends JButton {
 	}
 
 	private Color getForegroundColor(RuneStone stone) {
-		if (stone.isStronger() && stone.getType() != RuneStone.Type.UNKNOWN)
-			return Color.WHITE;
-		else
-			return Color.BLACK;
+		return Color.BLACK;
 	}
 
 	public static RuneMapTable.Renderer factory(RuneMapTable table) {
@@ -52,26 +54,27 @@ public class RuneButton extends JButton {
 			RuneButton btn = new RuneButton(stone);
 			btn.addActionListener(e -> {
 				RuneMap mp = table.getRuneMap();
-				switch (mp.getStone(x, y).getType()) {
+				switch (mp.getStone(x, y)) {
 				case FIRE:
-					mp.setRuneStone(x, y, new RuneStone(RuneStone.Type.GREEN));
+					mp.setRuneStone(x, y, RuneStone.GREEN);
 					break;
 				case GREEN:
-					mp.setRuneStone(x, y, new RuneStone(RuneStone.Type.WATER));
+					mp.setRuneStone(x, y, RuneStone.WATER);
 					break;
 				case WATER:
-					mp.setRuneStone(x, y, new RuneStone(RuneStone.Type.LIGHT));
+					mp.setRuneStone(x, y, RuneStone.LIGHT);
 					break;
 				case LIGHT:
-					mp.setRuneStone(x, y, new RuneStone(RuneStone.Type.DARK));
+					mp.setRuneStone(x, y, RuneStone.DARK);
 					break;
 				case DARK:
-					mp.setRuneStone(x, y, new RuneStone(RuneStone.Type.HEART));
+					mp.setRuneStone(x, y, RuneStone.HEART);
 					break;
 				case HEART:
+					mp.setRuneStone(x, y, RuneStone.UNKNOWN);
+					break;
 				case UNKNOWN:
-				default:
-					mp.setRuneStone(x, y, new RuneStone(RuneStone.Type.FIRE));
+					mp.setRuneStone(x, y, RuneStone.FIRE);
 					break;
 				}
 				table.setRuneMap(mp);

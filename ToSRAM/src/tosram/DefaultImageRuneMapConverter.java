@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import tosram.RuneStone.Type;
-
 /**
  * An implementation of <code>RuneStoneGetter</code>.
  * 
@@ -46,19 +44,19 @@ public class DefaultImageRuneMapConverter implements ImageRuneMapConverter {
 	 */
 	private static Map<Integer, RuneStone> defaultRGBMap() {
 		Map<Integer, RuneStone> map0 = new HashMap<Integer, RuneStone>();
-		map0.put(0xE9_28_14, new RuneStone(Type.FIRE));
-		map0.put(0x4A_A6_E8, new RuneStone(Type.WATER));
-		map0.put(0x1C_CA_2D, new RuneStone(Type.GREEN));
-		map0.put(0xCA_9A_00, new RuneStone(Type.LIGHT));
-		map0.put(0xD2_2C_F4, new RuneStone(Type.DARK));
-		map0.put(0xEA_84_C0, new RuneStone(Type.HEART));
-		map0.put(0xFA_67_3D, new RuneStone(Type.FIRE, true));
-		map0.put(0x71_D7_FE, new RuneStone(Type.WATER, true));
-		map0.put(0x15_E6_1E, new RuneStone(Type.GREEN, true));
-		map0.put(0xF5_BE_2D, new RuneStone(Type.LIGHT, true));
-		map0.put(0xFE_4B_FC, new RuneStone(Type.DARK, true));
-		map0.put(0xFB_D3_DD, new RuneStone(Type.HEART, true));
-		map0.put(0xFF_FF_FF, new RuneStone(Type.UNKNOWN));
+		map0.put(0xE9_28_14, RuneStone.FIRE);
+		map0.put(0x4A_A6_E8, RuneStone.WATER);
+		map0.put(0x1C_CA_2D, RuneStone.GREEN);
+		map0.put(0xCA_9A_00, RuneStone.LIGHT);
+		map0.put(0xD2_2C_F4, RuneStone.DARK);
+		map0.put(0xEA_84_C0, RuneStone.HEART);
+		map0.put(0xFA_67_3D, RuneStone.FIRE);
+		map0.put(0x71_D7_FE, RuneStone.WATER);
+		map0.put(0x15_E6_1E, RuneStone.GREEN);
+		map0.put(0xF5_BE_2D, RuneStone.LIGHT);
+		map0.put(0xFE_4B_FC, RuneStone.DARK);
+		map0.put(0xFB_D3_DD, RuneStone.HEART);
+		map0.put(0xFF_FF_FF, RuneStone.UNKNOWN);
 		return Collections.unmodifiableMap(map0);
 	}
 

@@ -2,7 +2,6 @@ package tosram.strategy;
 
 import static java.text.MessageFormat.format;
 import tosram.RuneStone;
-import tosram.RuneStoneFormatter;
 
 class MilestoneFormatter {
 
@@ -33,8 +32,8 @@ class MilestoneFormatter {
 			return "without six ";
 	}
 
-	static String formatStoneUsage(RuneStone.Type type, int amount) {
-		return format("{1} {0}{1,choice,1#|1<s} ", new Object[] {
-				RuneStoneFormatter.format(type), amount });
+	static String formatStoneUsage(RuneStone type, int amount) {
+		return format("{1} {0}{1,choice,1#|1<s} ",
+				new Object[] { type.toString(), amount });
 	}
 }
