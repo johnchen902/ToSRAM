@@ -12,13 +12,13 @@ public enum RuneStone {
 	 */
 	FIRE,
 	/**
+	 * The green one, which has four signs of leaf on it.
+	 */
+	EARTH,
+	/**
 	 * The blue one, which is shaped as a drop of water.
 	 */
 	WATER,
-	/**
-	 * The green one, which has four signs of leaf on it.
-	 */
-	GREEN,
 	/**
 	 * The yellow one, which has a cross sign on it.
 	 */

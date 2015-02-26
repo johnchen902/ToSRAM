@@ -30,10 +30,10 @@ public class RuneButton extends JButton {
 		switch (stone) {
 		case FIRE:
 			return Color.RED;
+		case EARTH:
+			return Color.GREEN;
 		case WATER:
 			return Color.BLUE;
-		case GREEN:
-			return Color.GREEN;
 		case LIGHT:
 			return Color.YELLOW;
 		case DARK:
@@ -57,9 +57,9 @@ public class RuneButton extends JButton {
 				MutableRuneMap mp = table.getRuneMap().toMutable();
 				switch (mp.getRuneStone(x, y)) {
 				case FIRE:
-					mp.setRuneStone(x, y, RuneStone.GREEN);
+					mp.setRuneStone(x, y, RuneStone.EARTH);
 					break;
-				case GREEN:
+				case EARTH:
 					mp.setRuneStone(x, y, RuneStone.WATER);
 					break;
 				case WATER:

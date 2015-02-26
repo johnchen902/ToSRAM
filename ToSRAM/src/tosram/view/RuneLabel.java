@@ -23,10 +23,10 @@ public class RuneLabel extends JLabel {
 		switch (stone) {
 		case FIRE:
 			return Color.RED;
+		case EARTH:
+			return Color.GREEN;
 		case WATER:
 			return Color.BLUE;
-		case GREEN:
-			return Color.GREEN;
 		case LIGHT:
 			return Color.YELLOW;
 		case DARK:

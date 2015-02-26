@@ -23,8 +23,10 @@ public class MainFrame extends JFrame {
 
 	private static final String STATUS_IDLE = "Idle";
 	private static final String STATUS_EDITTING = "Editting";
+
 	private static final String BUTTON_EDIT = "Edit";
 	private static final String BUTTON_FIHISH = "Finish";
+	private static final String BUTTON_COMPUTE = "Compute";
 
 	private JPanel pnMain;
 	private JLabel lbStatus; // general states and computing milestones
@@ -33,6 +35,7 @@ public class MainFrame extends JFrame {
 
 	private JPanel buttonsPanel;
 	private JButton btEdit;
+	private JButton btCompute;
 
 	public MainFrame() {
 		super("Tower of Savior Runestone Auto Mover");
@@ -104,6 +107,9 @@ public class MainFrame extends JFrame {
 				else
 					finishEditing();
 			});
+
+			btCompute = new JButton(BUTTON_COMPUTE);
+			buttonsPanel.add(btCompute);
 		}
 	}
 
@@ -111,11 +117,13 @@ public class MainFrame extends JFrame {
 		btEdit.setText(BUTTON_FIHISH);
 		tbStones.setRenderer(RuneButton.factory(tbStones));
 		lbStatus.setText(STATUS_EDITTING);
+		btCompute.setEnabled(false);
 	}
 
 	private void finishEditing() {
 		btEdit.setText(BUTTON_EDIT);
 		tbStones.setRenderer(RuneLabel.factory());
 		lbStatus.setText(STATUS_IDLE);
+		btCompute.setEnabled(true);
 	}
 }
