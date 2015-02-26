@@ -45,4 +45,8 @@ public class RuneLabel extends JLabel {
 		else
 			return Color.BLACK;
 	}
+
+	public static RuneMapTable.Renderer factory() {
+		return (stone, x, y) -> new RuneLabel(stone);
+	}
 }

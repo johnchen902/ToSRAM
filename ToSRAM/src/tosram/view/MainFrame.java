@@ -21,12 +21,18 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame {
 
+	private static final String STATUS_IDLE = "Idle";
+	private static final String STATUS_EDITTING = "Editting";
+	private static final String BUTTON_EDIT = "Edit";
+	private static final String BUTTON_FIHISH = "Finish";
+
 	private JPanel pnMain;
 	private JLabel lbStatus; // general states and computing milestones
 	private PathPanel pnPath; // path drawn above tbStones
 	private RuneMapTable tbStones;
 
 	private JPanel buttonsPanel;
+	private JButton btEdit;
 
 	public MainFrame() {
 		super("Tower of Savior Runestone Auto Mover");
@@ -56,7 +62,7 @@ public class MainFrame extends JFrame {
 
 			lbStatus = new JLabel();
 			pnNorth.add(lbStatus);
-			lbStatus.setText("Idle");
+			lbStatus.setText(STATUS_IDLE);
 			lbStatus.setFont(lbStatus.getFont().deriveFont(24f));
 			lbStatus.setHorizontalAlignment(JLabel.CENTER);
 		}
@@ -89,7 +95,27 @@ public class MainFrame extends JFrame {
 		{
 			buttonsPanel = new JPanel();
 			pnMain.add(buttonsPanel, BorderLayout.SOUTH);
-			buttonsPanel.add(new JButton("Edit"));
+
+			btEdit = new JButton(BUTTON_EDIT);
+			buttonsPanel.add(btEdit);
+			btEdit.addActionListener(e -> {
+				if (btEdit.getText().equals(BUTTON_EDIT))
+					startEditing();
+				else
+					finishEditing();
+			});
 		}
+	}
+
+	private void startEditing() {
+		btEdit.setText(BUTTON_FIHISH);
+		tbStones.setRenderer(RuneButton.factory(tbStones));
+		lbStatus.setText(STATUS_EDITTING);
+	}
+
+	private void finishEditing() {
+		btEdit.setText(BUTTON_EDIT);
+		tbStones.setRenderer(RuneLabel.factory());
+		lbStatus.setText(STATUS_IDLE);
 	}
 }

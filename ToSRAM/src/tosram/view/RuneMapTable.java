@@ -2,7 +2,7 @@ package tosram.view;
 
 import java.awt.Component;
 import java.awt.GridLayout;
-import java.util.function.Function;
+import java.util.Objects;
 
 import javax.swing.JPanel;
 
@@ -17,29 +17,33 @@ import tosram.RuneStone;
 @SuppressWarnings("serial")
 public class RuneMapTable extends JPanel {
 
-	private Function<RuneStone, Component> func;
+	public static interface Renderer {
+		public Component render(RuneStone stone, int x, int y);
+	}
+
 	private RuneMap map;
+	private Renderer renderer;
 
 	// TODO document
-	public RuneMapTable(Function<RuneStone, Component> func, RuneMap map) {
-		this.func = func;
+	public RuneMapTable(RuneMap map, Renderer renderer) {
 		this.map = new RuneMap(map);
+		this.renderer = Objects.requireNonNull(renderer);
 		update();
 	}
 
-	public RuneMapTable(Function<RuneStone, Component> func) {
-		this(func, getEmptyMap());
+	public RuneMapTable(Renderer renderer) {
+		this(createEmptyMap(), renderer);
 	}
 
 	public RuneMapTable(RuneMap map) {
-		this(RuneLabel::new, getEmptyMap());
+		this(map, RuneLabel.factory());
 	}
 
 	public RuneMapTable() {
-		this(RuneLabel::new, getEmptyMap());
+		this(createEmptyMap(), RuneLabel.factory());
 	}
 
-	private static RuneMap getEmptyMap() {
+	private static RuneMap createEmptyMap() {
 		RuneMap m = new RuneMap(6, 5);
 		for (int i = 0; i < m.getWidth(); i++)
 			for (int j = 0; j < m.getHeight(); j++)
@@ -69,12 +73,32 @@ public class RuneMapTable extends JPanel {
 		return new RuneMap(map);
 	}
 
+	/**
+	 * Set the function used to render <code>RuneStone</code>.
+	 * 
+	 * @param renderer
+	 *            the function used to render <code>RuneStone</code>.
+	 */
+	public void setRenderer(Renderer renderer) {
+		this.renderer = Objects.requireNonNull(renderer);
+		update();
+	}
+
+	/**
+	 * Get the function used to render <code>RuneStone</code>.
+	 * 
+	 * @return the function used to render <code>RuneStone</code>.
+	 */
+	public Renderer getRenderer() {
+		return renderer;
+	}
+
 	private void update() {
 		removeAll();
 		setLayout(new GridLayout(map.getHeight(), map.getWidth(), 1, 1));
 		for (int i = 0; i < map.getHeight(); i++)
 			for (int j = 0; j < map.getWidth(); j++)
-				add(func.apply(map.getStone(j, i)));
+				add(renderer.render(map.getStone(j, i), j, i));
 		validate();
 	}
 }
