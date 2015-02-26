@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Deque;
 
 import tosram.Direction;
+import tosram.MutableRuneMap;
 import tosram.Path;
 import tosram.PathRobot;
 import tosram.RuneMap;
@@ -68,8 +69,8 @@ public class IDAStarRobot implements PathRobot {
 		this.moving = moving;
 	}
 
-	private Path search(RuneMap m, int x, int y, int g, int bound, double pa,
-			double pb) {
+	private Path search(MutableRuneMap m, int x, int y, int g, int bound,
+			double pa, double pb) {
 		Goal.Result goalResult = currentGoal.getResult(m, x, y);
 		int f = g + goalResult.heuristicCostEstimate();
 		if (f > bound || Thread.currentThread().isInterrupted())
@@ -89,8 +90,8 @@ public class IDAStarRobot implements PathRobot {
 			if (nx < 0 || nx >= m.getWidth() || ny < 0 || ny >= m.getHeight())
 				continue;
 
-			RuneStone stone1 = m.getStone(x, y);
-			RuneStone stone2 = m.getStone(nx, ny);
+			RuneStone stone1 = m.getRuneStone(x, y);
+			RuneStone stone2 = m.getRuneStone(nx, ny);
 			m.setRuneStone(x, y, stone2);
 			m.setRuneStone(nx, ny, stone1);
 
@@ -115,7 +116,8 @@ public class IDAStarRobot implements PathRobot {
 		double pa = 0;
 		for (by = 0; by < m.getHeight(); by++)
 			for (bx = 0; bx < m.getWidth(); bx++) {
-				Path result = search(m, bx, by, 0, bound, pa, 1.0 / 30);
+				MutableRuneMap mm = m.toMutable();
+				Path result = search(mm, bx, by, 0, bound, pa, 1.0 / 30);
 				pa += 1.0 / 30;
 				if (result != null)
 					return result;
@@ -124,7 +126,8 @@ public class IDAStarRobot implements PathRobot {
 	}
 
 	private Path runIDAStar(RuneMap stones) {
-		int bound = currentGoal.getResult(stones).heuristicCostEstimate();
+		int bound = currentGoal.getResult(stones.toMutable())
+				.heuristicCostEstimate();
 		while (!Thread.currentThread().isInterrupted()) {
 			updateMilestone(bound);
 			Path result = search(stones, bound);
@@ -146,11 +149,10 @@ public class IDAStarRobot implements PathRobot {
 
 	@Override
 	public Path getPath(RuneMap stones) {
-		stones = new RuneMap(stones);
 		Path path = new Path(new Point(0, 0),
 				Collections.<Direction> emptyList());
 
-		Goal[] goalPair = gsf.createGoalSeries(new RuneMap(stones));
+		Goal[] goalPair = gsf.createGoalSeries(stones);
 		madeGoal = currentGoal = goalPair[0];
 		finalGoal = goalPair[1];
 		while (true) {
@@ -205,5 +207,4 @@ public class IDAStarRobot implements PathRobot {
 	public void setStatusListener(StatusListener listener) {
 		this.listener = listener;
 	}
-
 }

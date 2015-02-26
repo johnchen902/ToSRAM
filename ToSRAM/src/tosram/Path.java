@@ -121,7 +121,7 @@ public class Path {
 	public static RuneMap follow(RuneMap map, Path path, int steps) {
 		if (steps < 0 || steps > path.getDirections().size())
 			throw new IndexOutOfBoundsException("steps=" + steps);
-		RuneMap newMap = new RuneMap(map);
+		MutableRuneMap newMap = map.toMutable();
 		int x = path.getBeginPoint().x, y = path.getBeginPoint().y;
 		Iterator<Direction> ite = path.getDirections().iterator();
 		while (steps-- != 0) {
@@ -157,11 +157,11 @@ public class Path {
 			case EAST:
 				break;
 			}
-			RuneStone stone1 = newMap.getStone(x, y);
-			RuneStone stone2 = newMap.getStone(px, py);
+			RuneStone stone1 = newMap.getRuneStone(x, y);
+			RuneStone stone2 = newMap.getRuneStone(px, py);
 			newMap.setRuneStone(x, y, stone2);
 			newMap.setRuneStone(px, py, stone1);
 		}
-		return newMap;
+		return new RuneMap(newMap);
 	}
 }

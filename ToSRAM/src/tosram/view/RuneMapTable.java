@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import javax.swing.JPanel;
 
+import tosram.MutableRuneMap;
 import tosram.RuneMap;
 import tosram.RuneStone;
 
@@ -26,7 +27,7 @@ public class RuneMapTable extends JPanel {
 
 	// TODO document
 	public RuneMapTable(RuneMap map, Renderer renderer) {
-		this.map = new RuneMap(map);
+		this.map = map;
 		this.renderer = Objects.requireNonNull(renderer);
 		update();
 	}
@@ -44,11 +45,11 @@ public class RuneMapTable extends JPanel {
 	}
 
 	private static RuneMap createEmptyMap() {
-		RuneMap m = new RuneMap(6, 5);
+		MutableRuneMap m = new MutableRuneMap(6, 5);
 		for (int i = 0; i < m.getWidth(); i++)
 			for (int j = 0; j < m.getHeight(); j++)
 				m.setRuneStone(i, j, RuneStone.FIRE);
-		return m;
+		return new RuneMap(m);
 	}
 
 	/**
@@ -59,7 +60,7 @@ public class RuneMapTable extends JPanel {
 	 * @see #getRuneMap()
 	 */
 	public void setRuneMap(RuneMap map) {
-		this.map = new RuneMap(map);
+		this.map = map;
 		update();
 	}
 
@@ -70,7 +71,7 @@ public class RuneMapTable extends JPanel {
 	 * @see #setRuneMap(RuneMap)
 	 */
 	public RuneMap getRuneMap() {
-		return new RuneMap(map);
+		return map;
 	}
 
 	/**
@@ -98,7 +99,7 @@ public class RuneMapTable extends JPanel {
 		setLayout(new GridLayout(map.getHeight(), map.getWidth(), 1, 1));
 		for (int i = 0; i < map.getHeight(); i++)
 			for (int j = 0; j < map.getWidth(); j++)
-				add(renderer.render(map.getStone(j, i), j, i));
+				add(renderer.render(map.getRuneStone(j, i), j, i));
 		validate();
 	}
 }

@@ -1,6 +1,6 @@
 package tosram.xrobot;
 
-import tosram.RuneMap;
+import tosram.MutableRuneMap;
 
 /**
  * A goal for an IDA* robot to make.
@@ -15,7 +15,7 @@ public interface Goal {
 	 *            the specified map.
 	 * @return a Goal.Result
 	 */
-	public Goal.Result getResult(RuneMap runemap);
+	public Goal.Result getResult(MutableRuneMap runemap);
 
 	/**
 	 * Get a result about the specified map and the position of the stone held.
@@ -28,7 +28,7 @@ public interface Goal {
 	 *            the Y coordinate of the position of the stone held
 	 * @return a Goal.Result
 	 */
-	public Goal.Result getResult(RuneMap runemap, int x, int y);
+	public Goal.Result getResult(MutableRuneMap runemap, int x, int y);
 
 	/**
 	 * A result includes a estimated heuristic cost, a "whether goal is make"

@@ -5,7 +5,7 @@ import java.util.EnumSet;
 
 import tosram.ComboCalculator;
 import tosram.Direction;
-import tosram.RuneMap;
+import tosram.MutableRuneMap;
 import tosram.RuneStone;
 
 /**
@@ -65,8 +65,8 @@ public class GroupAttackStrategy extends FilterSolutionStrategy {
 	private int groupAttacks;
 
 	@Override
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			ComboCalculator.Describer cd) {
+	public void submit(MutableRuneMap map, int x, int y,
+			Deque<Direction> stack, ComboCalculator.Describer cd) {
 		super.submit(map, x, y, stack, cd);
 		EnumSet<RuneStone> types = EnumSet.noneOf(RuneStone.class);
 		for (ComboCalculator.Combo ccc : cd.getFullComboList()) {

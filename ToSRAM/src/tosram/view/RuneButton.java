@@ -6,6 +6,7 @@ import javax.swing.JButton;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
+import tosram.MutableRuneMap;
 import tosram.RuneMap;
 import tosram.RuneStone;
 
@@ -53,8 +54,8 @@ public class RuneButton extends JButton {
 		return (stone, x, y) -> {
 			RuneButton btn = new RuneButton(stone);
 			btn.addActionListener(e -> {
-				RuneMap mp = table.getRuneMap();
-				switch (mp.getStone(x, y)) {
+				MutableRuneMap mp = table.getRuneMap().toMutable();
+				switch (mp.getRuneStone(x, y)) {
 				case FIRE:
 					mp.setRuneStone(x, y, RuneStone.GREEN);
 					break;
@@ -77,7 +78,7 @@ public class RuneButton extends JButton {
 					mp.setRuneStone(x, y, RuneStone.FIRE);
 					break;
 				}
-				table.setRuneMap(mp);
+				table.setRuneMap(new RuneMap(mp));
 			});
 			return btn;
 		};

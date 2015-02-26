@@ -176,7 +176,7 @@ public class ComboCalculator {
 	 * @param that
 	 *            the map being computed
 	 */
-	public static Describer getDescriber(RuneMap map) {
+	public static Describer getDescriber(MutableRuneMap map) {
 		List<Combo> comboList = new ArrayList<Combo>(2 * (WIDTH - 2)
 				* (HEIGHT - 2));
 		scanForHorizontalCombo(map, comboList);
@@ -191,7 +191,7 @@ public class ComboCalculator {
 			while (comboList.size() > j)
 				comboList.remove(comboList.size() - 1);
 			// remove
-			RuneMap nextmap = remove(map, comboList);
+			MutableRuneMap nextmap = remove(map, comboList);
 			fall(nextmap);
 			// consider stacking
 			return new Describer(comboList, getDescriber(nextmap));
@@ -199,8 +199,8 @@ public class ComboCalculator {
 		return new Describer();
 	}
 
-	private static RuneStone typeOf(RuneMap map, int x, int y) {
-		return map.getStone(x, y);
+	private static RuneStone typeOf(MutableRuneMap map, int x, int y) {
+		return map.getRuneStone(x, y);
 	}
 
 	private static long neighborMask(long mask) {
@@ -209,7 +209,7 @@ public class ComboCalculator {
 	}
 
 	// scan for three in a row horizontally
-	private static void scanForHorizontalCombo(RuneMap map,
+	private static void scanForHorizontalCombo(MutableRuneMap map,
 			List<Combo> comboList) {
 		for (int y = 0; y < HEIGHT; y++) {
 			for (int x = 0; x < WIDTH - 2; x++) {
@@ -244,7 +244,8 @@ public class ComboCalculator {
 	}
 
 	// scan for three in a row vertically
-	private static void scanForVerticalCombo(RuneMap map, List<Combo> comboList) {
+	private static void scanForVerticalCombo(MutableRuneMap map,
+			List<Combo> comboList) {
 		for (int x = 0; x < WIDTH; x++) {
 			for (int y = 0; y < HEIGHT - 2; y++) {
 				RuneStone type = typeOf(map, x, y + 2);
@@ -300,8 +301,9 @@ public class ComboCalculator {
 	}
 
 	// remove used stones
-	private static RuneMap remove(RuneMap map, List<Combo> comboList) {
-		RuneMap nextmap = new RuneMap(map);
+	private static MutableRuneMap remove(MutableRuneMap map,
+			List<Combo> comboList) {
+		MutableRuneMap nextmap = new MutableRuneMap(map);
 		for (Combo c : comboList) {
 			// mask &= mask - 1: remove lowest one bit
 			for (long mask = c.mask; mask != 0; mask &= mask - 1) {
@@ -315,15 +317,15 @@ public class ComboCalculator {
 	}
 
 	// fall
-	private static void fall(RuneMap nextmap) {
+	private static void fall(MutableRuneMap nextmap) {
 		for (int x = 0; x < WIDTH; x++) {
 			for (int y = HEIGHT - 1, y2 = HEIGHT; y >= 0; y--) {
 				do {
 					y2--;
-				} while (y2 >= 0 && nextmap.getStone(x, y2) == null);
+				} while (y2 >= 0 && nextmap.getRuneStone(x, y2) == null);
 				if (y != y2) {
 					if (y2 >= 0) {
-						nextmap.setRuneStone(x, y, nextmap.getStone(x, y2));
+						nextmap.setRuneStone(x, y, nextmap.getRuneStone(x, y2));
 						nextmap.setRuneStone(x, y2, null);
 					} else {
 						nextmap.setRuneStone(x, y, RuneStone.UNKNOWN);

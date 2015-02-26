@@ -4,7 +4,7 @@ import java.util.Deque;
 import java.util.EnumSet;
 
 import tosram.Direction;
-import tosram.RuneMap;
+import tosram.MutableRuneMap;
 
 public interface SearchStrategy {
 
@@ -27,8 +27,8 @@ public interface SearchStrategy {
 	 * @param quality
 	 *            the quality of the solution
 	 */
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			double quality);
+	public void submit(MutableRuneMap map, int x, int y,
+			Deque<Direction> stack, double quality);
 
 	/**
 	 * Adapt the progress calculated by treating each branch equally to the

@@ -4,7 +4,7 @@ import java.util.Deque;
 
 import tosram.ComboCalculator;
 import tosram.Direction;
-import tosram.RuneMap;
+import tosram.MutableRuneMap;
 
 /**
  * A strategy that forbids stacking.
@@ -31,8 +31,8 @@ public class NoStackingStrategy extends FilterSolutionStrategy {
 	private boolean noStacking;
 
 	@Override
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			ComboCalculator.Describer cd) {
+	public void submit(MutableRuneMap map, int x, int y,
+			Deque<Direction> stack, ComboCalculator.Describer cd) {
 		super.submit(map, x, y, stack, cd);
 		noStacking = cd.getPartialComboList().size() == 0
 				|| cd.getStacked().getPartialComboList().size() == 0;

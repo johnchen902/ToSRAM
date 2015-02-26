@@ -19,6 +19,7 @@ import java.util.List;
 
 import tosram.ComboCalculator;
 import tosram.Direction;
+import tosram.MutableRuneMap;
 import tosram.Path;
 import tosram.PathRobot;
 import tosram.RuneMap;
@@ -72,7 +73,7 @@ public class StrategySearchPathRobot implements PathRobot {
 			double subprogress = 1.0 / points.size();
 			double curprogress = 0;
 			for (Point p : points) {
-				compute(new RuneMap(stones), p.x, p.y, curprogress, subprogress);
+				compute(stones, p.x, p.y, curprogress, subprogress);
 				curprogress += subprogress;
 			}
 		} catch (Exception exception) {
@@ -109,7 +110,7 @@ public class StrategySearchPathRobot implements PathRobot {
 	private void compute(RuneMap init, int bx, int by, double pB, double pI) {
 		this.bx = bx;
 		this.by = by;
-		turn(init, bx, by, pB, pI);
+		turn(init.toMutable(), bx, by, pB, pI);
 	}
 
 	private static int getX(int x, Direction direction) {
@@ -148,7 +149,7 @@ public class StrategySearchPathRobot implements PathRobot {
 
 	// pB = the progress when this method starts
 	// pB + pI = the progress when this method ends
-	private void turn(RuneMap cc, int x, int y, double pB, double pI) {
+	private void turn(MutableRuneMap cc, int x, int y, double pB, double pI) {
 		solutionStrategy.submit(cc, x, y, stack,
 				ComboCalculator.getDescriber(cc));
 
@@ -186,8 +187,8 @@ public class StrategySearchPathRobot implements PathRobot {
 		for (Direction dir : alist) {
 			int nx = getX(x, dir);
 			int ny = getY(y, dir);
-			RuneStone stone1 = cc.getStone(x, y);
-			RuneStone stone2 = cc.getStone(nx, ny);
+			RuneStone stone1 = cc.getRuneStone(x, y);
+			RuneStone stone2 = cc.getRuneStone(nx, ny);
 			cc.setRuneStone(x, y, stone2);
 			cc.setRuneStone(nx, ny, stone1);
 

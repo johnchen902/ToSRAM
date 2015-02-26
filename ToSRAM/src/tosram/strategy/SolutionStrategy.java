@@ -4,7 +4,7 @@ import java.util.Deque;
 
 import tosram.ComboCalculator;
 import tosram.Direction;
-import tosram.RuneMap;
+import tosram.MutableRuneMap;
 
 /**
  * A strategy determines the quality of the solution.
@@ -31,8 +31,8 @@ public interface SolutionStrategy {
 	 * @param combos
 	 *            an description of combo of the map
 	 */
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			ComboCalculator.Describer combos);
+	public void submit(MutableRuneMap map, int x, int y,
+			Deque<Direction> stack, ComboCalculator.Describer combos);
 
 	/**
 	 * Compare the currently submitted solution and the currently accepted

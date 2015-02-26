@@ -5,7 +5,7 @@ import java.util.Deque;
 import java.util.EnumSet;
 
 import tosram.Direction;
-import tosram.RuneMap;
+import tosram.MutableRuneMap;
 
 /**
  * A search strategy that permits a branch when it determines that branch is
@@ -34,8 +34,8 @@ public class ImprovementStrategy implements SearchStrategy {
 	private double quality;
 
 	@Override
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			double q) {
+	public void submit(MutableRuneMap map, int x, int y,
+			Deque<Direction> stack, double q) {
 		steps = stack.size();
 		quality = q;
 		for (int i = steps; i < MAX_STEP && quality > bestQualities[i]; i++)

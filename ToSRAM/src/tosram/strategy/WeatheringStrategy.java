@@ -5,7 +5,7 @@ import java.util.Deque;
 import java.util.EnumSet;
 
 import tosram.Direction;
-import tosram.RuneMap;
+import tosram.MutableRuneMap;
 
 /**
  * A strategy that handles weathering stones.
@@ -40,8 +40,8 @@ public class WeatheringStrategy implements SearchStrategy {
 	}
 
 	@Override
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			double quality) {
+	public void submit(MutableRuneMap map, int x, int y,
+			Deque<Direction> stack, double quality) {
 		strategy.submit(map, x, y, stack, quality);
 		position = y * map.getWidth() + x;
 	}

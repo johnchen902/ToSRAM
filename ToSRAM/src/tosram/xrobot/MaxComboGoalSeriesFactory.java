@@ -4,6 +4,7 @@ import java.util.EnumMap;
 import java.util.Map.Entry;
 
 import tosram.ComboCalculator;
+import tosram.MutableRuneMap;
 import tosram.RuneMap;
 import tosram.RuneStone;
 
@@ -45,7 +46,7 @@ public class MaxComboGoalSeriesFactory implements GoalSeriesFactory {
 			map.put(type, 0);
 		for (int y = 0; y < initialMap.getHeight(); y++)
 			for (int x = 0; x < initialMap.getWidth(); x++) {
-				RuneStone t = initialMap.getStone(x, y);
+				RuneStone t = initialMap.getRuneStone(x, y);
 				map.put(t, map.get(t) + 1);
 			}
 		int maxCombo = 0;
@@ -79,7 +80,7 @@ public class MaxComboGoalSeriesFactory implements GoalSeriesFactory {
 		}
 
 		@Override
-		public Result getResult(RuneMap runemap) {
+		public Result getResult(MutableRuneMap runemap) {
 			int combo = ComboCalculator.getDescriber(runemap)
 					.getFullComboCount();
 			if (combo < goalCombo)
@@ -89,7 +90,7 @@ public class MaxComboGoalSeriesFactory implements GoalSeriesFactory {
 		}
 
 		@Override
-		public Result getResult(RuneMap runemap, int x, int y) {
+		public Result getResult(MutableRuneMap runemap, int x, int y) {
 			return getResult(runemap);
 		}
 

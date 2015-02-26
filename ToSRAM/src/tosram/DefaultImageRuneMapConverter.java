@@ -62,14 +62,14 @@ public class DefaultImageRuneMapConverter implements ImageRuneMapConverter {
 
 	@Override
 	public RuneMap convert(BufferedImage image) {
-		RuneMap stones = new RuneMap(6, 5);
+		MutableRuneMap stones = new MutableRuneMap(6, 5);
 		for (int y = 0; y < HEIGHT; y++)
 			for (int x = 0; x < WIDTH; x++) {
 				int avgRGB = getSampleRGB(image, x, y);
 				RuneStone stone = getRuneStone(avgRGB);
 				stones.setRuneStone(x, y, stone);
 			}
-		return stones;
+		return new RuneMap(stones);
 	}
 
 	/**

@@ -4,7 +4,7 @@ import java.util.Deque;
 
 import tosram.ComboCalculator;
 import tosram.Direction;
-import tosram.RuneMap;
+import tosram.MutableRuneMap;
 
 /**
  * A strategy that tries to minimize steps.
@@ -34,8 +34,8 @@ public class MinStepStrategy extends FilterSolutionStrategy {
 	private int steps;
 
 	@Override
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			ComboCalculator.Describer cd) {
+	public void submit(MutableRuneMap map, int x, int y,
+			Deque<Direction> stack, ComboCalculator.Describer cd) {
 		super.submit(map, x, y, stack, cd);
 		steps = stack.size();
 	}

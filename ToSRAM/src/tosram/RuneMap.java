@@ -3,7 +3,7 @@ package tosram;
 import java.util.Arrays;
 
 /**
- * A map (matrix) of stones.
+ * An immutable matrix of RuneStone.
  * 
  * @author johnchen902
  */
@@ -12,28 +12,15 @@ public class RuneMap {
 	private final RuneStone[] stones;
 
 	/**
-	 * Create a new map with specified size
+	 * Construct a <code>RuneMap</code> from a <code>MutableRuneMap</code>
 	 * 
-	 * @param w
-	 *            the width
-	 * @param h
-	 *            the height
+	 * @param mutable
+	 *            a <code>MutableRuneMap</code>
 	 */
-	public RuneMap(int w, int h) {
-		width = w;
-		height = h;
-		stones = new RuneStone[w * h];
-	}
-
-	/**
-	 * Copy constructor
-	 * 
-	 * @param that
-	 *            the map to copy from
-	 */
-	public RuneMap(RuneMap that) {
-		this(that.width, that.height);
-		System.arraycopy(that.stones, 0, this.stones, 0, this.stones.length);
+	public RuneMap(MutableRuneMap mutable) {
+		this.width = mutable.getWidth();
+		this.height = mutable.getHeight();
+		this.stones = Arrays.copyOf(mutable.getRuneStones(), width * height);
 	}
 
 	/**
@@ -63,38 +50,19 @@ public class RuneMap {
 	 *            the Y coordinate of the stone
 	 * @return a {@code RuneStone}
 	 */
-	public RuneStone getStone(int x, int y) {
+	public RuneStone getRuneStone(int x, int y) {
 		return stones[y * width + x];
 	}
 
 	/**
-	 * Set the stone at {@code (x, y)} to {@code r}.
+	 * Make a <code>MutableRuneMap</code> from this <code>RuneMap</code>
 	 * 
-	 * @param x
-	 *            the X coordinate of the stone
-	 * @param y
-	 *            the Y coordinate of the stone
-	 * @param r
-	 *            a {@code RuneStone}
+	 * @return a <code>MutableRuneMap</code>
 	 */
-	public void setRuneStone(int x, int y, RuneStone r) {
-		stones[y * width + x] = r;
-	}
-
-	/**
-	 * Set the content of this map to another map.
-	 * 
-	 * @param that
-	 *            the map being assigned from
-	 * @throws IllegalArgumentException
-	 *             if the dimension of this is are different from the other
-	 */
-	public void assign(RuneMap that) throws IllegalArgumentException {
-		if (this.width != that.width)
-			throw new IllegalArgumentException("this.width != that.width");
-		if (this.height != that.height)
-			throw new IllegalArgumentException("this.height != that.height");
-		System.arraycopy(that.stones, 0, this.stones, 0, this.stones.length);
+	public MutableRuneMap toMutable() {
+		MutableRuneMap mutable = new MutableRuneMap(width, height);
+		System.arraycopy(stones, 0, mutable.getRuneStones(), 0, width * height);
+		return mutable;
 	}
 
 	/**
@@ -122,19 +90,18 @@ public class RuneMap {
 	}
 
 	/**
-	 * A string representation of this <code>RuneMap</code>. May contains new
-	 * line in the middle, but not at the end.
+	 * A string representation of this <code>RuneMap</code>.
 	 */
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(height * (width + 1) - 1);
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				RuneStone stone = getStone(x, y);
+				RuneStone stone = getRuneStone(x, y);
 				sb.append(stone == null ? "?" : stone.toString());
 			}
 			if (y != height - 1)
-				sb.append('\n');
+				sb.append('/');
 		}
 		return sb.toString();
 	}

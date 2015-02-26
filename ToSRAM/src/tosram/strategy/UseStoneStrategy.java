@@ -4,7 +4,7 @@ import java.util.Deque;
 
 import tosram.ComboCalculator;
 import tosram.Direction;
-import tosram.RuneMap;
+import tosram.MutableRuneMap;
 import tosram.RuneStone;
 
 /**
@@ -51,8 +51,8 @@ public class UseStoneStrategy extends FilterSolutionStrategy {
 	private int difference;
 
 	@Override
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			ComboCalculator.Describer cd) {
+	public void submit(MutableRuneMap map, int x, int y,
+			Deque<Direction> stack, ComboCalculator.Describer cd) {
 		super.submit(map, x, y, stack, cd);
 		count = 0;
 		for (ComboCalculator.Combo ccc : cd.getFullComboList())

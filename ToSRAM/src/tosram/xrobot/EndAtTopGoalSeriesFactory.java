@@ -1,5 +1,6 @@
 package tosram.xrobot;
 
+import tosram.MutableRuneMap;
 import tosram.RuneMap;
 
 /**
@@ -45,12 +46,12 @@ public class EndAtTopGoalSeriesFactory implements GoalSeriesFactory {
 		}
 
 		@Override
-		public Result getResult(RuneMap runemap) {
+		public Result getResult(MutableRuneMap runemap) {
 			return delegate.getResult(runemap);
 		}
 
 		@Override
-		public Result getResult(RuneMap runemap, int x, int y) {
+		public Result getResult(MutableRuneMap runemap, int x, int y) {
 			Result result = delegate.getResult(runemap, x, y);
 			if (result.isMade() && y == 0) {
 				return new Result(new EndAtTopGoal(result.getNext()));

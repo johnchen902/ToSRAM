@@ -4,7 +4,7 @@ import java.util.Deque;
 import java.util.EnumSet;
 
 import tosram.Direction;
-import tosram.RuneMap;
+import tosram.MutableRuneMap;
 
 /**
  * A search strategy that permits a branch when it doesn't exceed the step
@@ -29,8 +29,8 @@ public class LinearStrategy implements SearchStrategy {
 	}
 
 	@Override
-	public void submit(RuneMap map, int x, int y, Deque<Direction> stack,
-			double quality) {
+	public void submit(MutableRuneMap map, int x, int y,
+			Deque<Direction> stack, double quality) {
 		this.steps = stack.size();
 		this.quality = quality;
 	}
