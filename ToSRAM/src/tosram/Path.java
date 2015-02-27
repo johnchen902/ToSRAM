@@ -127,36 +127,8 @@ public class Path {
 		while (steps-- != 0) {
 			Direction dir = ite.next();
 			int px = x, py = y;
-			switch (dir) {
-			case WEST:
-			case WEST_NORTH:
-			case WEST_SOUTH:
-				x--;
-				break;
-			case EAST:
-			case EAST_NORTH:
-			case EAST_SOUTH:
-				x++;
-				break;
-			case NORTH:
-			case SOUTH:
-				break;
-			}
-			switch (dir) {
-			case SOUTH:
-			case WEST_SOUTH:
-			case EAST_SOUTH:
-				y++;
-				break;
-			case NORTH:
-			case WEST_NORTH:
-			case EAST_NORTH:
-				y--;
-				break;
-			case WEST:
-			case EAST:
-				break;
-			}
+			x += dir.getX();
+			y += dir.getY();
 			RuneStone stone1 = newMap.getRuneStone(x, y);
 			RuneStone stone2 = newMap.getRuneStone(px, py);
 			newMap.setRuneStone(x, y, stone2);
