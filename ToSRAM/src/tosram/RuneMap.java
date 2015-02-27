@@ -1,6 +1,7 @@
 package tosram;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 /**
  * An immutable matrix of RuneStone.
@@ -70,8 +71,14 @@ public class RuneMap {
 	}
 
 	/**
-	 * Check if two <code>RuneMap</code> has the same width, height and content.
+	 * Returns a sequential Stream with this <code>RuneMap</code> as its source.
+	 * 
+	 * @return a <code>Stream</code> for this <code>RuneMap</code>
 	 */
+	public Stream<RuneStone> stream() {
+		return Arrays.stream(stones);
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof RuneMap))
@@ -81,9 +88,6 @@ public class RuneMap {
 				&& Arrays.equals(this.stones, that.stones);
 	}
 
-	/**
-	 * Computes a hash code for this map.
-	 */
 	@Override
 	public int hashCode() {
 		int h = 17;
@@ -93,9 +97,6 @@ public class RuneMap {
 		return h;
 	}
 
-	/**
-	 * A string representation of this <code>RuneMap</code>.
-	 */
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

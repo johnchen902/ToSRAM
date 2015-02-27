@@ -1,6 +1,7 @@
 package tosram;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 /**
  * A mutable matrix of RuneStone.
@@ -101,6 +102,16 @@ public class MutableRuneMap {
 	 */
 	public RuneStone[] getRuneStones() {
 		return stones;
+	}
+
+	/**
+	 * Returns a sequential Stream with this <code>MutableRuneMap</code> as its
+	 * source.
+	 * 
+	 * @return a <code>Stream</code> for this <code>MutableRuneMap</code>
+	 */
+	public Stream<RuneStone> stream() {
+		return Arrays.stream(stones);
 	}
 
 	@Override
