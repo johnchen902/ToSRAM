@@ -5,16 +5,22 @@ import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
+
+import tosram.Path;
+import tosram.algorithm.PathFindingAlgorithm;
+import tosram.algorithm.idastar.IDAStarPathFindingAlgorithm;
 
 /**
- * The frame shown on the screen. Please don't try to serialize me. I don't
- * regard the serialized form.
+ * The frame shown on the screen.
  * 
  * @author johnchen902
  */
@@ -23,10 +29,14 @@ public class MainFrame extends JFrame {
 
 	private static final String STATUS_IDLE = "Idle";
 	private static final String STATUS_EDITTING = "Editting";
+	private static final String STATUS_COMPUTING = "Computing";
+	private static final String STATUS_NOW = "Now";
+	private static final String STATUS_ERROR = "Error";
 
 	private static final String BUTTON_EDIT = "Edit";
-	private static final String BUTTON_FIHISH = "Finish";
+	private static final String BUTTON_FINISH = "Finish";
 	private static final String BUTTON_COMPUTE = "Compute";
+	private static final String BUTTON_STOP = "Stop";
 
 	private JPanel pnMain;
 	private JLabel lbStatus; // general states and computing milestones
@@ -36,6 +46,9 @@ public class MainFrame extends JFrame {
 	private JPanel buttonsPanel;
 	private JButton btEdit;
 	private JButton btCompute;
+	private JButton btStop;
+
+	private PathFindingAlgorithm algorithm;
 
 	public MainFrame() {
 		super("Tower of Savior Runestone Auto Mover");
@@ -82,6 +95,7 @@ public class MainFrame extends JFrame {
 					public void componentResized(ComponentEvent e) {
 						Component c = e.getComponent();
 						pnPath.setBounds(c.getBounds());
+						pnPath.setCellSize(c.getWidth() / 6, c.getHeight() / 5);
 						tbStones.setBounds(c.getBounds());
 						c.validate();
 					}
@@ -110,14 +124,21 @@ public class MainFrame extends JFrame {
 
 			btCompute = new JButton(BUTTON_COMPUTE);
 			buttonsPanel.add(btCompute);
+			btCompute.addActionListener(e -> startComputing());
+
+			btStop = new JButton(BUTTON_STOP);
+			buttonsPanel.add(btStop);
+			btStop.addActionListener(e -> stopComputing());
+			btStop.setEnabled(false);
 		}
 	}
 
 	private void startEditing() {
-		btEdit.setText(BUTTON_FIHISH);
+		btEdit.setText(BUTTON_FINISH);
 		tbStones.setRenderer(RuneButton.factory(tbStones));
 		lbStatus.setText(STATUS_EDITTING);
 		btCompute.setEnabled(false);
+		pnPath.setPath(null);
 	}
 
 	private void finishEditing() {
@@ -125,5 +146,49 @@ public class MainFrame extends JFrame {
 		tbStones.setRenderer(RuneLabel.factory());
 		lbStatus.setText(STATUS_IDLE);
 		btCompute.setEnabled(true);
+	}
+
+	private void startComputing() {
+		lbStatus.setText(STATUS_COMPUTING);
+		btEdit.setEnabled(false);
+		btCompute.setEnabled(false);
+		btStop.setEnabled(true);
+		pnPath.setPath(null);
+		algorithm = new IDAStarPathFindingAlgorithm();
+		new SwingWorker<Void, Object[]>() {
+			@Override
+			protected Void doInBackground() {
+				algorithm.findPath(tbStones.getRuneMap(),
+						(p, s) -> publish(new Object[] { p, s }));
+				return null;
+			}
+
+			@Override
+			protected void process(List<Object[]> chunks) {
+				Object[] pair = chunks.get(chunks.size() - 1);
+				pnPath.setPath((Path) pair[0]);
+				lbStatus.setText(STATUS_NOW + ": " + pair[1]);
+			}
+
+			@Override
+			protected void done() {
+				stopComputing();
+				try {
+					get();
+				} catch (ExecutionException e) {
+					lbStatus.setText(STATUS_ERROR + ": " + e.getCause());
+				} catch (InterruptedException e) {
+				}
+			}
+		}.execute();
+	}
+
+	private void stopComputing() {
+		if (btStop.isEnabled()) {
+			btEdit.setEnabled(true);
+			btCompute.setEnabled(true);
+			btStop.setEnabled(false);
+			algorithm.stop();
+		}
 	}
 }

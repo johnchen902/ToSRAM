@@ -1,5 +1,7 @@
 package tosram.algorithm;
 
+import java.util.function.BiConsumer;
+
 import tosram.Path;
 import tosram.RuneMap;
 
@@ -15,7 +17,18 @@ public interface PathFindingAlgorithm {
 	 * 
 	 * @param initialMap
 	 *            the starting <code>RuneMap</code>.
-	 * @return the path the algorithm found
+	 * @param callBack
+	 *            a callback that would be invoked when finding a good result;
+	 *            the <code>Path</code> is the result found and the
+	 *            <code>String</code> is the description of the result
+	 * @see #stop()
 	 */
-	public Path findPath(RuneMap initialMap);
+	public void findPath(RuneMap initialMap, BiConsumer<Path, String> callBack);
+
+	/**
+	 * Stop <code>findPath</code>.
+	 * 
+	 * @see #findPath(RuneMap, BiConsumer)
+	 */
+	public void stop();
 }

@@ -1,7 +1,5 @@
 package tosram.algorithm;
 
-import java.awt.Point;
-
 import tosram.Direction;
 import tosram.MutableRuneMap;
 
@@ -15,29 +13,35 @@ public interface PathConstrain {
 	/**
 	 * Determines whether the path can start from the specified location.
 	 * 
-	 * @param startingPoint
-	 *            the starting location in question
+	 * @param startingX
+	 *            the X coordinate of starting location
+	 * @param startingY
+	 *            the Y coordinate of starting location
 	 * @param map
 	 *            the current <code>MutableRuneMap</code>
 	 * @return <code>true</code> if the path can start from the specified point;
 	 *         <code>false</code> otherwise
 	 */
-	public boolean canStart(Point startingPoint, MutableRuneMap map);
+	public boolean canStart(int startingX, int startingY, MutableRuneMap map);
 
 	/**
 	 * Determines whether it can move with the specified direction.
 	 * 
-	 * @param startingPoint
-	 *            the starting location of the path
+	 * @param startingX
+	 *            the X coordinate of starting location
+	 * @param startingY
+	 *            the Y coordinate of starting location
 	 * @param direction
 	 *            the direction in question
-	 * @param resultingPoint
-	 *            the resulting location if moved
+	 * @param resultingX
+	 *            the X coordinate of resulting location
+	 * @param resultingY
+	 *            the Y coordinate of resulting location
 	 * @param map
 	 *            the current <code>MutableRuneMap</code>
 	 * @return <code>true</code> if it can move with the specified direction;
 	 *         <code>false</code> otherwise
 	 */
-	public boolean canMove(Point startingPoint, Direction direction,
-			Point resultingPoint, MutableRuneMap map);
+	public boolean canMove(int startingX, int startingY, Direction direction,
+			int resultingX, int resultingY, MutableRuneMap map);
 }
