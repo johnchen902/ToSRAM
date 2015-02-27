@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
 import tosram.Path;
+import tosram.RuneMap;
 import tosram.algorithm.PathFindingAlgorithm;
 import tosram.algorithm.idastar.IDAStarPathFindingAlgorithm;
 
@@ -48,6 +49,7 @@ public class MainFrame extends JFrame {
 	private JButton btCompute;
 	private JButton btStop;
 
+	private RuneMap runeMap;
 	private PathFindingAlgorithm algorithm;
 
 	public MainFrame() {
@@ -107,6 +109,7 @@ public class MainFrame extends JFrame {
 				tbStones = new RuneMapTable();
 				layeredPane.add(tbStones, Integer.valueOf(1));
 				tbStones.setFont(tbStones.getFont().deriveFont(24f));
+				runeMap = tbStones.getRuneMap();
 			}
 		}
 		{
@@ -139,6 +142,7 @@ public class MainFrame extends JFrame {
 		lbStatus.setText(STATUS_EDITTING);
 		btCompute.setEnabled(false);
 		pnPath.setPath(null);
+		tbStones.setRuneMap(runeMap);
 	}
 
 	private void finishEditing() {
@@ -146,6 +150,7 @@ public class MainFrame extends JFrame {
 		tbStones.setRenderer(RuneLabel.factory());
 		lbStatus.setText(STATUS_IDLE);
 		btCompute.setEnabled(true);
+		runeMap = tbStones.getRuneMap();
 	}
 
 	private void startComputing() {
@@ -158,16 +163,18 @@ public class MainFrame extends JFrame {
 		new SwingWorker<Void, Object[]>() {
 			@Override
 			protected Void doInBackground() {
-				algorithm.findPath(tbStones.getRuneMap(),
-						(p, s) -> publish(new Object[] { p, s }));
+				algorithm.findPath(runeMap, (p, s) -> publish(new Object[] { p,
+						s }));
 				return null;
 			}
 
 			@Override
 			protected void process(List<Object[]> chunks) {
 				Object[] pair = chunks.get(chunks.size() - 1);
-				pnPath.setPath((Path) pair[0]);
+				Path path = (Path) pair[0];
+				pnPath.setPath(path);
 				lbStatus.setText(STATUS_NOW + ": " + pair[1]);
+				tbStones.setRuneMap(Path.follow(runeMap, path));
 			}
 
 			@Override
