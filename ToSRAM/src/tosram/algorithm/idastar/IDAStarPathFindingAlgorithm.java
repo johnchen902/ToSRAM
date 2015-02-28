@@ -12,8 +12,8 @@ import tosram.RuneMap;
 import tosram.RuneStone;
 import tosram.algorithm.AbstractPathFindingAlgorithm;
 import tosram.algorithm.ComboCountingAlgorithm;
-import tosram.algorithm.EmptyPathConstrain;
 import tosram.algorithm.LongComboCountingAlgorithm;
+import tosram.algorithm.NoUTurnPathConstrain;
 import tosram.algorithm.PathConstrain;
 
 /**
@@ -24,7 +24,7 @@ import tosram.algorithm.PathConstrain;
 public class IDAStarPathFindingAlgorithm extends AbstractPathFindingAlgorithm {
 
 	private final HeuristicCostEstimater estimater;
-	private int minHFound;
+	private int minGUsed, minHFound;
 
 	/**
 	 * Just a constructor.
@@ -46,7 +46,7 @@ public class IDAStarPathFindingAlgorithm extends AbstractPathFindingAlgorithm {
 	 * Just simpler constructor.
 	 */
 	public IDAStarPathFindingAlgorithm() {
-		this(new LongComboCountingAlgorithm(), new EmptyPathConstrain(),
+		this(new LongComboCountingAlgorithm(), new NoUTurnPathConstrain(),
 				new ComboHeuristicCostEstimater());
 	}
 
@@ -70,7 +70,7 @@ public class IDAStarPathFindingAlgorithm extends AbstractPathFindingAlgorithm {
 			for (int y = 0; y < map.getHeight(); y++)
 				if (findPathStartAt(map, limit, x, y))
 					return true;
-		return false;
+		return minHFound == 0;
 	}
 
 	private boolean findPathStartAt(MutableRuneMap map, int limit, int x, int y) {
@@ -86,12 +86,13 @@ public class IDAStarPathFindingAlgorithm extends AbstractPathFindingAlgorithm {
 			return false;
 		if (isStopped())
 			return true;
-		if (h < minHFound && directions.size() >= 1) {
+		if ((h < minHFound || (h == minHFound && g < minGUsed))
+				&& directions.size() >= 1) {
 			result(new Path(new Point(startX, startY), directions),
-					estimater.describe(map, comboCounter.countCombo(map)));
+					estimater.describe(map, comboCounter.countCombo(map)) + " "
+							+ directions.size() + " Move");
 			minHFound = h;
-			if (h == 0)
-				return true;
+			minGUsed = g;
 		}
 		for (Direction d : Direction.values()) {
 			int x2 = x1 + d.getX(), y2 = y1 + d.getY();
@@ -99,7 +100,7 @@ public class IDAStarPathFindingAlgorithm extends AbstractPathFindingAlgorithm {
 				continue;
 			if (y2 < 0 || y2 >= map.getHeight())
 				continue;
-			if (!constrain.canMove(startX, startY, d, x2, y2, map))
+			if (!constrain.canMove(startX, startY, directions, d, x2, y2, map))
 				continue;
 
 			RuneStone stone1 = map.getRuneStone(x1, y1);

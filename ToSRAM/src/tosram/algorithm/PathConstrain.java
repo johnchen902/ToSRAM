@@ -1,5 +1,7 @@
 package tosram.algorithm;
 
+import java.util.List;
+
 import tosram.Direction;
 import tosram.MutableRuneMap;
 
@@ -31,6 +33,8 @@ public interface PathConstrain {
 	 *            the X coordinate of starting location
 	 * @param startingY
 	 *            the Y coordinate of starting location
+	 * @param directions
+	 *            the directions already moved
 	 * @param direction
 	 *            the direction in question
 	 * @param resultingX
@@ -42,6 +46,7 @@ public interface PathConstrain {
 	 * @return <code>true</code> if it can move with the specified direction;
 	 *         <code>false</code> otherwise
 	 */
-	public boolean canMove(int startingX, int startingY, Direction direction,
-			int resultingX, int resultingY, MutableRuneMap map);
+	public boolean canMove(int startingX, int startingY,
+			List<Direction> directions, Direction direction, int resultingX,
+			int resultingY, MutableRuneMap map);
 }
