@@ -1,6 +1,8 @@
 package tosram.view;
 
 import java.awt.Point;
+import java.awt.Shape;
+import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -66,6 +68,12 @@ class PathPanelCalculator {
 	private static void follow(Point p, Direction d) {
 		p.x += d.getX();
 		p.y += d.getY();
+	}
+
+	private static Point2D.Double seperatePoint(Point2D.Double p1,
+			Point2D.Double p2, double a, double c) {
+		return new Point2D.Double((p1.x * (c - a) + p2.x * a) / c, //
+				(p1.y * (c - a) + p2.y * a) / c);
 	}
 
 	private static void addPoint(
@@ -157,9 +165,24 @@ class PathPanelCalculator {
 		path.lineTo(p.x, p.y);
 	}
 
-	static Path2D calculatePath(Path path, double cw, double ch, double dis) {
+	private static void addSegements(List<Shape> segs, Path2D.Double cornerBuf,
+			Point2D.Double p1, Point2D.Double p2, int nseg) {
+		lineTo(cornerBuf, seperatePoint(p1, p2, 0.5, nseg));
+		segs.add(new Path2D.Double(cornerBuf));
+		for (double d = 0.5; d + 1 < nseg; d++) {
+			segs.add(new Line2D.Double(seperatePoint(p1, p2, d, nseg),
+					seperatePoint(p1, p2, d + 1, nseg)));
+		}
+		cornerBuf.reset();
+		moveTo(cornerBuf, seperatePoint(p1, p2, nseg - 0.5, nseg));
+		lineTo(cornerBuf, p2);
+	}
+
+	static Pair<Path2D, List<Shape>> calculatePath(Path path, double cw,
+			double ch, double dis) {
 		if (path.getDirections().isEmpty())
-			return new Path2D.Double();
+			return Pair.with((Path2D) new Path2D.Double(),
+					Collections.<Shape> emptyList());
 
 		// Triplet<begin, end, id>
 		Map<Pair<Direction, Integer>, List<Triplet<Integer, Integer, Integer>>> data;
@@ -202,7 +225,11 @@ class PathPanelCalculator {
 		}
 
 		Path2D.Double ppath = new Path2D.Double();
+		Path2D.Double cornerBuf = new Path2D.Double();
+		List<Shape> segements = new ArrayList<>();
 
+		int segCount = 1;
+		Point2D.Double pLast = null;
 		Point p = new Point(path.getBeginPoint());
 		// Triplet<a, b, c> ax+by=c
 		Triplet<Double, Double, Double> e1 = null;
@@ -214,21 +241,27 @@ class PathPanelCalculator {
 						dir, trackId.get(pos), cw, ch, dis);
 				if (e1 == null) {
 					Point2D.Double pCur = solveOneEquation(e2, p, cw, ch);
-					moveTo(ppath, pCur);
+					cornerBuf.moveTo(pCur.x, pCur.y);
+					moveTo(ppath, pLast = pCur);
 				} else {
 					Point2D.Double pCur = solveEquation(e1, e2);
-					lineTo(ppath, pCur);
+					addSegements(segements, cornerBuf, pLast, pCur, segCount);
+					lineTo(ppath, pLast = pCur);
 				}
 				e1 = e2;
 				pos++;
 				lastDirection = dir;
+				segCount = 0;
 			}
 			follow(p, dir);
+			segCount++;
 		}
 		{
 			Point2D.Double pCur = solveOneEquation(e1, p, cw, ch);
-			lineTo(ppath, pCur);
+			addSegements(segements, cornerBuf, pLast, pCur, segCount);
+			lineTo(ppath, pLast = pCur);
 		}
-		return ppath;
+		segements.add(cornerBuf);
+		return Pair.with((Path2D) ppath, segements);
 	}
 }
