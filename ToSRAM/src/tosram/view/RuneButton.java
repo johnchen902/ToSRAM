@@ -1,8 +1,15 @@
 package tosram.view;
 
 import java.awt.Color;
+import java.awt.GridLayout;
 
+import javax.swing.Box;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
@@ -54,33 +61,43 @@ public class RuneButton extends JButton {
 		return (stone, x, y) -> {
 			RuneButton btn = new RuneButton(stone);
 			btn.addActionListener(e -> {
+				RuneStone newStone = showRuneStoneDialog(btn);
+				if (newStone == null || newStone == stone)
+					return;
 				MutableRuneMap mp = table.getRuneMap().toMutable();
-				switch (mp.getRuneStone(x, y)) {
-				case FIRE:
-					mp.setRuneStone(x, y, RuneStone.EARTH);
-					break;
-				case EARTH:
-					mp.setRuneStone(x, y, RuneStone.WATER);
-					break;
-				case WATER:
-					mp.setRuneStone(x, y, RuneStone.LIGHT);
-					break;
-				case LIGHT:
-					mp.setRuneStone(x, y, RuneStone.DARK);
-					break;
-				case DARK:
-					mp.setRuneStone(x, y, RuneStone.HEART);
-					break;
-				case HEART:
-					mp.setRuneStone(x, y, RuneStone.UNKNOWN);
-					break;
-				case UNKNOWN:
-					mp.setRuneStone(x, y, RuneStone.FIRE);
-					break;
-				}
+				mp.setRuneStone(x, y, newStone);
 				table.setRuneMap(new RuneMap(mp));
 			});
 			return btn;
 		};
+	}
+
+	private static RuneStone showRuneStoneDialog(RuneButton btn) {
+		JPanel msg = new JPanel(new GridLayout(3, 3, 1, 1));
+		JOptionPane pane = new JOptionPane(msg, JOptionPane.PLAIN_MESSAGE,
+				JOptionPane.DEFAULT_OPTION, null, new Object[0]);
+		JDialog dialog = pane.createDialog(btn, "Select a Runestone");
+
+		RuneStone[] selection = new RuneStone[1];
+		for (RuneStone s : RuneStone.values()) {
+			RuneButton b = new RuneButton(s);
+			b.addActionListener(e -> {
+				selection[0] = s;
+				dialog.setVisible(false);
+			});
+			char c = s.name().charAt(0);
+			b.setMnemonic(c);
+			InputMap im = b.getInputMap(WHEN_IN_FOCUSED_WINDOW);
+			im.put(KeyStroke.getKeyStroke("pressed " + c), "pressed");
+			im.put(KeyStroke.getKeyStroke("released " + c), "released");
+			msg.add(b);
+		}
+		msg.add(new Box.Filler(null, btn.getSize(), null), 6);
+
+		dialog.pack();
+		dialog.setLocationRelativeTo(btn);
+		dialog.setVisible(true);
+		dialog.dispose();
+		return selection[0];
 	}
 }
