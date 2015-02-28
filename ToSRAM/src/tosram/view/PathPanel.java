@@ -5,7 +5,10 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -20,7 +23,8 @@ import tosram.Path;
 public class PathPanel extends JPanel {
 
 	private Path path;
-	private Path2D gpath;
+	private List<Point2D> points;
+	private Path2D path2d;
 	private double cellWidth = 50;
 	private double cellHeight = 50;
 
@@ -62,10 +66,12 @@ public class PathPanel extends JPanel {
 
 	private void updatePath() {
 		if (path == null) {
-			gpath = null;
+			points = null;
+			path2d = null;
 		} else {
-			gpath = PathCalculator.calculatePath(path, cellWidth,
+			points = PathCalculator.calculatePoints(path, cellWidth,
 					cellHeight, cellWidth / 8, cellHeight / 8);
+			path2d = PathCalculator.calculatePath(points);
 		}
 		repaint();
 	}
@@ -73,19 +79,29 @@ public class PathPanel extends JPanel {
 	@Override
 	protected void paintComponent(Graphics g0) {
 		super.paintComponent(g0);
-		if (gpath == null)
+		if (points == null || path2d == null)
 			return;
 
 		Graphics2D g = (Graphics2D) g0;
-		Object oldval = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
 		g.setColor(Color.GRAY);
 		g.setStroke(new BasicStroke(3f, BasicStroke.CAP_ROUND,
 				BasicStroke.JOIN_ROUND));
-		g.draw(gpath);
+		g.draw(path2d);
+		g.setStroke(new BasicStroke());
 
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldval);
+		final double r = 4, d = r * 2;
+		Point2D st = points.get(0);
+		g.setColor(Color.GREEN);
+		g.fill(new Ellipse2D.Double(st.getX() - r, st.getY() - r, d, d));
+		g.setColor(Color.BLACK);
+		g.draw(new Ellipse2D.Double(st.getX() - r, st.getY() - r, d, d));
+		Point2D ed = points.get(points.size() - 1);
+		g.setColor(Color.RED);
+		g.fill(new Ellipse2D.Double(ed.getX() - r, ed.getY() - r, d, d));
+		g.setColor(Color.BLACK);
+		g.draw(new Ellipse2D.Double(ed.getX() - r, ed.getY() - r, d, d));
 	}
 }
