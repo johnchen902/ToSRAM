@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
@@ -11,6 +12,7 @@ import java.awt.geom.Point2D;
 import java.util.List;
 
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 import tosram.Path;
 
@@ -27,6 +29,8 @@ public class PathPanel extends JPanel {
 	private Path2D path2d;
 	private double cellWidth = 50;
 	private double cellHeight = 50;
+	private Timer timer;
+	private double animation;
 
 	/**
 	 * Create an empty <code>PathPanel</code>
@@ -65,6 +69,10 @@ public class PathPanel extends JPanel {
 	}
 
 	private void updatePath() {
+		if (timer != null) {
+			timer.stop();
+			timer = null;
+		}
 		if (path == null) {
 			points = null;
 			path2d = null;
@@ -72,6 +80,23 @@ public class PathPanel extends JPanel {
 			points = PathCalculator.calculatePoints(path, cellWidth,
 					cellHeight, cellWidth / 8, cellHeight / 8);
 			path2d = PathCalculator.calculatePath(points);
+
+			animation = 0.0;
+			timer = new Timer(1000 / 60, e -> {
+				Point2D p1 = getAnimationPoint();
+
+				animation += 1.0 / 16;
+				if (animation > points.size() - 1)
+					animation = 0.0;
+
+				Point2D p2 = getAnimationPoint();
+				Rectangle r = new Rectangle();
+				r.setFrameFromDiagonal(p1, p2);
+				r.setFrameFromCenter(r.getCenterX(), r.getCenterY(),
+						r.getMaxX() + 5, r.getMaxY() + 5);
+				repaint(r);
+			});
+			timer.start();
 		}
 		repaint();
 	}
@@ -103,5 +128,21 @@ public class PathPanel extends JPanel {
 		g.fill(new Ellipse2D.Double(ed.getX() - r, ed.getY() - r, d, d));
 		g.setColor(Color.BLACK);
 		g.draw(new Ellipse2D.Double(ed.getX() - r, ed.getY() - r, d, d));
+		Point2D an = getAnimationPoint();
+		g.setColor(Color.YELLOW);
+		g.fill(new Ellipse2D.Double(an.getX() - r, an.getY() - r, d, d));
+		g.setColor(Color.BLACK);
+		g.draw(new Ellipse2D.Double(an.getX() - r, an.getY() - r, d, d));
+	}
+
+	private Point2D getAnimationPoint() {
+		if (animation == (int) animation)
+			return points.get((int) animation);
+		Point2D prev = points.get((int) animation);
+		Point2D next = points.get((int) animation + 1);
+		double frac = animation - (int) animation;
+		double x = prev.getX() + (next.getX() - prev.getX()) * frac;
+		double y = prev.getY() + (next.getY() - prev.getY()) * frac;
+		return new Point2D.Double(x, y);
 	}
 }
