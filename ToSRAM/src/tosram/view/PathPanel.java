@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Path2D;
-import java.util.EventListener;
 
 import javax.swing.JPanel;
 
@@ -40,12 +39,7 @@ public class PathPanel extends JPanel {
 	 */
 	public void setPath(Path path) {
 		this.path = path == null ? path : new Path(path);
-		if (path == null) {
-			gpath = null;
-		} else {
-			gpath = calculatePath();
-		}
-		repaint();
+		updatePath();
 	}
 
 	public Path getPath() {
@@ -63,17 +57,18 @@ public class PathPanel extends JPanel {
 	public void setCellSize(double cellW, double cellH) {
 		this.cellWidth = cellW;
 		this.cellHeight = cellH;
+		updatePath();
+	}
+
+	private void updatePath() {
 		if (path == null) {
 			gpath = null;
 		} else {
-			gpath = calculatePath();
+			double dis = Math.min(cellWidth, cellHeight) / 8;
+			gpath = PathPanelCalculator.calculatePath(path, cellWidth,
+					cellHeight, dis);
 		}
-	}
-
-	private Path2D calculatePath() {
-		double dis = Math.min(cellWidth, cellHeight) / 6.3;
-		return PathPanelCalculator.calculatePath(path, cellWidth, cellHeight,
-				dis);
+		repaint();
 	}
 
 	@Override
@@ -93,33 +88,5 @@ public class PathPanel extends JPanel {
 		g.draw(gpath);
 
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldval);
-	}
-
-	/**
-	 * A callback when the panel start an animation cycle, animates and stop an
-	 * animation cycle.
-	 * 
-	 * @author johnchen902
-	 */
-	public interface AnimationListener extends EventListener {
-
-		/**
-		 * Called when the panel started an animation cycle.
-		 */
-		public void animationCycleStart();
-
-		/**
-		 * Called when the panel animated a move.
-		 * 
-		 * @param directionIndex
-		 *            the index of the animated direction in the
-		 *            <code>Path</code> passed in
-		 */
-		public void animate(int directionIndex);
-
-		/**
-		 * Called when the panel stopped an animation cycle.
-		 */
-		public void animationCycleStop();
 	}
 }
