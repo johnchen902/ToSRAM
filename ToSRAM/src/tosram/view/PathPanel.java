@@ -64,9 +64,8 @@ public class PathPanel extends JPanel {
 		if (path == null) {
 			gpath = null;
 		} else {
-			double dis = Math.min(cellWidth, cellHeight) / 8;
-			gpath = PathPanelCalculator.calculatePath(path, cellWidth,
-					cellHeight, dis);
+			gpath = PathCalculator.calculatePath(path, cellWidth,
+					cellHeight, cellWidth / 8, cellHeight / 8);
 		}
 		repaint();
 	}
