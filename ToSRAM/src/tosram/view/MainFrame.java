@@ -12,13 +12,13 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
 import tosram.Path;
 import tosram.RuneMap;
 import tosram.algorithm.PathFindingAlgorithm;
-import tosram.algorithm.idastar.IDAStarPathFindingAlgorithm;
 
 /**
  * The frame shown on the screen.
@@ -38,16 +38,19 @@ public class MainFrame extends JFrame {
 	private static final String BUTTON_FINISH = "Finish";
 	private static final String BUTTON_COMPUTE = "Compute";
 	private static final String BUTTON_STOP = "Stop";
+	private static final String BUTTON_SETTINGS = "Settings";
 
 	private JPanel pnMain;
 	private JLabel lbStatus; // general states and computing milestones
 	private PathPanel pnPath; // path drawn above tbStones
 	private RuneMapTable tbStones;
+	private Settings settings;
 
 	private JPanel buttonsPanel;
 	private JButton btEdit;
 	private JButton btCompute;
 	private JButton btStop;
+	private JButton btSettings;
 
 	private RuneMap runeMap;
 	private PathFindingAlgorithm algorithm;
@@ -56,6 +59,8 @@ public class MainFrame extends JFrame {
 		super("Tower of Savior Runestone Auto Mover");
 
 		initUI();
+
+		settings = new Settings();
 	}
 
 	private void initUI() {
@@ -133,6 +138,10 @@ public class MainFrame extends JFrame {
 			buttonsPanel.add(btStop);
 			btStop.addActionListener(e -> stopComputing());
 			btStop.setEnabled(false);
+
+			btSettings = new JButton(BUTTON_SETTINGS);
+			buttonsPanel.add(btSettings);
+			btSettings.addActionListener(e -> showSettings());
 		}
 	}
 
@@ -143,6 +152,7 @@ public class MainFrame extends JFrame {
 		btCompute.setEnabled(false);
 		pnPath.setPath(null);
 		tbStones.setRuneMap(runeMap);
+		btSettings.setEnabled(false);
 	}
 
 	private void finishEditing() {
@@ -151,6 +161,7 @@ public class MainFrame extends JFrame {
 		lbStatus.setText(STATUS_IDLE);
 		btCompute.setEnabled(true);
 		runeMap = tbStones.getRuneMap();
+		btSettings.setEnabled(true);
 	}
 
 	private void startComputing() {
@@ -159,7 +170,8 @@ public class MainFrame extends JFrame {
 		btCompute.setEnabled(false);
 		btStop.setEnabled(true);
 		pnPath.setPath(null);
-		algorithm = new IDAStarPathFindingAlgorithm();
+		algorithm = settings.getAlgorithm();
+		btSettings.setEnabled(false);
 		new SwingWorker<Void, Object[]>() {
 			@Override
 			protected Void doInBackground() {
@@ -196,6 +208,17 @@ public class MainFrame extends JFrame {
 			btCompute.setEnabled(true);
 			btStop.setEnabled(false);
 			algorithm.stop();
+			btSettings.setEnabled(true);
 		}
+	}
+
+	private void showSettings() {
+		int result = JOptionPane.showConfirmDialog(this,
+				settings.getEditorPanel(), "Settings",
+				JOptionPane.OK_CANCEL_OPTION);
+		if (result == JOptionPane.OK_OPTION)
+			settings.commit();
+		else
+			settings.cancel();
 	}
 }
