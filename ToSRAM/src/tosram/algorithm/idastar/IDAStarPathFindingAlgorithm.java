@@ -13,7 +13,7 @@ import tosram.RuneStone;
 import tosram.algorithm.AbstractPathFindingAlgorithm;
 import tosram.algorithm.ComboCountingAlgorithm;
 import tosram.algorithm.LongComboCountingAlgorithm;
-import tosram.algorithm.NoUTurnPathConstrain;
+import tosram.algorithm.UTurnPathConstrain;
 import tosram.algorithm.PathConstrain;
 
 /**
@@ -46,7 +46,7 @@ public class IDAStarPathFindingAlgorithm extends AbstractPathFindingAlgorithm {
 	 * Just simpler constructor.
 	 */
 	public IDAStarPathFindingAlgorithm() {
-		this(new LongComboCountingAlgorithm(), new NoUTurnPathConstrain(),
+		this(new LongComboCountingAlgorithm(), new UTurnPathConstrain(),
 				new ComboHeuristicCostEstimater());
 	}
 
