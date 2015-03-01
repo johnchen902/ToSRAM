@@ -10,8 +10,7 @@ import tosram.MutableRuneMap;
  * 
  * @author johnchen902
  */
-public class NoUTurnPathConstrain implements PathConstrain {
-
+public class UTurnPathConstrain implements PathConstrain {
 	@Override
 	public boolean canStart(int startingX, int startingY, MutableRuneMap map) {
 		return true;
