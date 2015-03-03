@@ -4,6 +4,7 @@ import java.util.List;
 
 import tosram.Direction;
 import tosram.MutableRuneMap;
+import tosram.RuneStone;
 import tosram.algorithm.PathConstrain;
 
 /**
@@ -22,8 +23,12 @@ public class NullStartPathConstrain implements PathConstrain {
 	public boolean canMove(int startingX, int startingY,
 			List<Direction> directions, Direction direction, int resultingX,
 			int resultingY, MutableRuneMap map) {
-		return directions.size() != 0
-				|| map.getRuneStone(startingX, startingY) != map.getRuneStone(
-						resultingX, resultingY);
+		if (directions.size() != 1)
+			return true;
+		RuneStone stone1 = map.getRuneStone(startingX, startingY);
+		startingX += directions.get(0).getX();
+		startingY += directions.get(0).getY();
+		RuneStone stone2 = map.getRuneStone(startingX, startingY);
+		return stone1 != stone2;
 	}
 }
