@@ -1,9 +1,10 @@
-package tosram.algorithm;
+package tosram.algorithm.path;
 
 import java.util.List;
 
 import tosram.Direction;
 import tosram.MutableRuneMap;
+import tosram.algorithm.PathConstrain;
 
 /**
  * A <code>PathConstrain</code> that do not constrain the path in any way.

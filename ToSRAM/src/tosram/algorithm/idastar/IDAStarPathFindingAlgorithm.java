@@ -13,8 +13,8 @@ import tosram.RuneStone;
 import tosram.algorithm.AbstractPathFindingAlgorithm;
 import tosram.algorithm.ComboCountingAlgorithm;
 import tosram.algorithm.LongComboCountingAlgorithm;
-import tosram.algorithm.UTurnPathConstrain;
 import tosram.algorithm.PathConstrain;
+import tosram.algorithm.path.UTurnPathConstrain;
 
 /**
  * Iterative-deepening A* algorithm.

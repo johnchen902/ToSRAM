@@ -7,15 +7,15 @@ import java.util.List;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
-import tosram.algorithm.CompositePathConstrain;
-import tosram.algorithm.DiagonalMovePathConstrain;
 import tosram.algorithm.LongComboCountingAlgorithm;
-import tosram.algorithm.NullStartPathConstrain;
 import tosram.algorithm.PathConstrain;
 import tosram.algorithm.PathFindingAlgorithm;
-import tosram.algorithm.UTurnPathConstrain;
 import tosram.algorithm.idastar.ComboHeuristicCostEstimater;
 import tosram.algorithm.idastar.IDAStarPathFindingAlgorithm;
+import tosram.algorithm.path.CompositePathConstrain;
+import tosram.algorithm.path.DiagonalMovePathConstrain;
+import tosram.algorithm.path.NullStartPathConstrain;
+import tosram.algorithm.path.UTurnPathConstrain;
 
 /**
  * The Settings handler.

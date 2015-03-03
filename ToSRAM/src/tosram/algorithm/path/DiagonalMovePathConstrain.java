@@ -1,9 +1,10 @@
-package tosram.algorithm;
+package tosram.algorithm.path;
 
 import java.util.List;
 
 import tosram.Direction;
 import tosram.MutableRuneMap;
+import tosram.algorithm.PathConstrain;
 
 /**
  * A <code>PathConstrain</code> that forbids diagonal move.
