@@ -21,7 +21,10 @@ public class RuneMap {
 	public RuneMap(MutableRuneMap mutable) {
 		this.width = mutable.getWidth();
 		this.height = mutable.getHeight();
-		this.stones = Arrays.copyOf(mutable.getRuneStones(), width * height);
+		this.stones = new RuneStone[width * height];
+		for (int y = 0; y < height; y++)
+			for (int x = 0; x < width; x++)
+				stones[y * width + x] = mutable.getRuneStone(x, y);
 	}
 
 	/**
@@ -52,11 +55,23 @@ public class RuneMap {
 	 * @return a {@code RuneStone}
 	 */
 	public RuneStone getRuneStone(int x, int y) {
-		if (x < 0 || x >= width)
-			throw new IndexOutOfBoundsException("x");
-		if (y < 0 || y >= height)
-			throw new IndexOutOfBoundsException("y");
+		if (!isInRange(x, y))
+			throw new IndexOutOfBoundsException();
 		return stones[y * width + x];
+	}
+
+	/**
+	 * Checks if the specified location is in valid range of this
+	 * <code>RuneMap</code>.
+	 * 
+	 * @param x
+	 *            the X coordinate of the specified location
+	 * @param y
+	 *            the Y coordinate of the specified location
+	 * @return <code>true</code> if in range; <code>false</code> otherwise
+	 */
+	public boolean isInRange(int x, int y) {
+		return x >= 0 && x < width && y >= 0 && y < height;
 	}
 
 	/**
@@ -66,7 +81,9 @@ public class RuneMap {
 	 */
 	public MutableRuneMap toMutable() {
 		MutableRuneMap mutable = new MutableRuneMap(width, height);
-		System.arraycopy(stones, 0, mutable.getRuneStones(), 0, width * height);
+		for (int y = 0; y < height; y++)
+			for (int x = 0; x < width; x++)
+				mutable.setRuneStone(x, y, getRuneStone(x, y));
 		return mutable;
 	}
 

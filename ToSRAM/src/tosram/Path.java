@@ -126,13 +126,7 @@ public class Path {
 		Iterator<Direction> ite = path.getDirections().iterator();
 		while (steps-- != 0) {
 			Direction dir = ite.next();
-			int px = x, py = y;
-			x += dir.getX();
-			y += dir.getY();
-			RuneStone stone1 = newMap.getRuneStone(x, y);
-			RuneStone stone2 = newMap.getRuneStone(px, py);
-			newMap.setRuneStone(x, y, stone2);
-			newMap.setRuneStone(px, py, stone1);
+			newMap.swap(x, y, x += dir.getX(), y += dir.getY());
 		}
 		return new RuneMap(newMap);
 	}

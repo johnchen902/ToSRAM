@@ -13,7 +13,7 @@ public class MutableRuneMap {
 	private final RuneStone[] stones;
 
 	/**
-	 * Create a new MutableRuneMap with specified size
+	 * Create an empty MutableRuneMap with specified size.
 	 * 
 	 * @param w
 	 *            its width
@@ -31,7 +31,7 @@ public class MutableRuneMap {
 	}
 
 	/**
-	 * Copy constructor
+	 * Create a MutableRuneMap with copied content from <code>that</code>.
 	 * 
 	 * @param that
 	 *            the MutableRuneMap to copy from
@@ -39,7 +39,7 @@ public class MutableRuneMap {
 	public MutableRuneMap(MutableRuneMap that) {
 		this.width = that.width;
 		this.height = that.height;
-		this.stones = Arrays.copyOf(that.getRuneStones(), width * height);
+		this.stones = Arrays.copyOf(that.stones, that.stones.length);
 	}
 
 	/**
@@ -70,10 +70,8 @@ public class MutableRuneMap {
 	 * @return a {@code RuneStone}
 	 */
 	public RuneStone getRuneStone(int x, int y) {
-		if (x < 0 || x >= width)
-			throw new IndexOutOfBoundsException("x");
-		if (y < 0 || y >= height)
-			throw new IndexOutOfBoundsException("y");
+		if (!isInRange(x, y))
+			throw new IndexOutOfBoundsException();
 		return stones[y * width + x];
 	}
 
@@ -88,20 +86,42 @@ public class MutableRuneMap {
 	 *            a {@code RuneStone}
 	 */
 	public void setRuneStone(int x, int y, RuneStone r) {
-		if (x < 0 || x >= width)
-			throw new IndexOutOfBoundsException("x");
-		if (y < 0 || y >= height)
-			throw new IndexOutOfBoundsException("y");
+		if (!isInRange(x, y))
+			throw new IndexOutOfBoundsException();
 		stones[y * width + x] = r;
 	}
 
 	/**
-	 * Get the RuneStone array that backed up this MutableRuneMap.
+	 * Checks if the specified location is in valid range of this
+	 * <code>MutableRuneMap</code>.
 	 * 
-	 * @return the RuneStone array
+	 * @param x
+	 *            the X coordinate of the specified location
+	 * @param y
+	 *            the Y coordinate of the specified location
+	 * @return <code>true</code> if in range; <code>false</code> otherwise
 	 */
-	public RuneStone[] getRuneStones() {
-		return stones;
+	public boolean isInRange(int x, int y) {
+		return x >= 0 && x < width && y >= 0 && y < height;
+	}
+
+	/**
+	 * Swap two stone at the specific locations.
+	 * 
+	 * @param x1
+	 *            the X coordinate of the first stone
+	 * @param y1
+	 *            the Y coordinate of the first stone
+	 * @param x2
+	 *            the X coordinate of the second stone
+	 * @param y2
+	 *            the Y coordinate of the second stone
+	 */
+	public void swap(int x1, int y1, int x2, int y2) {
+		RuneStone stone1 = getRuneStone(x1, y1);
+		RuneStone stone2 = getRuneStone(x2, y2);
+		setRuneStone(x1, y1, stone2);
+		setRuneStone(x2, y2, stone1);
 	}
 
 	/**

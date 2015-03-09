@@ -9,7 +9,6 @@ import tosram.Direction;
 import tosram.MutableRuneMap;
 import tosram.Path;
 import tosram.RuneMap;
-import tosram.RuneStone;
 import tosram.algorithm.AbstractPathFindingAlgorithm;
 import tosram.algorithm.ComboCountingAlgorithm;
 import tosram.algorithm.LongComboCountingAlgorithm;
@@ -91,24 +90,18 @@ public class IDAStarPathFindingAlgorithm extends AbstractPathFindingAlgorithm {
 		}
 		for (Direction d : Direction.values()) {
 			int x2 = x1 + d.getX(), y2 = y1 + d.getY();
-			if (x2 < 0 || x2 >= map.getWidth())
-				continue;
-			if (y2 < 0 || y2 >= map.getHeight())
+			if (!map.isInRange(x2, y2))
 				continue;
 			if (!constrain.canMove(startX, startY, directions, d, x2, y2, map))
 				continue;
 
-			RuneStone stone1 = map.getRuneStone(x1, y1);
-			RuneStone stone2 = map.getRuneStone(x2, y2);
-			map.setRuneStone(x1, y1, stone2);
-			map.setRuneStone(x2, y2, stone1);
+			map.swap(x1, y1, x2, y2);
 			directions.add(d);
 
 			findPathFrom(map, limit, startX, startY, directions, x2, y2,
 					g + (d.ordinal() < 4 ? 1 : 2));
 
-			map.setRuneStone(x1, y1, stone1);
-			map.setRuneStone(x2, y2, stone2);
+			map.swap(x1, y1, x2, y2);
 			directions.remove(directions.size() - 1);
 		}
 	}
