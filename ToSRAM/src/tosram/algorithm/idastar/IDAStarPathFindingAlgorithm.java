@@ -61,31 +61,26 @@ public class IDAStarPathFindingAlgorithm extends AbstractPathFindingAlgorithm {
 		estimater.setSourceState(initialMap);
 		MutableRuneMap map = initialMap.toMutable();
 		int limit = h(map);
-		while (!findPathLimited(map, limit))
-			limit++;
+		while (minHFound != 0)
+			findPathLimited(map, limit++);
 	}
 
-	private boolean findPathLimited(MutableRuneMap map, int limit) {
+	private void findPathLimited(MutableRuneMap map, int limit) {
 		for (int x = 0; x < map.getWidth(); x++)
 			for (int y = 0; y < map.getHeight(); y++)
-				if (findPathStartAt(map, limit, x, y))
-					return true;
-		return minHFound == 0;
+				findPathStartAt(map, limit, x, y);
 	}
 
-	private boolean findPathStartAt(MutableRuneMap map, int limit, int x, int y) {
-		if (!constrain.canStart(x, y, map))
-			return false;
-		return findPathFrom(map, limit, x, y, new ArrayList<>(), x, y, 0);
+	private void findPathStartAt(MutableRuneMap map, int limit, int x, int y) {
+		if (constrain.canStart(x, y, map))
+			findPathFrom(map, limit, x, y, new ArrayList<>(), x, y, 0);
 	}
 
-	private boolean findPathFrom(MutableRuneMap map, int limit, int startX,
+	private void findPathFrom(MutableRuneMap map, int limit, int startX,
 			int startY, List<Direction> directions, int x1, int y1, int g) {
 		int h = h(map);
-		if (g + h > limit)
-			return false;
-		if (isStopped())
-			return true;
+		if (g + h > limit || isStopped())
+			return;
 		if ((h < minHFound || (h == minHFound && g < minGUsed))
 				&& directions.size() >= 1) {
 			result(new Path(new Point(startX, startY), directions),
@@ -109,16 +104,12 @@ public class IDAStarPathFindingAlgorithm extends AbstractPathFindingAlgorithm {
 			map.setRuneStone(x2, y2, stone1);
 			directions.add(d);
 
-			boolean b = findPathFrom(map, limit, startX, startY, directions,
-					x2, y2, g + (d.ordinal() < 4 ? 1 : 2));
+			findPathFrom(map, limit, startX, startY, directions, x2, y2,
+					g + (d.ordinal() < 4 ? 1 : 2));
 
 			map.setRuneStone(x1, y1, stone1);
 			map.setRuneStone(x2, y2, stone2);
 			directions.remove(directions.size() - 1);
-
-			if (b)
-				return true;
 		}
-		return false;
 	}
 }
