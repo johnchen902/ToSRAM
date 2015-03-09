@@ -2,6 +2,7 @@ package tosram.view;
 
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.util.Objects;
 
 import javax.swing.Box;
 import javax.swing.InputMap;
@@ -17,12 +18,16 @@ import tosram.MutableRuneMap;
 import tosram.RuneMap;
 import tosram.RuneStone;
 
-// TODO document
+/**
+ * A button showing a <code>RuneStone</code>.
+ * 
+ * @author johnchen902
+ */
 @SuppressWarnings("serial")
 public class RuneButton extends JButton {
 	public RuneButton(RuneStone stone) {
-		if (stone == null)
-			return;
+		Objects.requireNonNull(stone);
+
 		setText(stone.toString());
 		setOpaque(true);
 		setBackground(getBackgroundColor(stone));

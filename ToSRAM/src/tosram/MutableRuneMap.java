@@ -1,6 +1,7 @@
 package tosram;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -28,6 +29,7 @@ public class MutableRuneMap {
 		width = w;
 		height = h;
 		stones = new RuneStone[w * h];
+		Arrays.fill(stones, RuneStone.UNKNOWN);
 	}
 
 	/**
@@ -88,7 +90,7 @@ public class MutableRuneMap {
 	public void setRuneStone(int x, int y, RuneStone r) {
 		if (!isInRange(x, y))
 			throw new IndexOutOfBoundsException();
-		stones[y * width + x] = r;
+		stones[y * width + x] = Objects.requireNonNull(r);
 	}
 
 	/**

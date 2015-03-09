@@ -23,7 +23,7 @@ public class MaximumComboCalculator {
 	 * @return the maximum possible combo
 	 */
 	public static int getMaxCombo(RuneMap map) {
-		return map.stream().filter(s -> s != null && s != RuneStone.UNKNOWN)
+		return map.stream().filter(s -> s != RuneStone.UNKNOWN)
 				.collect(groupingBy(identity(), counting())).values().stream()
 				.mapToInt(MaximumComboCalculator::getMaxComboSingleElement)
 				.sum();

@@ -1,17 +1,22 @@
 package tosram.view;
 
 import java.awt.Color;
+import java.util.Objects;
 
 import javax.swing.JLabel;
 
 import tosram.RuneStone;
 
-// TODO document
+/**
+ * A label showing a <code>RuneStone</code>.
+ * 
+ * @author johnchen902
+ */
 @SuppressWarnings("serial")
 public class RuneLabel extends JLabel {
 	public RuneLabel(RuneStone stone) {
-		if (stone == null)
-			return;
+		Objects.requireNonNull(stone);
+
 		setText(stone.toString());
 		setOpaque(true);
 		setBackground(getBackgroundColor(stone));
