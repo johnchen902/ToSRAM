@@ -1,4 +1,4 @@
-package tosram.algorithm.uct;
+package tosram.algorithm.montecarlo;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -19,18 +19,19 @@ import tosram.algorithm.MaximumComboCalculator;
 import tosram.algorithm.PathConstrain;
 
 /**
- * MonteCarlo Tree Search with Upper Confidence Bound applied in Tree.
+ * MonteCarlo Tree Search with Upper Confidence Bound.
  * 
  * @author johnchen902
  */
-public class UCTPathFindingAlgorithm extends AbstractPathFindingAlgorithm {
+public class MonteCarloPathFindingAlgorithm extends
+		AbstractPathFindingAlgorithm {
 
 	private static final int VALUE_PER_COMBO = 10;
 	private int maximumPossibleCombo;
 	private int highestValue = 0;
 	private int highestPossibleValue = 0;
 
-	public UCTPathFindingAlgorithm(ComboCountingAlgorithm comboCounter,
+	public MonteCarloPathFindingAlgorithm(ComboCountingAlgorithm comboCounter,
 			PathConstrain constrain) {
 		super(comboCounter, constrain);
 	}
@@ -134,7 +135,8 @@ public class UCTPathFindingAlgorithm extends AbstractPathFindingAlgorithm {
 
 		private void evaluate(MutableRuneMap map, int startX, int startY,
 				List<Direction> directions) {
-			value = UCTPathFindingAlgorithm.this.evaluate(map, directions);
+			value = MonteCarloPathFindingAlgorithm.this.evaluate(map,
+					directions);
 			if (!directions.isEmpty() && value > highestValue) {
 				highestValue = value;
 				result(new Path(new Point(startX, startY), directions),
