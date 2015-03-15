@@ -160,7 +160,7 @@ public class LongComboCountingAlgorithm implements ComboCountingAlgorithm {
 		for (int y = 0; y < height; y++) {
 			for (int x = 2; x < width;) { // . . x
 				RuneStone type = map.getRuneStone(x, y);
-				if (type == null || type == RuneStone.UNKNOWN) {
+				if (type == RuneStone.UNKNOWN) {
 					x += 3; // . . U . . x
 				} else {
 					if (map.getRuneStone(x - 1, y) == type) {
@@ -192,7 +192,7 @@ public class LongComboCountingAlgorithm implements ComboCountingAlgorithm {
 		for (int x = 0; x < width; x++) {
 			for (int y = 2; y < height;) { // . . y
 				RuneStone type = map.getRuneStone(x, y);
-				if (type == null || type == RuneStone.UNKNOWN) {
+				if (type == RuneStone.UNKNOWN) {
 					y += 3; // . . U . . y
 				} else {
 					if (map.getRuneStone(x, y - 1) == type) {

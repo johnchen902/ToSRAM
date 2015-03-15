@@ -1,17 +1,17 @@
-package tosram.algorithm;
+package tosram.algorithm.path;
 
 import java.util.List;
 
 import tosram.Direction;
 import tosram.MutableRuneMap;
+import tosram.algorithm.PathConstrain;
 
 /**
- * A <code>PathConstrain</code> that forbids exchanging two same stone as the
- * first move.
+ * A <code>PathConstrain</code> that forbids diagonal move.
  * 
  * @author johnchen902
  */
-public class NullStartPathConstrain implements PathConstrain {
+public class DiagonalMovePathConstrain implements PathConstrain {
 	@Override
 	public boolean canStart(int startingX, int startingY, MutableRuneMap map) {
 		return true;
@@ -21,8 +21,6 @@ public class NullStartPathConstrain implements PathConstrain {
 	public boolean canMove(int startingX, int startingY,
 			List<Direction> directions, Direction direction, int resultingX,
 			int resultingY, MutableRuneMap map) {
-		return directions.size() != 0
-				|| map.getRuneStone(startingX, startingY) != map.getRuneStone(
-						resultingX, resultingY);
+		return direction.ordinal() < 4;
 	}
 }
