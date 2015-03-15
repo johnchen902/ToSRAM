@@ -29,39 +29,10 @@ public class BasicMovingPathGenerator implements MovingPathGenerator {
 		moves.add(new Move(toScreen(screen, mapSize, p),
 				startImmediately ? timePerStep : 3000));
 		for (Direction dir : path.getDirections()) {
-			switch (dir) {
-			case WEST:
-			case WEST_NORTH:
-			case WEST_SOUTH:
-				p.x--;
-				break;
-			case EAST:
-			case EAST_NORTH:
-			case EAST_SOUTH:
-				p.x++;
-				break;
-			case NORTH:
-			case SOUTH:
-				break;
-			}
-			switch (dir) {
-			case SOUTH:
-			case WEST_SOUTH:
-			case EAST_SOUTH:
-				p.y++;
-				break;
-			case NORTH:
-			case WEST_NORTH:
-			case EAST_NORTH:
-				p.y--;
-				break;
-			case WEST:
-			case EAST:
-				break;
-			}
+			p.x += dir.getX();
+			p.y += dir.getY();
 			moves.add(new Move(toScreen(screen, mapSize, p), timePerStep));
 		}
 		return moves;
 	}
-
 }

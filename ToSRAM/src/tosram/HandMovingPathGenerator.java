@@ -17,7 +17,6 @@ import java.util.List;
  */
 public class HandMovingPathGenerator implements MovingPathGenerator {
 
-	@SuppressWarnings("incomplete-switch")
 	private Path2D.Double buildPath2D(Path path, Rectangle r, Dimension d) {
 		RoundPath gp = new RoundPath();
 		Point p = new Point(path.getBeginPoint());
@@ -27,30 +26,8 @@ public class HandMovingPathGenerator implements MovingPathGenerator {
 			gp.moveTo(x, y);
 		}
 		for (Direction dir : path.getDirections()) {
-			switch (dir) {
-			case WEST:
-			case WEST_NORTH:
-			case WEST_SOUTH:
-				p.x--;
-				break;
-			case EAST:
-			case EAST_NORTH:
-			case EAST_SOUTH:
-				p.x++;
-				break;
-			}
-			switch (dir) {
-			case SOUTH:
-			case WEST_SOUTH:
-			case EAST_SOUTH:
-				p.y++;
-				break;
-			case NORTH:
-			case WEST_NORTH:
-			case EAST_NORTH:
-				p.y--;
-				break;
-			}
+			p.x += dir.getX();
+			p.y += dir.getY();
 			{
 				double x = r.x + r.width * (p.x + 0.5) / d.width;
 				double y = r.y + r.height * (p.y + 0.5) / d.height;

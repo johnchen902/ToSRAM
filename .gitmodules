@@ -1,6 +1,3 @@
 [submodule "Swing-range-slider"]
 	path = ToSRAM/lib/Swing-range-slider
 	url = git://github.com/johnchen902/Swing-range-slider.git
-[submodule "javatuples"]
-	path = ToSRAM/lib/javatuples
-	url = git://github.com/javatuples/javatuples.git

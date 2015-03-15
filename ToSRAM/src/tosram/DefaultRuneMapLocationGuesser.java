@@ -4,8 +4,6 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
-import org.javatuples.Pair;
-
 public class DefaultRuneMapLocationGuesser {
 
 	private static int distance(int rgb1, int rgb2) {
@@ -15,7 +13,7 @@ public class DefaultRuneMapLocationGuesser {
 				* (green1 - green2) + (blue1 - blue2) * (blue1 - blue2);
 	}
 
-	private static Pair<Integer, Integer> maximumSubArray(int[] array) {
+	private static int[] maximumSubArray(int[] array) {
 		int bestBegin = 0, bestEnd = -1, bestSum = 0;
 		for (int begin = 0, end = 0, sum = 0; end < array.length; end++) {
 			if ((sum += array[end]) < 0) {
@@ -27,7 +25,7 @@ public class DefaultRuneMapLocationGuesser {
 				bestEnd = end;
 			}
 		}
-		return Pair.with(bestBegin, bestEnd);
+		return new int[] { bestBegin, bestEnd };
 	}
 
 	/**
@@ -52,11 +50,10 @@ public class DefaultRuneMapLocationGuesser {
 				}
 			}
 		}
-		Pair<Integer, Integer> pii1 = maximumSubArray(sumVert);
-		Pair<Integer, Integer> pii2 = maximumSubArray(sumHori);
+		int[] pii1 = maximumSubArray(sumVert);
+		int[] pii2 = maximumSubArray(sumHori);
 		Rectangle rect = new Rectangle();
-		rect.setFrameFromDiagonal(pii1.getValue0(), pii2.getValue0(),
-				pii1.getValue1() + 1, pii2.getValue1() + 1);
+		rect.setFrameFromDiagonal(pii1[0], pii2[0], pii1[1] + 1, pii2[1] + 1);
 		if (rect.height > rect.width) {
 			// the dimension should be near 6:5
 			int newHeight = rect.width * 5 / 6;

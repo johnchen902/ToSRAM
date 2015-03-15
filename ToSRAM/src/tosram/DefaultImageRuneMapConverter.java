@@ -44,6 +44,7 @@ public class DefaultImageRuneMapConverter implements ImageRuneMapConverter {
 	 */
 	private static Map<Integer, RuneStone> defaultRGBMap() {
 		Map<Integer, RuneStone> map0 = new HashMap<Integer, RuneStone>();
+		// these magic numbers are color codes
 		map0.put(0xE9_28_14, RuneStone.FIRE);
 		map0.put(0x1C_CA_2D, RuneStone.EARTH);
 		map0.put(0x4A_A6_E8, RuneStone.WATER);

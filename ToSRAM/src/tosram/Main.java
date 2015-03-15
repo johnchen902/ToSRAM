@@ -18,11 +18,6 @@ public class Main {
 	 * Simply <code>main</code>.
 	 */
 	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				new MainFrame();
-			}
-		});
+		SwingUtilities.invokeLater(MainFrame::new);
 	}
 }

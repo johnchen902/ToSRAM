@@ -9,8 +9,6 @@ import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -67,12 +65,9 @@ public class SubimageChooser extends JDialog {
 				.toString());
 		btnOK.setAlignmentX(Component.CENTER_ALIGNMENT);
 		getRootPane().setDefaultButton(btnOK);
-		btnOK.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				canceled = false;
-				dispose();
-			}
+		btnOK.addActionListener(e -> {
+			canceled = false;
+			dispose();
 		});
 		JButton btnCancel = new JButton(UIManager.get(
 				"OptionPane.cancelButtonText").toString());
@@ -85,12 +80,9 @@ public class SubimageChooser extends JDialog {
 		pnLeft.add(btnCancel);
 		pnLeft.add(Box.createVerticalGlue());
 
-		btnCancel.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				canceled = true;
-				dispose();
-			}
+		btnCancel.addActionListener(e -> {
+			canceled = true;
+			dispose();
 		});
 
 		final JScrollPane scroll = new JScrollPane();
