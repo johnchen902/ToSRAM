@@ -60,7 +60,7 @@ public class IDAStarPathFindingAlgorithm extends AbstractPathFindingAlgorithm {
 		estimater.setSourceState(initialMap);
 		MutableRuneMap map = initialMap.toMutable();
 		int limit = h(map);
-		while (minHFound != 0)
+		while (minHFound != 0 && !isStopped())
 			findPathLimited(map, limit++);
 	}
 
