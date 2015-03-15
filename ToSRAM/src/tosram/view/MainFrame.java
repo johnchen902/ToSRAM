@@ -187,6 +187,7 @@ public class MainFrame extends JFrame {
 				pnPath.setPath(path);
 				lbStatus.setText(STATUS_NOW + ": " + pair[1]);
 				tbStones.setRuneMap(Path.follow(runeMap, path));
+				repaint();
 			}
 
 			@Override
@@ -195,6 +196,7 @@ public class MainFrame extends JFrame {
 				try {
 					get();
 				} catch (ExecutionException e) {
+					e.printStackTrace();
 					lbStatus.setText(STATUS_ERROR + ": " + e.getCause());
 				} catch (InterruptedException e) {
 				}
