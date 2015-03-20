@@ -1,13 +1,19 @@
 package tosram.view;
 
 import java.awt.GridLayout;
+import java.awt.Window;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 import tosram.algorithm.LongComboCountingAlgorithm;
 import tosram.algorithm.PathConstrain;
@@ -49,6 +55,26 @@ public class Settings {
 		panel.add(cbxUTurn = new JCheckBox("Forbid U Turn"));
 		panel.add(cbxNullStart = new JCheckBox("Forbid Null Start"));
 		panel.add(cbxDiagonalMove = new JCheckBox("Forbid Diagonal Move"));
+
+		JComboBox<String> comboBox = new JComboBox<>(Arrays
+				.stream(UIManager.getInstalledLookAndFeels())
+				.map(LookAndFeelInfo::getName).toArray(String[]::new));
+		comboBox.addActionListener(e -> {
+			String s = comboBox.getSelectedItem().toString();
+			for (LookAndFeelInfo x : UIManager.getInstalledLookAndFeels())
+				if (x.getName().equals(s))
+					try {
+						UIManager.setLookAndFeel(x.getClassName());
+						break;
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+
+			for (Window w : Window.getWindows())
+				SwingUtilities.updateComponentTreeUI(w);
+			SwingUtilities.getWindowAncestor(panel).pack();
+		});
+		panel.add(comboBox);
 		cancel();
 	}
 
