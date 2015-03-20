@@ -2,6 +2,7 @@ package tosram.view;
 
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.util.Objects;
 
 import javax.swing.Box;
@@ -11,8 +12,6 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 
 import tosram.MutableRuneMap;
 import tosram.RuneMap;
@@ -29,13 +28,10 @@ public class RuneButton extends JButton {
 		Objects.requireNonNull(stone);
 
 		setText(stone.toString());
-		setOpaque(true);
 		setBackground(getBackgroundColor(stone));
 		setForeground(getForegroundColor(stone));
 		setHorizontalAlignment(CENTER);
-		Border border = getBorder();
-		if (border instanceof CompoundBorder)
-			setBorder(((CompoundBorder) border).getOutsideBorder());
+		setMargin(new Insets(0, -5, 0, -5));
 	}
 
 	private Color getBackgroundColor(RuneStone stone) {
