@@ -9,8 +9,11 @@ import java.util.List;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -36,13 +39,11 @@ public class Settings {
 	private JPanel panel;
 	private JRadioButton btnIDAStar;
 	private JRadioButton btnMonteCarlo;
-	private JCheckBox cbxUTurn;
-	private JCheckBox cbxNullStart;
+	private JSpinner spnIteration;
 	private JCheckBox cbxDiagonalMove;
 	private boolean iDAStar = true;
 	private boolean monteCarlo = false;
-	private boolean uTurn = true;
-	private boolean nullStart = true;
+	private int iteration = 1000000;
 	private boolean diagonalMove = true;
 
 	private void initEditorPanel() {
@@ -52,10 +53,16 @@ public class Settings {
 		group.add(btnIDAStar);
 		panel.add(btnMonteCarlo = new JRadioButton("Monte Carlo"));
 		group.add(btnMonteCarlo);
-		panel.add(cbxUTurn = new JCheckBox("Forbid U Turn"));
-		panel.add(cbxNullStart = new JCheckBox("Forbid Null Start"));
-		panel.add(cbxDiagonalMove = new JCheckBox("Forbid Diagonal Move"));
 
+		panel.add(spnIteration = new JSpinner(new SpinnerNumberModel(1000000,
+				10000, 2000000000, 10000)));
+		btnMonteCarlo.addItemListener(e -> spnIteration
+				.setEnabled(btnMonteCarlo.isSelected()));
+		spnIteration.setEnabled(false);
+
+		panel.add(cbxDiagonalMove = new JCheckBox("No Diagonal Move"));
+
+		panel.add(new JLabel("Look and Feel"));
 		JComboBox<String> comboBox = new JComboBox<>(Arrays
 				.stream(UIManager.getInstalledLookAndFeels())
 				.map(LookAndFeelInfo::getName).toArray(String[]::new));
@@ -95,8 +102,7 @@ public class Settings {
 	public void commit() {
 		iDAStar = btnIDAStar.isSelected();
 		monteCarlo = btnMonteCarlo.isSelected();
-		uTurn = cbxUTurn.isSelected();
-		nullStart = cbxNullStart.isSelected();
+		iteration = (int) spnIteration.getValue();
 		diagonalMove = cbxDiagonalMove.isSelected();
 	}
 
@@ -106,8 +112,7 @@ public class Settings {
 	public void cancel() {
 		btnIDAStar.setSelected(iDAStar);
 		btnMonteCarlo.setSelected(monteCarlo);
-		cbxUTurn.setSelected(uTurn);
-		cbxNullStart.setSelected(nullStart);
+		spnIteration.setValue(iteration);
 		cbxDiagonalMove.setSelected(diagonalMove);
 	}
 
@@ -118,10 +123,8 @@ public class Settings {
 	 */
 	public PathFindingAlgorithm getAlgorithm() {
 		List<PathConstrain> list = new ArrayList<>();
-		if (uTurn)
-			list.add(new UTurnPathConstrain());
-		if (nullStart)
-			list.add(new NullStartPathConstrain());
+		list.add(new UTurnPathConstrain());
+		list.add(new NullStartPathConstrain());
 		if (diagonalMove)
 			list.add(new DiagonalMovePathConstrain());
 		if (iDAStar)
@@ -132,7 +135,7 @@ public class Settings {
 		if (monteCarlo)
 			return new MonteCarloPathFindingAlgorithm(
 					new LongComboCountingAlgorithm(),
-					new CompositePathConstrain(list));
+					new CompositePathConstrain(list), iteration);
 		throw new AssertionError("iDAStar || monteCarlo");
 	}
 }
