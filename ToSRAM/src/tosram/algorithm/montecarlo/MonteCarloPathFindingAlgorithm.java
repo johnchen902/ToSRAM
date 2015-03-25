@@ -29,10 +29,17 @@ public class MonteCarloPathFindingAlgorithm extends
 	private int maximumPossibleCombo;
 	private int highestValue = 0;
 	private int highestPossibleValue = 0;
+	private final int iterations;
 
 	public MonteCarloPathFindingAlgorithm(ComboCountingAlgorithm comboCounter,
 			PathConstrain constrain) {
+		this(comboCounter, constrain, Integer.MAX_VALUE);
+	}
+
+	public MonteCarloPathFindingAlgorithm(ComboCountingAlgorithm comboCounter,
+			PathConstrain constrain, int iterations) {
 		super(comboCounter, constrain);
+		this.iterations = iterations;
 	}
 
 	@Override
@@ -43,7 +50,7 @@ public class MonteCarloPathFindingAlgorithm extends
 		try {
 			MutableRuneMap m = initialMap.toMutable();
 			Root root = new Root(m);
-			while (!isStopped())
+			for (int i = 0; i < iterations && !isStopped(); i++)
 				root.select(m);
 		} catch (OutOfMemoryError e) {
 			e.printStackTrace();
