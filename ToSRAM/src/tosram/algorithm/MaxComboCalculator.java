@@ -7,16 +7,16 @@ import tosram.RuneMap;
 import tosram.RuneStone;
 
 /**
- * A utility computing maximum combo of a <code>RuneMap</code>
+ * A utility computing maximum combo of a <code>RuneMap</code>.
  * 
  * @author johnchen902
  */
-public class MaximumComboCalculator {
-	private MaximumComboCalculator() {
+public class MaxComboCalculator {
+	private MaxComboCalculator() {
 	}
 
 	/**
-	 * Get the maximum possible combo for the specified <code>RuneMap</code>
+	 * Get the maximum possible combo for the specified <code>RuneMap</code>.
 	 * 
 	 * @param map
 	 *            the specified <code>RuneMap</code>
@@ -25,8 +25,7 @@ public class MaximumComboCalculator {
 	public static int getMaxCombo(RuneMap map) {
 		return map.stream().filter(s -> s != RuneStone.UNKNOWN)
 				.collect(groupingBy(identity(), counting())).values().stream()
-				.mapToInt(MaximumComboCalculator::getMaxComboSingleElement)
-				.sum();
+				.mapToInt(MaxComboCalculator::getMaxComboSingleElement).sum();
 	}
 
 	private static int getMaxComboSingleElement(long count) {

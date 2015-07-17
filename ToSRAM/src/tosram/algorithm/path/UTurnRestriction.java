@@ -4,14 +4,15 @@ import java.util.List;
 
 import tosram.Direction;
 import tosram.MutableRuneMap;
-import tosram.algorithm.PathConstrain;
+import tosram.algorithm.PathRestriction;
 
 /**
- * A <code>PathConstrain</code> that forbids direct u-turn.
+ * Restriction which disallows U-turns i.e. consecutive opposite moves, which
+ * would be useless in most cases.
  * 
  * @author johnchen902
  */
-public class UTurnPathConstrain implements PathConstrain {
+public class UTurnRestriction implements PathRestriction {
 	@Override
 	public boolean canStart(int startingX, int startingY, MutableRuneMap map) {
 		return true;

@@ -18,16 +18,16 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import tosram.algorithm.LongComboCountingAlgorithm;
-import tosram.algorithm.PathConstrain;
-import tosram.algorithm.PathFindingAlgorithm;
+import tosram.algorithm.LongComboCounter;
+import tosram.algorithm.PathRestriction;
+import tosram.algorithm.PathFinder;
 import tosram.algorithm.idastar.ComboHeuristicCostEstimater;
-import tosram.algorithm.idastar.IDAStarPathFindingAlgorithm;
-import tosram.algorithm.montecarlo.MonteCarloPathFindingAlgorithm;
-import tosram.algorithm.path.CompositePathConstrain;
-import tosram.algorithm.path.DiagonalMovePathConstrain;
-import tosram.algorithm.path.NullStartPathConstrain;
-import tosram.algorithm.path.UTurnPathConstrain;
+import tosram.algorithm.idastar.IDAStarPathFinder;
+import tosram.algorithm.montecarlo.MonteCarloPathFinder;
+import tosram.algorithm.path.CompositeRestriction;
+import tosram.algorithm.path.DiagonalMoveRestriction;
+import tosram.algorithm.path.IdenticalStartRestriction;
+import tosram.algorithm.path.UTurnRestriction;
 
 /**
  * The Settings handler.
@@ -121,21 +121,19 @@ public class Settings {
 	 * 
 	 * @return a <code>PathFindingAlgorithm</code>
 	 */
-	public PathFindingAlgorithm getAlgorithm() {
-		List<PathConstrain> list = new ArrayList<>();
-		list.add(new UTurnPathConstrain());
-		list.add(new NullStartPathConstrain());
+	public PathFinder getAlgorithm() {
+		List<PathRestriction> list = new ArrayList<>();
+		list.add(new UTurnRestriction());
+		list.add(new IdenticalStartRestriction());
 		if (diagonalMove)
-			list.add(new DiagonalMovePathConstrain());
+			list.add(new DiagonalMoveRestriction());
 		if (iDAStar)
-			return new IDAStarPathFindingAlgorithm(
-					new LongComboCountingAlgorithm(),
-					new CompositePathConstrain(list),
+			return new IDAStarPathFinder(new LongComboCounter(),
+					CompositeRestriction.composite(list),
 					new ComboHeuristicCostEstimater());
 		if (monteCarlo)
-			return new MonteCarloPathFindingAlgorithm(
-					new LongComboCountingAlgorithm(),
-					new CompositePathConstrain(list), iteration);
+			return new MonteCarloPathFinder(new LongComboCounter(),
+					CompositeRestriction.composite(list), iteration);
 		throw new AssertionError("iDAStar || monteCarlo");
 	}
 }

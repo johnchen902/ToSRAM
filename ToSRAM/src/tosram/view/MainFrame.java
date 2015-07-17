@@ -18,7 +18,7 @@ import javax.swing.SwingWorker;
 
 import tosram.Path;
 import tosram.RuneMap;
-import tosram.algorithm.PathFindingAlgorithm;
+import tosram.algorithm.PathFinder;
 
 /**
  * The frame shown on the screen.
@@ -53,7 +53,7 @@ public class MainFrame extends JFrame {
 	private JButton btSettings;
 
 	private RuneMap runeMap;
-	private PathFindingAlgorithm algorithm;
+	private PathFinder algorithm;
 
 	public MainFrame() {
 		super("Tower of Savior Runestone Auto Mover");

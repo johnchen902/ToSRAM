@@ -7,14 +7,14 @@ import tosram.MutableRuneMap;
 import tosram.RuneStone;
 
 /**
- * An algorithm to count combo of a <code>MutableRuneMap</code>.
+ * An interface that analyze combo of a map.
  * 
  * @author johnchen902
  */
-public interface ComboCountingAlgorithm {
+public interface ComboCounter {
 
 	/**
-	 * The detail of a combo.
+	 * The detailed information about a combo.
 	 * 
 	 * @author johnchen902
 	 */
@@ -45,6 +45,7 @@ public interface ComboCountingAlgorithm {
 		 * 
 		 * @return a list of locations
 		 */
+		// XXX The order of points is irrelevant. Maybe use Set here.
 		public abstract List<Point> getPoints();
 
 		@Override
@@ -86,12 +87,11 @@ public interface ComboCountingAlgorithm {
 	}
 
 	/**
-	 * Count the combo of the <code>MutableRuneMap</code> under Tower of Savior
-	 * rules.
+	 * Analyze the combo of the specified map.
 	 * 
 	 * @param map
-	 *            the <code>MutableRuneMap</code>
-	 * @return the combo
+	 *            the map to analyze
+	 * @return the combo made by this map
 	 */
 	public List<Combo> countCombo(MutableRuneMap map);
 }

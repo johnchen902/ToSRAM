@@ -9,13 +9,13 @@ import tosram.MutableRuneMap;
 import tosram.RuneStone;
 
 /**
- * An implementation of {@link ComboCountingAlgorithm} using <code>long</code>
- * as a bitmask. However, it can only handle <code>MutableRuneMap</code> with
- * <code>((width + 1) * height) - 1 <= 64</code>
+ * An combo counter using <code>long</code> as bitmask under Tower of Savior
+ * rules. As <code>long</code> only has <code>64</code> bits, it can only handle
+ * maps satisfying <code>(width + 1) * height - 1 <= 64</code>.
  * 
  * @author johnchen902
  */
-public class LongComboCountingAlgorithm implements ComboCountingAlgorithm {
+public class LongComboCounter implements ComboCounter {
 
 	private static class ComboImpl extends Combo {
 
@@ -107,6 +107,11 @@ public class LongComboCountingAlgorithm implements ComboCountingAlgorithm {
 			return result;
 		}
 
+		/*
+		 * It is overridden to compute the same hash code without creating all
+		 * the objects. Not sure if it's really better but I'm not bothered to
+		 * revert it.
+		 */
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -146,14 +151,23 @@ public class LongComboCountingAlgorithm implements ComboCountingAlgorithm {
 		return Collections.unmodifiableList(comboList);
 	}
 
+	/*
+	 * Get the bit of a stone at the specified location.
+	 */
 	private static long getBit(int x, int y, int width) {
 		return 1L << (y * (width + 1) + x);
 	}
 
+	/*
+	 * Get the bit mask of a simple horizontal combo at the specified location.
+	 */
 	private static long horizontalMask(int x, int y, int width) {
 		return 0b111L << (y * (width + 1) + x);
 	}
 
+	/*
+	 * Find all horizontal combo and add them to comboList.
+	 */
 	private static void scanForHorizontalCombo(MutableRuneMap map,
 			List<Combo> comboList) {
 		int width = map.getWidth(), height = map.getHeight();
@@ -178,14 +192,23 @@ public class LongComboCountingAlgorithm implements ComboCountingAlgorithm {
 		}
 	}
 
+	/*
+	 * Get the bit mask of a simple vertical combo at (0, 0).
+	 */
 	private static long baseVerticalMask(int width) {
 		return 1L | 1L << (width + 1) | 1L << (width + 1) << (width + 1);
 	}
 
+	/*
+	 * Get the bit mask of a simple vertical combo at the specified location.
+	 */
 	private static long verticalMask(int x, int y, int width) {
 		return baseVerticalMask(width) << (y * (width + 1) + x);
 	}
 
+	/*
+	 * Find all vertical combo and add them to comboList.
+	 */
 	private static void scanForVerticalCombo(MutableRuneMap map,
 			List<Combo> comboList) {
 		int width = map.getWidth(), height = map.getHeight();
@@ -210,16 +233,25 @@ public class LongComboCountingAlgorithm implements ComboCountingAlgorithm {
 		}
 	}
 
+	/*
+	 * Get the mask including itself and its neighborhood.
+	 */
 	private static long neighborMask(long mask, int width) {
 		return mask << (width + 1) | mask << 1 | mask | mask >>> 1
 				| mask >>> (width + 1);
 	}
 
-	private static boolean needMerge(ComboImpl c1, ComboImpl c2) {
+	/*
+	 * Check if two combo should be merged to one.
+	 */
+	private static boolean shouldMerge(ComboImpl c1, ComboImpl c2) {
 		return c1.type == c2.type
 				&& (neighborMask(c1.mask, c1.width) & c2.mask) != 0;
 	}
 
+	/*
+	 * Merge all combo that should be merged.
+	 */
 	private static void mergeCombo(List<Combo> comboList, int from) {
 		for (int i = from; i < comboList.size(); i++) {
 			final ComboImpl c1 = (ComboImpl) comboList.get(i);
@@ -230,7 +262,7 @@ public class LongComboCountingAlgorithm implements ComboCountingAlgorithm {
 				merged = false;
 				for (int j = i + 1; j < comboList.size(); j++) {
 					ComboImpl c2 = (ComboImpl) comboList.get(j);
-					if (needMerge(c1, c2)) {
+					if (shouldMerge(c1, c2)) {
 						c1.mask |= c2.mask;
 						c2.mask = 0;
 						merged = true;
@@ -249,6 +281,10 @@ public class LongComboCountingAlgorithm implements ComboCountingAlgorithm {
 			((ComboImpl) comboList.get(i)).batch = batch;
 	}
 
+	/*
+	 * Remove stones in combo from the map, make remaining stones fall and fill
+	 * empty spots with unknown stones.
+	 */
 	private static MutableRuneMap dissolve(MutableRuneMap map,
 			List<Combo> comboList, int from) {
 		map = new MutableRuneMap(map);

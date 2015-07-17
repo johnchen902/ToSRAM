@@ -4,42 +4,52 @@ import java.util.List;
 
 import tosram.MutableRuneMap;
 import tosram.RuneMap;
-import tosram.algorithm.ComboCountingAlgorithm.Combo;
+import tosram.algorithm.ComboCounter.Combo;
 
 /**
- * The h-function used by IDA* algorithm.
+ * The h-function provided to {@link IDAStarPathFinder} to implement IDA*
+ * algorithm.
  * 
  * @author johnchen902
  */
 public interface HeuristicCostEstimater {
 
 	/**
-	 * Set the source state.
+	 * The caller is going to find a path for the specified map. It is designed
+	 * to do preprocessing work here.
 	 * 
 	 * @param map
-	 *            the source state
+	 *            the initial map
 	 */
-	public void setSourceState(RuneMap map);
+	public void setInitialMap(RuneMap map);
 
 	/**
-	 * Estimate heuristic cost to the destination state.
+	 * Estimate the cost required to move to the best possible map from the
+	 * provided map. This map is guaranteed to be achievable from the map
+	 * provided with the last {@link #setInitialMap(RuneMap)} call. As combo is
+	 * likely a required information, it is evaluated and provided by caller.
 	 * 
 	 * @param map
-	 *            the current state; should not be modified
+	 *            the map to be estimated; should not be modified or stored for
+	 *            future use
 	 * @param combo
-	 *            the combo already evaluated
-	 * @return Estimated heuristic cost
+	 *            the combo information of the provided map
+	 * @return the estimated cost
 	 */
-	public int estimateHeuristicCost(MutableRuneMap map, List<Combo> combo);
+	public int estimateCost(MutableRuneMap map, List<Combo> combo);
 
 	/**
-	 * Get the textual judgment of the destination state.
+	 * Get a user-friendly textual description of the provided map. This map is
+	 * guaranteed to be the map provided with the last
+	 * {@link #estimateCost(MutableRuneMap, List)} call. As combo is likely a
+	 * required information, it is evaluated and provided by caller.
 	 * 
 	 * @param map
-	 *            the current state; should not be modified
+	 *            the map to be described; should not be modified or stored for
+	 *            future use
 	 * @param combo
-	 *            the combo already evaluated
-	 * @return the textual judgment
+	 *            the combo information of the provided map
+	 * @return a user-friendly textual description
 	 */
 	public String describe(MutableRuneMap map, List<Combo> combo);
 }

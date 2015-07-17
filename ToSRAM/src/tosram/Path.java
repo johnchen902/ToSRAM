@@ -9,42 +9,31 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Path to move stones.
+ * Path, a starting point and a sequence of directions, representing moves made
+ * to a rune map. Guaranteed to be immutable.
  * 
  * @author johnchen902
  */
-public class Path {
+public final class Path {
 
 	private final Point beginPoint;
 	private final List<Direction> directions;
 
 	/**
-	 * Constructs a path beginning from the specified point, with the directions
-	 * specified by the list.
+	 * Constructs a path starting from the specified point and moving toward
+	 * directions specified by the list.
 	 * 
 	 * @param point
-	 *            the point the path begin with
+	 *            the point the path starts with
 	 * @param list
-	 *            the list of directions
+	 *            the list of directions moving toward
 	 * @throws NullPointerException
-	 *             if the specified point or collection is null
+	 *             if either argument is <code>null</code>
 	 */
 	public Path(Point point, Collection<Direction> list) {
 		this.beginPoint = new Point(point);
 		this.directions = Collections
 				.unmodifiableList(new ArrayList<Direction>(list));
-	}
-
-	/**
-	 * Copy constructor.
-	 * 
-	 * @param path
-	 *            the path to copy from
-	 * @throws NullPointerException
-	 *             if <code>path</code> is <code>null</code>
-	 */
-	public Path(Path path) {
-		this(path.beginPoint, path.directions);
 	}
 
 	/**
@@ -66,7 +55,7 @@ public class Path {
 	}
 
 	/**
-	 * Return if the points and the contents of underling list are equal.
+	 * Return if the starting points and the directions are equal.
 	 */
 	@Override
 	public boolean equals(Object obj) {
@@ -94,7 +83,7 @@ public class Path {
 	}
 
 	/**
-	 * Return what a map will be following the specified path.
+	 * Create a map by following the specified path.
 	 * 
 	 * @param map
 	 *            the original map
@@ -107,15 +96,15 @@ public class Path {
 	}
 
 	/**
-	 * Return what a map will be following the specified path for specified
-	 * steps.
+	 * Create a map by following the specified path for the specified number of
+	 * moves.
 	 * 
 	 * @param map
 	 *            the original map
 	 * @param path
 	 *            the specified path
 	 * @param steps
-	 *            the number of steps followed
+	 *            the number of moves followed
 	 * @return the map after following
 	 */
 	public static RuneMap follow(RuneMap map, Path path, int steps) {

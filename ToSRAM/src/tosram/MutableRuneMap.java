@@ -5,8 +5,9 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
- * A mutable matrix of RuneStone.
+ * A mutable matrix of rune stones.
  * 
+ * @see RuneMap
  * @author johnchen902
  */
 public class MutableRuneMap {
@@ -49,7 +50,7 @@ public class MutableRuneMap {
 	 * 
 	 * @return the width of this MutableRuneMap
 	 */
-	public int getWidth() {
+	public final int getWidth() {
 		return width;
 	}
 
@@ -58,7 +59,7 @@ public class MutableRuneMap {
 	 * 
 	 * @return the height of this MutableRuneMap
 	 */
-	public int getHeight() {
+	public final int getHeight() {
 		return height;
 	}
 
@@ -71,7 +72,7 @@ public class MutableRuneMap {
 	 *            the Y coordinate of the specified location
 	 * @return a {@code RuneStone}
 	 */
-	public RuneStone getRuneStone(int x, int y) {
+	public final RuneStone getRuneStone(int x, int y) {
 		if (!isInRange(x, y))
 			throw new IndexOutOfBoundsException();
 		return stones[y * width + x];
@@ -87,7 +88,7 @@ public class MutableRuneMap {
 	 * @param r
 	 *            a {@code RuneStone}
 	 */
-	public void setRuneStone(int x, int y, RuneStone r) {
+	public final void setRuneStone(int x, int y, RuneStone r) {
 		if (!isInRange(x, y))
 			throw new IndexOutOfBoundsException();
 		stones[y * width + x] = Objects.requireNonNull(r);
@@ -103,7 +104,7 @@ public class MutableRuneMap {
 	 *            the Y coordinate of the specified location
 	 * @return <code>true</code> if in range; <code>false</code> otherwise
 	 */
-	public boolean isInRange(int x, int y) {
+	public final boolean isInRange(int x, int y) {
 		return x >= 0 && x < width && y >= 0 && y < height;
 	}
 
@@ -119,7 +120,7 @@ public class MutableRuneMap {
 	 * @param y2
 	 *            the Y coordinate of the second stone
 	 */
-	public void swap(int x1, int y1, int x2, int y2) {
+	public final void swap(int x1, int y1, int x2, int y2) {
 		RuneStone stone1 = getRuneStone(x1, y1);
 		RuneStone stone2 = getRuneStone(x2, y2);
 		setRuneStone(x1, y1, stone2);
@@ -132,7 +133,7 @@ public class MutableRuneMap {
 	 * 
 	 * @return a <code>Stream</code> for this <code>MutableRuneMap</code>
 	 */
-	public Stream<RuneStone> stream() {
+	public final Stream<RuneStone> stream() {
 		return Arrays.stream(stones);
 	}
 

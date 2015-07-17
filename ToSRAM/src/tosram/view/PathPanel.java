@@ -46,12 +46,12 @@ public class PathPanel extends JPanel {
 	 *            the path shown; <code>null</code> if nothing is shown
 	 */
 	public void setPath(Path path) {
-		this.path = path == null ? path : new Path(path);
+		this.path = path;
 		updatePath();
 	}
 
 	public Path getPath() {
-		return path == null ? null : new Path(path);
+		return path;
 	}
 
 	/**

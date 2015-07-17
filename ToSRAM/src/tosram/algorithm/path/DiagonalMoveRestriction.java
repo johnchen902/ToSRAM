@@ -4,14 +4,15 @@ import java.util.List;
 
 import tosram.Direction;
 import tosram.MutableRuneMap;
-import tosram.algorithm.PathConstrain;
+import tosram.algorithm.PathRestriction;
 
 /**
- * A <code>PathConstrain</code> that forbids diagonal move.
+ * Restriction which disallows diagonal moves.
  * 
  * @author johnchen902
  */
-public class DiagonalMovePathConstrain implements PathConstrain {
+public class DiagonalMoveRestriction implements PathRestriction {
+
 	@Override
 	public boolean canStart(int startingX, int startingY, MutableRuneMap map) {
 		return true;
@@ -21,6 +22,6 @@ public class DiagonalMovePathConstrain implements PathConstrain {
 	public boolean canMove(int startingX, int startingY,
 			List<Direction> directions, Direction direction, int resultingX,
 			int resultingY, MutableRuneMap map) {
-		return direction.ordinal() < 4;
+		return !direction.isDiagonal();
 	}
 }

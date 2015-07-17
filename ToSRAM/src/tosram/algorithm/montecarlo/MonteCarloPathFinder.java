@@ -12,18 +12,21 @@ import tosram.Direction;
 import tosram.MutableRuneMap;
 import tosram.Path;
 import tosram.RuneMap;
-import tosram.algorithm.AbstractPathFindingAlgorithm;
-import tosram.algorithm.ComboCountingAlgorithm;
-import tosram.algorithm.MaximumComboCalculator;
-import tosram.algorithm.PathConstrain;
+import tosram.algorithm.AbstractPathFinder;
+import tosram.algorithm.ComboCounter;
+import tosram.algorithm.MaxComboCalculator;
+import tosram.algorithm.PathRestriction;
 
 /**
  * MonteCarlo Tree Search with Upper Confidence Bound.
  * 
  * @author johnchen902
  */
-public class MonteCarloPathFindingAlgorithm extends
-		AbstractPathFindingAlgorithm {
+/*
+ * I've already forgotten what the magic here is. Maybe you can find some
+ * information here: https://en.wikipedia.org/wiki/Monte_Carlo_tree_search
+ */
+public class MonteCarloPathFinder extends AbstractPathFinder {
 
 	private static final int VALUE_PER_COMBO = 10;
 	private int maximumPossibleCombo;
@@ -31,20 +34,19 @@ public class MonteCarloPathFindingAlgorithm extends
 	private int highestPossibleValue = 0;
 	private final int iterations;
 
-	public MonteCarloPathFindingAlgorithm(ComboCountingAlgorithm comboCounter,
-			PathConstrain constrain) {
-		this(comboCounter, constrain, Integer.MAX_VALUE);
+	public MonteCarloPathFinder(ComboCounter comboer, PathRestriction restrict) {
+		this(comboer, restrict, Integer.MAX_VALUE);
 	}
 
-	public MonteCarloPathFindingAlgorithm(ComboCountingAlgorithm comboCounter,
-			PathConstrain constrain, int iterations) {
-		super(comboCounter, constrain);
+	public MonteCarloPathFinder(ComboCounter comboer, PathRestriction restrict,
+			int iterations) {
+		super(comboer, restrict);
 		this.iterations = iterations;
 	}
 
 	@Override
 	protected void findPath(RuneMap initialMap) {
-		maximumPossibleCombo = MaximumComboCalculator.getMaxCombo(initialMap);
+		maximumPossibleCombo = MaxComboCalculator.getMaxCombo(initialMap);
 		highestValue = 0;
 		highestPossibleValue = maximumPossibleCombo * VALUE_PER_COMBO;
 		try {
@@ -59,13 +61,13 @@ public class MonteCarloPathFindingAlgorithm extends
 	}
 
 	private int evaluate(MutableRuneMap map, List<Direction> directions) {
-		int combo = comboCounter.countCombo(map).size();
+		int combo = countCombo(map).size();
 		int v = combo * VALUE_PER_COMBO - directions.size();
 		return Math.max(v, 0);
 	}
 
 	private String message(MutableRuneMap map, List<Direction> directions) {
-		int combo = comboCounter.countCombo(map).size();
+		int combo = countCombo(map).size();
 		return String.format("%d/%d Combo %d Move", combo,
 				maximumPossibleCombo, directions.size());
 	}
@@ -78,7 +80,7 @@ public class MonteCarloPathFindingAlgorithm extends
 			children = new HashMap<>();
 			for (int x = 0; x < map.getWidth(); x++)
 				for (int y = 0; y < map.getHeight(); y++)
-					if (constrain.canStart(x, y, map))
+					if (canStart(x, y, map))
 						children.put(new Point(x, y), new Node());
 		}
 
@@ -137,8 +139,7 @@ public class MonteCarloPathFindingAlgorithm extends
 
 		private void evaluate(MutableRuneMap map, int startX, int startY,
 				List<Direction> directions) {
-			value = MonteCarloPathFindingAlgorithm.this.evaluate(map,
-					directions);
+			value = MonteCarloPathFinder.this.evaluate(map, directions);
 			if (!directions.isEmpty() && value > highestValue) {
 				highestValue = value;
 				result(new Path(new Point(startX, startY), directions),
@@ -154,8 +155,7 @@ public class MonteCarloPathFindingAlgorithm extends
 				int x2 = x1 + d.getX(), y2 = y1 + d.getY();
 				if (!map.isInRange(x2, y2))
 					continue;
-				if (!constrain.canMove(startX, startY, directions, d, x2, y2,
-						map))
+				if (!canMove(startX, startY, directions, d, x2, y2, map))
 					continue;
 				children.put(d, new Node());
 			}
