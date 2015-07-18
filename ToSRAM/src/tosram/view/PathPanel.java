@@ -24,12 +24,16 @@ import tosram.Path;
 @SuppressWarnings("serial")
 public class PathPanel extends JPanel {
 
+	private static int MILLIS_PER_FRAME = 1000 / 60;
+	private static int MILLIS_PER_MOVE = 250;
+
 	private Path path;
 	private List<Point2D> points;
 	private Path2D path2d;
 	private double cellWidth = 50;
 	private double cellHeight = 50;
 	private Timer timer;
+	private long startingTime;
 	private double animation;
 
 	/**
@@ -81,13 +85,14 @@ public class PathPanel extends JPanel {
 					cellHeight, cellWidth / 8, cellHeight / 8);
 			path2d = PathCalculator.calculatePath(points);
 
+			startingTime = System.currentTimeMillis();
 			animation = 0.0;
-			timer = new Timer(1000 / 60, e -> {
+			timer = new Timer(MILLIS_PER_FRAME, e -> {
 				Point2D p1 = getAnimationPoint();
 
-				animation += 1.0 / 16;
-				if (animation > points.size() - 1)
-					animation = 0.0;
+				long elapsedTime = (System.currentTimeMillis() - startingTime);
+				double fullAni = (double) elapsedTime / MILLIS_PER_MOVE;
+				animation = fullAni % (points.size() - 1);
 
 				Point2D p2 = getAnimationPoint();
 				Rectangle r = new Rectangle();
@@ -136,6 +141,7 @@ public class PathPanel extends JPanel {
 	}
 
 	private Point2D getAnimationPoint() {
+		double animation = this.animation;
 		if (animation == (int) animation)
 			return points.get((int) animation);
 		Point2D prev = points.get((int) animation);
