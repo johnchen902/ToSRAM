@@ -21,7 +21,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import tosram.algorithm.LongComboCounter;
 import tosram.algorithm.PathRestriction;
 import tosram.algorithm.PathFinder;
-import tosram.algorithm.idastar.ComboHeuristicCostEstimater;
+import tosram.algorithm.idastar.ComboCostFunction;
 import tosram.algorithm.idastar.IDAStarPathFinder;
 import tosram.algorithm.montecarlo.MonteCarloPathFinder;
 import tosram.algorithm.path.CompositeRestriction;
@@ -130,7 +130,7 @@ public class Settings {
 		if (iDAStar)
 			return new IDAStarPathFinder(new LongComboCounter(),
 					CompositeRestriction.composite(list),
-					new ComboHeuristicCostEstimater());
+					new ComboCostFunction(3));
 		if (monteCarlo)
 			return new MonteCarloPathFinder(new LongComboCounter(),
 					CompositeRestriction.composite(list), iteration);

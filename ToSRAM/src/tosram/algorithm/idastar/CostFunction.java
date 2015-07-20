@@ -2,17 +2,18 @@ package tosram.algorithm.idastar;
 
 import java.util.List;
 
+import tosram.Direction;
 import tosram.MutableRuneMap;
 import tosram.RuneMap;
 import tosram.algorithm.ComboCounter.Combo;
 
 /**
- * The h-function provided to {@link IDAStarPathFinder} to implement IDA*
- * algorithm.
+ * The g-function and h-function provided to {@link IDAStarPathFinder} to
+ * implement IDA* algorithm.
  * 
  * @author johnchen902
  */
-public interface HeuristicCostEstimater {
+public interface CostFunction {
 
 	/**
 	 * The caller is going to find a path for the specified map. It is designed
@@ -22,6 +23,15 @@ public interface HeuristicCostEstimater {
 	 *            the initial map
 	 */
 	public void setInitialMap(RuneMap map);
+
+	/**
+	 * Determines the cost to make a move toward specified direction.
+	 *
+	 * @param direction
+	 *            the direction to move
+	 * @return the cost to make such move
+	 */
+	public int costOfMove(Direction direction);
 
 	/**
 	 * Estimate the cost required to move to the best possible map from the

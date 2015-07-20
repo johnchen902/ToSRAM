@@ -11,9 +11,7 @@ import tosram.Path;
 import tosram.RuneMap;
 import tosram.algorithm.AbstractPathFinder;
 import tosram.algorithm.ComboCounter;
-import tosram.algorithm.LongComboCounter;
 import tosram.algorithm.PathRestriction;
-import tosram.algorithm.path.UTurnRestriction;
 
 /**
  * Iterative-deepening A* algorithm.
@@ -22,7 +20,7 @@ import tosram.algorithm.path.UTurnRestriction;
  */
 public class IDAStarPathFinder extends AbstractPathFinder {
 
-	private final HeuristicCostEstimater estimater;
+	private final CostFunction costFunc;
 	private int minGUsed, minHFound;
 
 	/**
@@ -32,34 +30,23 @@ public class IDAStarPathFinder extends AbstractPathFinder {
 	 *            the algorithm to count combo
 	 * @param restrict
 	 *            the restriction about path
-	 * @param estimater
+	 * @param costFunc
 	 *            the h-function of this algorithm
 	 */
 	public IDAStarPathFinder(ComboCounter comboer, PathRestriction restrict,
-			HeuristicCostEstimater estimater) {
+			CostFunction costFunc) {
 		super(comboer, restrict);
-		this.estimater = Objects.requireNonNull(estimater);
+		this.costFunc = Objects.requireNonNull(costFunc);
 	}
 
-	/**
-	 * A constructor with default arguments.
-	 */
-	public IDAStarPathFinder() {
-		this(new LongComboCounter(), new UTurnRestriction(),
-				new ComboHeuristicCostEstimater());
-	}
-
-	/*
-	 * Returns the estimated cost of the map.
-	 */
 	private int costOf(MutableRuneMap map) {
-		return estimater.estimateCost(map, countCombo(map));
+		return costFunc.estimateCost(map, countCombo(map));
 	}
 
 	@Override
 	protected void findPath(RuneMap initialMap) {
 		minHFound = Integer.MAX_VALUE;
-		estimater.setInitialMap(initialMap);
+		costFunc.setInitialMap(initialMap);
 		MutableRuneMap map = initialMap.toMutable();
 		for (int limit = costOf(map); minHFound != 0 && !isStopped(); limit++)
 			for (int x = 0; x < map.getWidth(); x++)
@@ -77,7 +64,7 @@ public class IDAStarPathFinder extends AbstractPathFinder {
 		if ((h < minHFound || (h == minHFound && g < minGUsed))
 				&& !directions.isEmpty()) {
 			Path path = new Path(new Point(startX, startY), directions);
-			String descr = estimater.describe(map, countCombo(map));
+			String descr = costFunc.describe(map, countCombo(map));
 			descr += " " + directions.size() + " Move";
 			result(path, descr);
 
@@ -94,8 +81,8 @@ public class IDAStarPathFinder extends AbstractPathFinder {
 			map.swap(x1, y1, x2, y2);
 			directions.add(d);
 
-			findPath(map, limit, startX, startY, directions, x2, y2,
-					g + (d.isDiagonal() ? 2 : 1));
+			int cost = costFunc.costOfMove(d);
+			findPath(map, limit, startX, startY, directions, x2, y2, g + cost);
 
 			map.swap(x1, y1, x2, y2);
 			directions.remove(directions.size() - 1);
