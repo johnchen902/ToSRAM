@@ -4,8 +4,7 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 /**
- * An immutable matrix of rune stones. However, width and height cannot be
- * changed.
+ * An immutable matrix of rune stones.
  * 
  * @see MutableRuneMap
  * @author johnchen902
