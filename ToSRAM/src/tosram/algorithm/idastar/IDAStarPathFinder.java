@@ -33,8 +33,7 @@ public class IDAStarPathFinder extends AbstractPathFinder {
 	 * @param costFunc
 	 *            the h-function of this algorithm
 	 */
-	public IDAStarPathFinder(ComboCounter comboer, PathRestriction restrict,
-			CostFunction costFunc) {
+	public IDAStarPathFinder(ComboCounter comboer, PathRestriction restrict, CostFunction costFunc) {
 		super(comboer, restrict);
 		this.costFunc = Objects.requireNonNull(costFunc);
 	}
@@ -46,7 +45,6 @@ public class IDAStarPathFinder extends AbstractPathFinder {
 	@Override
 	protected void findPath(RuneMap initialMap) {
 		minHFound = Integer.MAX_VALUE;
-		costFunc.setInitialMap(initialMap);
 		MutableRuneMap map = initialMap.toMutable();
 		for (int limit = costOf(map); minHFound != 0 && !isStopped(); limit++)
 			for (int x = 0; x < map.getWidth(); x++)
@@ -56,13 +54,12 @@ public class IDAStarPathFinder extends AbstractPathFinder {
 	}
 
 	// The Recursion!
-	private void findPath(MutableRuneMap map, int limit, int startX,
-			int startY, List<Direction> directions, int x1, int y1, int g) {
+	private void findPath(MutableRuneMap map, int limit, int startX, int startY, List<Direction> directions, int x1,
+			int y1, int g) {
 		int h = costOf(map);
 		if (g + h > limit || isStopped())
 			return;
-		if ((h < minHFound || (h == minHFound && g < minGUsed))
-				&& !directions.isEmpty()) {
+		if ((h < minHFound || (h == minHFound && g < minGUsed)) && !directions.isEmpty()) {
 			Path path = new Path(new Point(startX, startY), directions);
 			String descr = costFunc.describe(map, countCombo(map));
 			descr += " " + directions.size() + " Move";

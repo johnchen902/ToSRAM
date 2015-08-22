@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -18,7 +19,16 @@ import javax.swing.SwingWorker;
 
 import tosram.Path;
 import tosram.RuneMap;
+import tosram.algorithm.LongComboCounter;
+import tosram.algorithm.MaxComboCalculator;
 import tosram.algorithm.PathFinder;
+import tosram.algorithm.PathRestriction;
+import tosram.algorithm.idastar.ComboCostFunction;
+import tosram.algorithm.idastar.IDAStarPathFinder;
+import tosram.algorithm.path.CompositeRestriction;
+import tosram.algorithm.path.DiagonalMoveRestriction;
+import tosram.algorithm.path.IdenticalStartRestriction;
+import tosram.algorithm.path.UTurnRestriction;
 
 /**
  * The frame containing most of the user interface of this program.
@@ -42,7 +52,6 @@ public class MainFrame extends JFrame {
 	private JLabel lbStatus;
 	private RuneMapTable tbStones;
 	private PathPanel pnPath;
-	private Settings settings;
 	private JButton btEdit;
 	private JButton btCompute;
 	private JButton btStop;
@@ -62,8 +71,6 @@ public class MainFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationByPlatform(true);
 		setVisible(true);
-
-		settings = new Settings();
 	}
 
 	private JPanel createMainPanel() {
@@ -117,7 +124,7 @@ public class MainFrame extends JFrame {
 
 			btSettings = new JButton(BUTTON_SETTINGS);
 			buttonsPanel.add(btSettings);
-			btSettings.addActionListener(e -> showSettings());
+			btSettings.addActionListener(e -> JOptionPane.showMessageDialog(this, "Under Refactoring"));
 		}
 		return pnMain;
 	}
@@ -158,8 +165,19 @@ public class MainFrame extends JFrame {
 
 		pnPath.setPath(null);
 		lbStatus.setText(STATUS_COMPUTING);
-		pathFinder = settings.getAlgorithm();
+
+		pathFinder = createPathFinder();
+
 		new ComputationWorker().execute();
+	}
+
+	private PathFinder createPathFinder() {
+		List<PathRestriction> list = new ArrayList<>();
+		list.add(new UTurnRestriction());
+		list.add(new IdenticalStartRestriction());
+		list.add(new DiagonalMoveRestriction());
+		return new IDAStarPathFinder(new LongComboCounter(), CompositeRestriction.composite(list),
+				new ComboCostFunction(3, MaxComboCalculator.getMaxCombo(runeMap)));
 	}
 
 	private void stopComputing() {
@@ -170,21 +188,10 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private void showSettings() {
-		Object editor = settings.getEditorPanel();
-		int result = JOptionPane.showConfirmDialog(this, editor, "Settings",
-				JOptionPane.OK_CANCEL_OPTION);
-		if (result == JOptionPane.OK_OPTION)
-			settings.commit();
-		else
-			settings.cancel();
-	}
-
 	private class ComputationWorker extends SwingWorker<Void, Object[]> {
 		@Override
 		protected Void doInBackground() {
-			pathFinder.findPath(runeMap,
-					(path, message) -> publish(new Object[] { path, message }));
+			pathFinder.findPath(runeMap, (path, message) -> publish(new Object[] { path, message }));
 			return null;
 		}
 

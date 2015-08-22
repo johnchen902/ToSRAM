@@ -4,9 +4,7 @@ import java.util.List;
 
 import tosram.Direction;
 import tosram.MutableRuneMap;
-import tosram.RuneMap;
 import tosram.algorithm.ComboCounter.Combo;
-import tosram.algorithm.MaxComboCalculator;
 
 /**
  * The cost function considering numbers of combo. A diagonal move cost twice as
@@ -17,21 +15,19 @@ import tosram.algorithm.MaxComboCalculator;
 public class ComboCostFunction implements CostFunction {
 
 	private final int factor;
-	private int maxCombo;
+	private final int maxCombo;
 
 	/**
 	 * A cost function assuming each combo worth the specified numbers of moves.
 	 * 
 	 * @param costPerCombo
 	 *            the number of moves each combo worths.
+	 * @param expectedCombo
+	 *            the number of combo expected
 	 */
-	public ComboCostFunction(int costPerCombo) {
+	public ComboCostFunction(int costPerCombo, int expectedCombo) {
 		this.factor = costPerCombo;
-	}
-
-	@Override
-	public void setInitialMap(RuneMap map) {
-		maxCombo = MaxComboCalculator.getMaxCombo(map);
+		this.maxCombo = expectedCombo;
 	}
 
 	@Override

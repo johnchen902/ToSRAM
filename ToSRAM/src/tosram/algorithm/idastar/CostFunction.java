@@ -16,15 +16,6 @@ import tosram.algorithm.ComboCounter.Combo;
 public interface CostFunction {
 
 	/**
-	 * The caller is going to find a path for the specified map. It is designed
-	 * to do preprocessing work here.
-	 * 
-	 * @param map
-	 *            the initial map
-	 */
-	public void setInitialMap(RuneMap map);
-
-	/**
 	 * Determines the cost to make a move toward specified direction.
 	 *
 	 * @param direction
