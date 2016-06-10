@@ -95,6 +95,7 @@ public class PathPanel extends JPanel {
 				r.setFrameFromCenter(r.getCenterX(), r.getCenterY(),
 						r.getMaxX() + 5, r.getMaxY() + 5);
 				repaint(r);
+				getToolkit().sync();
 			});
 			timer.start();
 		}
