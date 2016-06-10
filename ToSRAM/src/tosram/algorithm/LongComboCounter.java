@@ -255,20 +255,13 @@ public class LongComboCounter implements ComboCounter {
 	private static void mergeCombo(List<Combo> comboList, int from) {
 		for (int i = from; i < comboList.size(); i++) {
 			final ComboImpl c1 = (ComboImpl) comboList.get(i);
-			if (c1.mask == 0)
-				continue;
-			boolean merged;
-			do {
-				merged = false;
-				for (int j = i + 1; j < comboList.size(); j++) {
-					ComboImpl c2 = (ComboImpl) comboList.get(j);
-					if (shouldMerge(c1, c2)) {
-						c1.mask |= c2.mask;
-						c2.mask = 0;
-						merged = true;
-					}
+			for (int j = from; j < i; j++) {
+				final ComboImpl c2 = (ComboImpl) comboList.get(j);
+				if (shouldMerge(c1, c2)) {
+					c1.mask |= c2.mask;
+					c2.mask = 0;
 				}
-			} while (merged);
+			}
 		}
 	}
 
