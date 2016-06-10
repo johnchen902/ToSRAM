@@ -104,7 +104,7 @@ public class RuneMapTable extends JPanel {
 	 * @see #setRenderer(Renderer)
 	 */
 	public RuneMapTable(Renderer renderer) {
-		this(createEmptyMap(), renderer);
+		this(createSampleMap(), renderer);
 	}
 
 	/**
@@ -124,14 +124,41 @@ public class RuneMapTable extends JPanel {
 	 * <code>Renderer</code>.
 	 */
 	public RuneMapTable() {
-		this(createEmptyMap(), RuneLabel.factory());
+		this(createSampleMap(), RuneLabel.factory());
 	}
 
-	private static RuneMap createEmptyMap() {
+	private static RuneMap createSampleMap() {
 		MutableRuneMap m = new MutableRuneMap(6, 5);
-		for (int i = 0; i < m.getWidth(); i++)
-			for (int j = 0; j < m.getHeight(); j++)
-				m.setRuneStone(i, j, RuneStone.FIRE);
+		m.setRuneStone(0, 0, RuneStone.FIRE);
+		m.setRuneStone(1, 0, RuneStone.LIGHT);
+		m.setRuneStone(2, 0, RuneStone.LIGHT);
+		m.setRuneStone(3, 0, RuneStone.EARTH);
+		m.setRuneStone(4, 0, RuneStone.LIGHT);
+		m.setRuneStone(5, 0, RuneStone.DARK);
+		m.setRuneStone(0, 1, RuneStone.FIRE);
+		m.setRuneStone(1, 1, RuneStone.HEART);
+		m.setRuneStone(2, 1, RuneStone.EARTH);
+		m.setRuneStone(3, 1, RuneStone.FIRE);
+		m.setRuneStone(4, 1, RuneStone.WATER);
+		m.setRuneStone(5, 1, RuneStone.DARK);
+		m.setRuneStone(0, 2, RuneStone.DARK);
+		m.setRuneStone(1, 2, RuneStone.DARK);
+		m.setRuneStone(2, 2, RuneStone.LIGHT);
+		m.setRuneStone(3, 2, RuneStone.EARTH);
+		m.setRuneStone(4, 2, RuneStone.EARTH);
+		m.setRuneStone(5, 2, RuneStone.WATER);
+		m.setRuneStone(0, 3, RuneStone.LIGHT);
+		m.setRuneStone(1, 3, RuneStone.HEART);
+		m.setRuneStone(2, 3, RuneStone.HEART);
+		m.setRuneStone(3, 3, RuneStone.LIGHT);
+		m.setRuneStone(4, 3, RuneStone.HEART);
+		m.setRuneStone(5, 3, RuneStone.DARK);
+		m.setRuneStone(0, 4, RuneStone.HEART);
+		m.setRuneStone(1, 4, RuneStone.HEART);
+		m.setRuneStone(2, 4, RuneStone.DARK);
+		m.setRuneStone(3, 4, RuneStone.EARTH);
+		m.setRuneStone(4, 4, RuneStone.FIRE);
+		m.setRuneStone(5, 4, RuneStone.LIGHT);
 		return new RuneMap(m);
 	}
 
